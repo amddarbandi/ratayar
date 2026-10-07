@@ -1,9 +1,19 @@
-import { IsString, IsNotEmpty, Length, Matches, IsOptional, IsDateString, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  Length,
+  Matches,
+  IsOptional,
+  IsDateString,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterDto {
   @IsString()
   @IsNotEmpty()
-  @Matches(/^09[0-9]{9}$/, { message: 'شماره موبایل باید با ۰۹ شروع و ۱۱ رقم باشد' })
+  @Matches(/^09[0-9]{9}$/, {
+    message: 'شماره موبایل باید با ۰۹ شروع و ۱۱ رقم باشد',
+  })
   phone: string;
 
   @IsString()
@@ -20,8 +30,9 @@ export class RegisterDto {
   @IsDateString()
   birthDate?: string;
 
-  @IsOptional()
+  // 🔒 SEC-002: کد OTP اجباری است (نه اختیاری)
   @IsString()
-  @Length(6, 6)
-  otpCode?: string;
+  @IsNotEmpty({ message: 'کد تایید الزامی است' })
+  @Length(6, 6, { message: 'کد تایید باید ۶ رقمی باشد' })
+  otpCode: string;
 }

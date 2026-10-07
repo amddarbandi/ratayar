@@ -71,6 +71,7 @@ export default function RegisterPage() {
         phone,
         password,
         fullName,
+        otpCode: otp,
       });
       setAuth(data.user, data.accessToken, data.refreshToken);
       toast.success('خوش آمدید! 🎉');
