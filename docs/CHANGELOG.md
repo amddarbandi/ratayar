@@ -20,6 +20,27 @@
 
 ---
 
+## [0.95.4] — 2026-10-08
+
+### Fixed
+- **SEC-004**: Backup codes TTL
+  - `settings.service.ts`: در `verify2FA`، TTL از `0` (بی‌نهایت) به `365 روز` تغییر کرد
+  - `settings.service.ts`: در `regenerateBackupCodes`، همان تغییر
+  - الگو: `365 * 24 * 60 * 60` (31,536,000 ثانیه)
+
+### Verified
+- `tsc --noEmit` = ۰ خطا
+- `pnpm build` = موفق
+- `pm2 restart zarvan-api` = موفق
+- health = 200
+
+### Known Issues (باقی‌مانده)
+- SEC-003: 2FA در login چک نمی‌شود
+- SEC-005: Change password check
+- (لیست کامل در `docs/KNOWN-ISSUES.md`)
+
+---
+
 ## [0.95.3] — 2026-10-08
 
 ### Fixed

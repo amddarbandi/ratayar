@@ -15,13 +15,6 @@
 - **راه‌حل:** در `login()`, اگر `user.twoFaEnabled`, کد TOTP را verify کن
 - **وضعیت:** 🔴 Open
 
-### SEC-004: Backup codes هرگز expire نمی‌شوند
-- **فایل:** `apps/api/src/modules/settings/settings.service.ts`
-- **مشکل:** `redis.set('2fa-backup:${userId}', ..., 0)` — TTL=0 یعنی بدون انقضا
-- **تأثیر:** کدهای پشتیبان برای همیشه معتبر می‌مانند
-- **راه‌حل:** جایگزینی `0` با مقدار معقول (مثلاً یک سال)
-- **وضعیت:** 🔴 Open
-
 ### SEC-005: Change password Redis key چک نمی‌شود
 - **فایل:** `apps/api/src/modules/settings/settings.service.ts` + `auth/strategies/jwt.strategy.ts`
 - **مشکل:** کلید `pwd-changed:${userId}` ست می‌شود ولی هیچ‌جا چک نمی‌شود
@@ -160,6 +153,19 @@
 ---
 
 ## ✅ Resolved
+
+### SEC-004: Backup codes TTL — ✅ 2026-10-08
+- **رفع با:** branch `fix/sec-004-backup-ttl` (merged به main)
+- **Merge commit:** `522f573`
+- **Tag:** `v0.95.4`
+- **فایل تغییر یافته:** `apps/api/src/modules/settings/settings.service.ts` (+5/-2)
+- **جزئیات:**
+  - در `verify2FA`: `redis.set(..., 0)` → `redis.set(..., 365 * 24 * 60 * 60)`
+  - در `regenerateBackupCodes`: همان تغییر
+  - کدهای پشتیبان حالا بعد از ۱ سال expire می‌شوند
+- **Verification:**
+  - `tsc --noEmit` = ۰ خطا
+  - `pnpm build` = موفق
 
 ### SEC-002: Register OTP verification — ✅ 2026-10-08
 - **رفع با:** branch `fix/sec-002-register-otp` (merged به main)
