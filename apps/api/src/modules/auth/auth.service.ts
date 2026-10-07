@@ -9,6 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import * as speakeasy from 'speakeasy';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RedisService } from '../../common/redis/redis.service';
 import { RegisterDto } from './dto/register.dto';
@@ -100,6 +101,41 @@ export class AuthService {
     if (!isValid) {
       await this.recordFailedLogin(dto.phone);
       throw new UnauthorizedException('شماره موبایل یا رمز عبور اشتباه است');
+    }
+
+    // 🔒 SEC-003: چک 2FA
+    if (user.twoFaEnabled) {
+      // مرحله ۱: اگر کد 2FA ارسال نشده، درخواست کد کن
+      if (!dto.twoFaCode) {
+        return {
+          requires2FA: true,
+          phone: user.phone,
+          message: 'کد ورود دو مرحله‌ای را وارد کنید',
+        };
+      }
+
+      // مرحله ۲: secret باید موجود باشد
+      if (!user.twoFaSecret) {
+        this.logger.error(
+          `2FA enabled but secret missing for user ${user.phone}`,
+        );
+        throw new UnauthorizedException(
+          'خطای پیکربندی 2FA. لطفاً با پشتیبانی تماس بگیرید',
+        );
+      }
+
+      // مرحله ۳: verify TOTP با پنجره ±30 ثانیه
+      const isValid2FA = speakeasy.totp.verify({
+        secret: user.twoFaSecret,
+        encoding: 'base32',
+        token: dto.twoFaCode,
+        window: 1,
+      });
+
+      if (!isValid2FA) {
+        await this.recordFailedLogin(dto.phone);
+        throw new UnauthorizedException('کد ورود دو مرحله‌ای اشتباه است');
+      }
     }
 
     // ✅ ورود موفق - پاک کردن failed attempts
