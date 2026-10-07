@@ -3,17 +3,11 @@
 لیست باگ‌ها و مشکلات شناخته‌شده، به‌ترتیب اولویت.
 
 **آخرین به‌روزرسانی:** 2026-10-08
+**وضعیت امنیتی:** 🎉 همه ۵ باگ Critical رفع شد (SEC-001 تا SEC-005)
 
 ---
 
 ## 🔴 Critical — فوری
-
-### SEC-005: Change password Redis key چک نمی‌شود
-- **فایل:** `apps/api/src/modules/settings/settings.service.ts` + `auth/strategies/jwt.strategy.ts`
-- **مشکل:** کلید `pwd-changed:${userId}` ست می‌شود ولی هیچ‌جا چک نمی‌شود
-- **تأثیر:** tokenهای قدیمی بعد از تغییر رمز همچنان معتبر
-- **راه‌حل:** در `jwt.validate`, چک کن `pwd-changed` key وجود دارد یا نه
-- **وضعیت:** 🔴 Open
 
 ---
 
@@ -146,6 +140,23 @@
 ---
 
 ## ✅ Resolved
+
+### SEC-005: Invalidate tokens after password change — ✅ 2026-10-08
+- **رفع با:** branch `fix/sec-005-pwd-changed` (merged به main)
+- **Merge commit:** `2431bf2`
+- **Tag:** `v0.95.6`
+- **فایل‌های تغییر یافته:**
+  - `apps/api/src/modules/auth/strategies/jwt.strategy.ts` (+20)
+  - `apps/api/src/modules/auth/auth.service.ts` (+20/-1)
+- **جزئیات:**
+  - `jwt.strategy.validate`: `pwd-changed:{userId}` چک می‌شود
+  - مقایسه `pwdChangedAtMs > tokenIssuedAtMs`
+  - `refreshToken`: همان چک روی `payload.sub`
+  - پیام دقیق: `'رمز عبور تغییر کرده است. لطفاً دوباره وارد شوید'`
+- **Verification:**
+  - ۷ سناریو end-to-end موفق
+  - old access/refresh → 401 بعد از تغییر رمز
+  - login با رمز جدید → 200
 
 ### SEC-003: 2FA enforcement on login — ✅ 2026-10-08
 - **رفع با:** branch `fix/sec-003-login-2fa` (merged به main)

@@ -20,6 +20,54 @@
 
 ---
 
+## [0.95.6] — 2026-10-08
+
+### 🔒 Milestone: All 5 Critical Security Bugs Resolved
+
+این نسخه، **پنجمین و آخرین** باگ امنیتی سطح Critical را می‌بندد.
+از این نقطه، پروژه در برابر ۵ آسیب‌پذیری اصلی امنیتی محافظت می‌شود.
+
+### Fixed
+- **SEC-005**: Invalidate tokens after password change
+  - `jwt.strategy.ts`:
+    - `RedisService` تزریق شد
+    - در `validate()`، `pwd-changed:{userId}` چک می‌شود
+    - مقایسه timestamp تغییر رمز با `payload.iat` (به milliseconds)
+    - پیام دقیق: `'رمز عبور تغییر کرده است. لطفاً دوباره وارد شوید'`
+  - `auth.service.ts` (`refreshToken`):
+    - همان چک روی refresh token
+    - حفظ پیام دقیق با `try/catch + instanceof UnauthorizedException`
+
+### Verified
+- `tsc --noEmit` = ۰ خطا
+- `pnpm build` = موفق
+- ۷ سناریو end-to-end:
+  1. login → user + tokens ✅
+  2. old access token → 200 (قبل تغییر رمز) ✅
+  3. change password → success ✅
+  4. old access token → **401** (باطل شد) ✅
+  5. old refresh token → **401** (باطل شد) ✅
+  6. login با رمز جدید → 200 ✅
+  7. بازگرداندن رمز → success ✅
+
+### Summary — تمام باگ‌های Critical
+| ID | باگ | Tag | وضعیت |
+|---|---|---|---|
+| SEC-001 | OTP code exposure | v0.95.2 | ✅ |
+| SEC-002 | Register OTP verify | v0.95.3 | ✅ |
+| SEC-003 | 2FA enforcement on login | v0.95.5 | ✅ |
+| SEC-004 | Backup codes TTL | v0.95.4 | ✅ |
+| SEC-005 | Invalidate tokens after pwd change | v0.95.6 | ✅ |
+
+### Known Issues (باقی‌مانده — غیر Critical)
+- SEC-006: Token در localStorage (XSS-prone) — معماری، نیاز به تغییر بزرگ
+- API-001 تا API-012: باگ‌های منطقی/عملکردی
+- WEB-001 تا WEB-005: بهبودهای UI
+- ARCH-001: `packages/*` خالی
+- (لیست کامل در `docs/KNOWN-ISSUES.md`)
+
+---
+
 ## [0.95.5] — 2026-10-08
 
 ### Fixed
