@@ -20,6 +20,30 @@
 
 ---
 
+## [0.95.2] — 2026-10-08
+
+### Fixed
+- **SEC-001**: OTP code exposure در production
+  - `.env`: `DEV_OTP_ENABLED=false`
+  - `auth.service.ts`: کد OTP فقط در `NODE_ENV=development` و `DEV_OTP_ENABLED=true` نمایش داده می‌شود
+  - Defense in depth: دو لایه محافظت مستقل
+  - لاگ حرفه‌ای: نمایش جزئی شماره (`0912***099`) به‌جای کد کامل
+
+### Verified
+- `tsc --noEmit` = ۰ خطا
+- `pnpm build` = موفق
+- API test: پاسخ `send-otp` بدون فیلد `code`
+- Log format: `📱 OTP sent for 0912***099`
+
+### Known Issues (باقی‌مانده)
+- SEC-002: Register OTP verify نمی‌شود
+- SEC-003: 2FA در login چک نمی‌شود
+- SEC-004: Backup codes TTL=0
+- SEC-005: Change password check
+- (لیست کامل در `docs/KNOWN-ISSUES.md`)
+
+---
+
 ## [0.95.1] — 2026-10-08
 
 ### Fixed

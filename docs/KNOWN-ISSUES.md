@@ -8,11 +8,6 @@
 
 ## 🔴 Critical — فوری
 
-### SEC-001: `DEV_OTP_ENABLED=true` در production
-- **تأثیر:** کد OTP در پاسخ API برمی‌گردد → هر کسی می‌تواند وارد شود
-- **راه‌حل:** `.env` → `DEV_OTP_ENABLED=false`
-- **وضعیت:** 🔴 Open
-
 ### SEC-002: Register OTP verify نمی‌شود
 - **فایل:** `apps/api/src/modules/auth/auth.service.ts`
 - **مشکل:** `RegisterDto.otpCode` دریافت می‌شود ولی استفاده نمی‌شود
@@ -172,6 +167,21 @@
 ---
 
 ## ✅ Resolved
+
+### SEC-001: OTP code exposure در production — ✅ 2026-10-08
+- **رفع با:** branch `fix/sec-001-otp` (merged به main)
+- **Merge commit:** `ccf57d9`
+- **Tag:** `v0.95.2`
+- **فایل‌های تغییر یافته:** `apps/api/src/modules/auth/auth.service.ts` (+12/-3), `.env`
+- **جزئیات:**
+  - `.env`: `DEV_OTP_ENABLED=true` → `false`
+  - `auth.service.ts`: شرط `NODE_ENV === 'development' && DEV_OTP_ENABLED` برای نمایش کد
+  - Defense in depth: حتی اگر `.env` اشتباهاً تغییر کند، در production کد نمایش داده نمی‌شود
+  - لاگ امن: `📱 OTP sent for 0912***099` (بدون کد کامل)
+- **Verification:**
+  - `tsc --noEmit` = ۰ خطا
+  - `pnpm build` = موفق
+  - API test: پاسخ بدون فیلد `code`
 
 ### BUILD-001: دو خطای import در `documents/page.tsx` — ✅ 2026-10-08
 - **رفع با:** branch `fix/build-v0.95` (merged به main)
