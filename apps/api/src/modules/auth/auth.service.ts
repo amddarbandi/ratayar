@@ -224,17 +224,35 @@ export class AuthService {
         secret: this.config.get('JWT_SECRET'),
       });
 
+      // 🔒 بررسی blacklist
       const blacklistKey = `blacklist:${payload.jti}`;
       const isBlacklisted = await this.redis.exists(blacklistKey);
       if (isBlacklisted) {
         throw new UnauthorizedException('توکن منقضی شده است');
       }
 
+      // 🔒 SEC-005: invalidate refresh توکن‌های صادرشده قبل از تغییر رمز
+      const pwdChangedAtRaw = await this.redis.get(`pwd-changed:${payload.sub}`);
+      if (pwdChangedAtRaw) {
+        const pwdChangedAtMs = parseInt(pwdChangedAtRaw, 10);
+        const tokenIssuedAtMs = (payload.iat || 0) * 1000;
+
+        if (pwdChangedAtMs > tokenIssuedAtMs) {
+          throw new UnauthorizedException(
+            'رمز عبور تغییر کرده است. لطفاً دوباره وارد شوید',
+          );
+        }
+      }
+
       const tokens = await this.generateTokens(payload.sub, payload.phone);
       await this.redis.set(blacklistKey, 'true', 30 * 24 * 60 * 60);
 
       return tokens;
-    } catch {
+    } catch (err) {
+      // اگر خطای مورد انتظار ما بود، دوباره پرتاب کن (پیام دقیق)
+      if (err instanceof UnauthorizedException) {
+        throw err;
+      }
       throw new UnauthorizedException('توکن نامعتبر است');
     }
   }
