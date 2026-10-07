@@ -132,13 +132,22 @@ export class AuthService {
     await this.redis.incr(rateLimitKey);
     await this.redis.expire(rateLimitKey, 3600);
 
-    const devMode = this.config.get('DEV_OTP_ENABLED') === 'true';
-    this.logger.log(`📱 DEV_OTP_ENABLED = ${devMode}, code = ${code}`);
+    // 🔒 فقط در environment development و اگر DEV_OTP_ENABLED=true باشد، کد برمی‌گردد
+    // در production، حتی اگر DEV_OTP_ENABLED=true باشد، کد نمایش داده نمی‌شود.
+    const nodeEnv = this.config.get<string>('NODE_ENV', 'development');
+    const devOtpEnabled = this.config.get('DEV_OTP_ENABLED') === 'true';
+    const showCode = nodeEnv === 'development' && devOtpEnabled;
+
+    if (showCode) {
+      this.logger.warn(`📱 [DEV ONLY] OTP for ${phone}: ${code}`);
+    } else {
+      this.logger.log(`📱 OTP sent for ${phone.slice(0, 4)}***${phone.slice(-3)}`);
+    }
 
     return {
       success: true,
       message: 'کد تایید ارسال شد',
-      code: devMode ? code : undefined,
+      ...(showCode && { code }),
     };
   }
 
