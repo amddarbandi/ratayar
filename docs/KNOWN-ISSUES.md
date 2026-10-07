@@ -8,13 +8,6 @@
 
 ## 🔴 Critical — فوری
 
-### SEC-002: Register OTP verify نمی‌شود
-- **فایل:** `apps/api/src/modules/auth/auth.service.ts`
-- **مشکل:** `RegisterDto.otpCode` دریافت می‌شود ولی استفاده نمی‌شود
-- **تأثیر:** هر کد ۶ رقمی (یا هیچ کد) قبول می‌شود
-- **راه‌حل:** قبل از `prisma.user.create`, `verifyOtp` صدا زده شود
-- **وضعیت:** 🔴 Open
-
 ### SEC-003: 2FA در login چک نمی‌شود
 - **فایل:** `apps/api/src/modules/auth/auth.service.ts`
 - **مشکل:** `LoginDto.twoFaCode` وجود دارد ولی در `login()` بررسی نمی‌شود
@@ -167,6 +160,26 @@
 ---
 
 ## ✅ Resolved
+
+### SEC-002: Register OTP verification — ✅ 2026-10-08
+- **رفع با:** branch `fix/sec-002-register-otp` (merged به main)
+- **Merge commit:** `8f088b8`
+- **Tag:** `v0.95.3`
+- **فایل‌های تغییر یافته:**
+  - `apps/api/src/modules/auth/dto/register.dto.ts` (+16/-5)
+  - `apps/api/src/modules/auth/auth.service.ts` (+10/-0)
+  - `apps/web/src/lib/api.ts` (+1/-1)
+  - `apps/web/src/app/(auth)/register/page.tsx` (+1/-0)
+- **جزئیات:**
+  - `otpCode` در RegisterDto از `@IsOptional` به `@IsNotEmpty + @IsString + @Length(6,6)` تغییر کرد
+  - در `register()`, `verifyOtp(phone, otpCode)` قبل از `prisma.user.create`
+  - `verifyOtp` کد را از Redis پاک می‌کند (یکبار مصرف)
+  - Frontend `otpCode` را از state `otp` می‌فرستد
+- **Verification:**
+  - API tests: 400 بدون کد / 400 کد غلط / 201 کد درست / 409 تکراری
+  - End-to-end از فرانت: موفق
+  - `tsc --noEmit` = ۰ خطا
+  - `pnpm build` = موفق
 
 ### SEC-001: OTP code exposure در production — ✅ 2026-10-08
 - **رفع با:** branch `fix/sec-001-otp` (merged به main)

@@ -20,6 +20,31 @@
 
 ---
 
+## [0.95.3] — 2026-10-08
+
+### Fixed
+- **SEC-002**: Register OTP verification
+  - `register.dto.ts`: `otpCode` از `@IsOptional` به اجباری تغییر کرد
+  - `auth.service.ts`: در `register()`, `verifyOtp()` قبل از `prisma.user.create` صدا زده می‌شود
+  - `lib/api.ts`: type `authApi.register` به‌روز شد
+  - `register/page.tsx`: `otpCode: otp` ارسال می‌شود
+  - Redis: کد بعد از verify پاک می‌شود (یکبار مصرف)
+
+### Verified
+- `tsc --noEmit` = ۰ خطا
+- `pnpm build` = موفق (web + api)
+- API tests: 400 بدون کد / 400 کد غلط / 201 کد درست / 409 تکراری
+- End-to-end: OTP sent → register → user + tokens
+- Log: `📱 OTP sent for 0912***850` → `✅ User registered`
+
+### Known Issues (باقی‌مانده)
+- SEC-003: 2FA در login چک نمی‌شود
+- SEC-004: Backup codes TTL=0
+- SEC-005: Change password check
+- (لیست کامل در `docs/KNOWN-ISSUES.md`)
+
+---
+
 ## [0.95.2] — 2026-10-08
 
 ### Fixed
