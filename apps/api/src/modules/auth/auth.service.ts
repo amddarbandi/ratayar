@@ -26,6 +26,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    // ۱. چک تکراری نبودن شماره موبایل
     const existing = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
     });
@@ -34,6 +35,15 @@ export class AuthService {
       throw new ConflictException('این شماره موبایل قبلاً ثبت شده است');
     }
 
+    // 🔒 SEC-002: verify OTP قبل از ساخت کاربر
+    // اگر کد اشتباه/منقضی باشد، BadRequestException می‌دهد
+    // اگر درست باشد، کد را از Redis پاک می‌کند (یکبار مصرف)
+    if (!dto.otpCode) {
+      throw new BadRequestException('کد تایید الزامی است');
+    }
+    await this.verifyOtp(dto.phone, dto.otpCode);
+
+    // ۲. hash password
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
     const user = await this.prisma.user.create({
