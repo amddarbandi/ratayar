@@ -135,10 +135,12 @@ export class SettingsService {
       Math.random().toString(36).substring(2, 10).toUpperCase(),
     );
 
+    // SEC-004: کدهای پشتیبان با TTL یک‌ساله (۳۱۵۳۶۰۰۰ ثانیه)
+    // پیش‌تر TTL=0 بود که یعنی هرگز expire نمی‌شدند.
     await this.redis.set(
       `2fa-backup:${userId}`,
       JSON.stringify(backupCodes),
-      0, // no expiry
+      365 * 24 * 60 * 60, // 1 year
     );
 
     await this.redis.del(`2fa-setup:${userId}`);
@@ -207,10 +209,11 @@ export class SettingsService {
       Math.random().toString(36).substring(2, 10).toUpperCase(),
     );
 
+    // SEC-004: کدهای پشتیبان با TTL یک‌ساله (۳۱۵۳۶۰۰۰ ثانیه)
     await this.redis.set(
       `2fa-backup:${userId}`,
       JSON.stringify(backupCodes),
-      0,
+      365 * 24 * 60 * 60, // 1 year
     );
 
     return { codes: backupCodes };
