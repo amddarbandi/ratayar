@@ -8,13 +8,6 @@
 
 ## 🔴 Critical — فوری
 
-### SEC-003: 2FA در login چک نمی‌شود
-- **فایل:** `apps/api/src/modules/auth/auth.service.ts`
-- **مشکل:** `LoginDto.twoFaCode` وجود دارد ولی در `login()` بررسی نمی‌شود
-- **تأثیر:** کاربر با 2FA فعال می‌تواند بدون کد وارد شود
-- **راه‌حل:** در `login()`, اگر `user.twoFaEnabled`, کد TOTP را verify کن
-- **وضعیت:** 🔴 Open
-
 ### SEC-005: Change password Redis key چک نمی‌شود
 - **فایل:** `apps/api/src/modules/settings/settings.service.ts` + `auth/strategies/jwt.strategy.ts`
 - **مشکل:** کلید `pwd-changed:${userId}` ست می‌شود ولی هیچ‌جا چک نمی‌شود
@@ -153,6 +146,26 @@
 ---
 
 ## ✅ Resolved
+
+### SEC-003: 2FA enforcement on login — ✅ 2026-10-08
+- **رفع با:** branch `fix/sec-003-login-2fa` (merged به main)
+- **Merge commit:** `0ad7199`
+- **Tag:** `v0.95.5`
+- **فایل‌های تغییر یافته:**
+  - `apps/api/src/modules/auth/auth.service.ts` (+36)
+  - `apps/api/src/modules/auth/dto/login.dto.ts` (+5/-5)
+  - `apps/web/src/lib/api.ts` (+1/-1)
+  - `apps/web/src/app/(auth)/login/page.tsx` (+180/-53)
+- **جزئیات:**
+  - Backend: TOTP verify با speakeasy (`window: 1` = ±30s)
+  - Backend: بازگرداندن `{requires2FA: true, phone}` در مرحله اول
+  - Frontend: login دو مرحله‌ای (`credentials` → `twoFa`)
+  - Defense: کد غلط → `recordFailedLogin` (lockout هم‌چنان فعال)
+- **Verification:**
+  - tsc = ۰ خطا (api + web)
+  - pnpm build = موفق
+  - API tests: ۴ سناریو موفق
+  - End-to-end از فرانت: (تست مرورگر در فاز بعد)
 
 ### SEC-004: Backup codes TTL — ✅ 2026-10-08
 - **رفع با:** branch `fix/sec-004-backup-ttl` (merged به main)

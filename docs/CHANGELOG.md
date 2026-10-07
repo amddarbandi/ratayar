@@ -20,6 +20,42 @@
 
 ---
 
+## [0.95.5] — 2026-10-08
+
+### Fixed
+- **SEC-003**: 2FA enforcement on login
+  - Backend (`auth.service.ts`):
+    - `import * as speakeasy from 'speakeasy'` اضافه شد
+    - در `login()`، اگر `user.twoFaEnabled`:
+      - بدون `twoFaCode` → `{requires2FA: true, phone}`
+      - `twoFaSecret` نبود → 401 config error
+      - TOTP verify با پنجره `±30s` (`window: 1`)
+      - کد غلط → `recordFailedLogin` + 401
+  - Backend (`login.dto.ts`): `@Length(6, 6)` روی `twoFaCode`
+  - Frontend (`lib/api.ts`): type `login` شامل `twoFaCode?: string`
+  - Frontend (`login/page.tsx`): دو مرحله‌ای شد
+    - `step: 'credentials' | 'twoFa'`
+    - مرحله ۱: phone + password → اگر `requires2FA` → مرحله ۲
+    - مرحله ۲: کد ۶ رقمی TOTP
+    - دکمه بازگشت به مرحله قبل
+
+### Verified
+- `tsc --noEmit` = ۰ خطا (api + web)
+- `pnpm build` = موفق هر دو
+- API tests: ۴ سناریو موفق
+  1. user 2FA + بدون کد → `requires2FA: true`
+  2. user 2FA + کد غلط → 401
+  3. user 2FA + کد درست → user + tokens + `twoFaEnabled: true`
+  4. user بدون 2FA → user + tokens (بدون `requires2FA`)
+- Log: `WARN Failed login attempt 1` → `✅ User logged in`
+- `pm2 restart` = موفق
+
+### Known Issues (باقی‌مانده)
+- SEC-005: Change password Redis key چک نمی‌شود
+- (لیست کامل در `docs/KNOWN-ISSUES.md`)
+
+---
+
 ## [0.95.4] — 2026-10-08
 
 ### Fixed
