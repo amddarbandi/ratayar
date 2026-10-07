@@ -8,13 +8,6 @@
 
 ## 🔴 Critical — فوری
 
-### BUILD-001: دو خطای import در `documents/page.tsx`
-- **فایل:** `apps/web/src/app/dashboard/documents/page.tsx`
-- **خطا:** `termsApi` و `TermsModal` استفاده شده ولی import نشده
-- **تأثیر:** کل build وب شکست می‌خورد → ۲۶۸۰ بار restart → web از memory سرو می‌کند
-- **راه‌حل:** اضافه کردن ۲ import
-- **وضعیت:** 🔴 Open — **بالاترین اولویت**
-
 ### SEC-001: `DEV_OTP_ENABLED=true` در production
 - **تأثیر:** کد OTP در پاسخ API برمی‌گردد → هر کسی می‌تواند وارد شود
 - **راه‌حل:** `.env` → `DEV_OTP_ENABLED=false`
@@ -180,7 +173,17 @@
 
 ## ✅ Resolved
 
-هیچ‌کدام تا الان.
+### BUILD-001: دو خطای import در `documents/page.tsx` — ✅ 2026-10-08
+- **رفع با:** branch `fix/build-v0.95` (merged به main)
+- **Merge commit:** `559c858`
+- **Tag:** `v0.95.1`
+- **فایل تغییر یافته:** `apps/web/src/app/dashboard/documents/page.tsx` (+2/-1)
+- **جزئیات:** دو import (`termsApi` از `@/lib/api` و `TermsModal` از `@/components/terms/terms-modal`) اضافه شد
+- **Verification:**
+  - `npx tsc --noEmit` = ۰ خطا
+  - `pnpm build` = موفق (۱۹ route)
+  - تست پایداری ۹۰ ثانیه‌ای موفق
+  - `curl https://ratayar.ir` = 200
 
 ---
 

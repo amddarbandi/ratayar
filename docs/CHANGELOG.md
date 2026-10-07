@@ -20,6 +20,38 @@
 
 ---
 
+## [0.95.1] — 2026-10-08
+
+### Fixed
+- **BUILD-001**: رفع ۲ خطای import در `apps/web/src/app/dashboard/documents/page.tsx`
+  - اضافه کردن `termsApi` به import از `@/lib/api`
+  - اضافه کردن `import { TermsModal } from '@/components/terms/terms-modal'`
+- Web دیگر در حلقه ری‌استارت نیست
+- `BUILD_ID` به‌درستی تولید می‌شود
+- PM2 پایدار (restarts ثابت پس از restart)
+
+### Added
+- راه‌اندازی Git repository + GitHub (Private)
+- `.gitignore` + `.gitattributes` استاندارد
+- `.env.example` به‌عنوان template
+- مستندات کامل: `PROJECT-MEMORY.md`, `README.md`
+- `docs/QUICKSTART.md`, `docs/ARCHITECTURE.md`, `docs/KNOWN-ISSUES.md`
+- `backups/manual-*` از سورس + دیتابیس
+
+### Verified
+- `npx tsc --noEmit` = ۰ خطا
+- `pnpm build` = موفق (۱۹ route)
+- تست پایداری ۹۰ ثانیه‌ای موفق
+- `curl https://ratayar.ir` = 200
+
+### Known Issues (باقی‌مانده)
+- `DEV_OTP_ENABLED=true` در production
+- Register OTP verify نمی‌شود
+- 2FA در login چک نمی‌شود
+- لیست کامل در `docs/KNOWN-ISSUES.md`
+
+---
+
 ## [0.95] — 2026-10-07
 
 ### Added
