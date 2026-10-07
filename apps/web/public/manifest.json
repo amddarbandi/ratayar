@@ -1,0 +1,55 @@
+{
+  "name": "راتایار — دستیار هوشمند زندگی",
+  "short_name": "راتایار",
+  "description": "دستیار هوشمند زندگی از ۷ سال تا ۱۰۰ سال",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0F",
+  "theme_color": "#a855f7",
+  "lang": "fa",
+  "dir": "rtl",
+  "categories": ["productivity", "lifestyle", "finance"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "تعهدات",
+      "short_name": "تعهدات",
+      "url": "/dashboard/obligations",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "مالی",
+      "short_name": "مالی",
+      "url": "/dashboard/finance",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "اسناد",
+      "short_name": "اسناد",
+      "url": "/dashboard/documents",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

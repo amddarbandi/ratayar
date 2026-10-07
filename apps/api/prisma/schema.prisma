@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  phone           String    @unique @db.VarChar(11)
+  passwordHash    String    @map("password_hash")
+  fullName        String?   @map("full_name") @db.VarChar(100)
+  birthDate       DateTime? @map("birth_date") @db.Date
+  role            String    @default("user") @db.VarChar(20)
+  status          String    @default("active") @db.VarChar(20)
+  twoFaEnabled    Boolean   @default(false) @map("two_fa_enabled")
+  twoFaSecret     String?   @map("two_fa_secret")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  lastLoginAt     DateTime? @map("last_login_at")
+  termsAcceptedAt DateTime? @map("terms_accepted_at")
+  termsVersion    String?   @map("terms_version") @db.VarChar(20)
+  deletedAt       DateTime? @map("deleted_at")
+
+  ownedFamilies   Family[]  @relation("FamilyOwner")
+  memberships     FamilyMember[]
+
+  @@index([phone])
+  @@index([status])
+  @@map("users")
+}
+
+model Family {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @db.VarChar(100)
+  ownerId       String    @map("owner_id") @db.Uuid
+  plan          String    @default("free") @db.VarChar(20)
+  planExpiresAt DateTime? @map("plan_expires_at")
+  maxMembers    Int       @default(6) @map("max_members")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  owner         User      @relation("FamilyOwner", fields: [ownerId], references: [id])
+  members       FamilyMember[]
+
+  @@map("families")
+}
+
+model FamilyMember {
+  id          String   @id @default(uuid()) @db.Uuid
+  familyId    String   @map("family_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  role        String   @db.VarChar(20)
+  relation    String?  @db.VarChar(30)
+  permissions Json     @default("{}")
+  joinedAt    DateTime @default(now()) @map("joined_at")
+
+  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, userId])
+  @@index([familyId])
+  @@index([userId])
+  @@map("family_members")
+}
+
+model Obligation {
+  id              String    @id @default(uuid()) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  title           String    @db.VarChar(200)
+  description     String?
+  dueDate         DateTime  @map("due_date")
+  category        String    @default("life") @db.VarChar(20)
+  priority        String    @default("normal") @db.VarChar(20)
+  status          String    @default("active") @db.VarChar(20)
+  repeatType      String    @default("once") @map("repeat_type") @db.VarChar(20)
+  repeatInterval  Int?      @map("repeat_interval")
+  alertDays       Int[]     @default([30, 7, 1]) @map("alert_days")
+  assetId         String?   @map("asset_id") @db.Uuid
+  completedAt     DateTime? @map("completed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([dueDate])
+  @@index([status])
+  @@map("obligations")
+}
+
+model Asset {
+  id              String    @id @default(uuid()) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  type            String    @db.VarChar(30)
+  name            String    @db.VarChar(200)
+  model           String?   @db.VarChar(100)
+  year            Int?
+  purchasePrice   BigInt?   @map("purchase_price")
+  currentValue    BigInt?   @map("current_value")
+  metadata        Json      @default("{}")
+  notes           String?
+  status          String    @default("active") @db.VarChar(20)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@map("assets")
+}
+
+// ============================================
+// FINANCE
+// ============================================
+model Transaction {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  type        String    @db.VarChar(20)   // income | expense
+  category    String    @db.VarChar(50)
+  amount      BigInt
+  description String?
+  date        DateTime  @default(now())
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@index([userId])
+  @@index([type])
+  @@index([date])
+  @@map("transactions")
+}
+
+model Budget {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  category    String    @db.VarChar(50)
+  amount      BigInt
+  period      String    @default("monthly") @db.VarChar(20)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([userId, category, period])
+  @@index([userId])
+  @@map("budgets")
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+model Notification {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  type          String    @db.VarChar(30)   // obligation | family | system
+  title         String    @db.VarChar(200)
+  body          String?
+  priority      String    @default("normal") @db.VarChar(20) // critical | important | normal
+  referenceId   String?   @map("reference_id") @db.Uuid
+  referenceType String?   @map("reference_type") @db.VarChar(30)
+  scheduledFor  DateTime? @map("scheduled_for")
+  sentAt        DateTime? @map("sent_at")
+  readAt        DateTime? @map("read_at")
+  status        String    @default("pending") @db.VarChar(20) // pending | sent | read | failed
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([status])
+  @@index([scheduledFor])
+  @@map("notifications")
+}
+
+// ============================================
+// DOCUMENTS
+// ============================================
+model Document {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  name          String    @db.VarChar(200)
+  type          String    @db.VarChar(50)   // identity | property | vehicle | insurance | medical | business | family | other
+  mimeType      String    @map("mime_type") @db.VarChar(100)
+  size          BigInt
+  storageKey    String    @map("storage_key") @db.VarChar(500)
+  bucket        String    @default("documents") @db.VarChar(100)
+  hash          String?   @db.VarChar(64)   // SHA-256 checksum
+  encrypted     Boolean   @default(false)
+  ocrText       String?   @map("ocr_text")
+  metadata      Json      @default("{}")
+  tags          String[]  @default([])
+  expiresAt     DateTime? @map("expires_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  @@index([userId])
+  @@index([type])
+  @@index([deletedAt])
+  @@map("documents")
+}
