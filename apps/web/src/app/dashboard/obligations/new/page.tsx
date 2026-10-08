@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { JalaliDatePicker } from '@/components/common/jalali-date-picker';
 
 const categories = [
   { key: 'financial', label: 'مالی', emoji: '💰' },
@@ -123,12 +124,11 @@ export default function NewObligationPage() {
               />
             </div>
 
-            <Input
+            <JalaliDatePicker
               label="تاریخ سررسید"
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              dir="ltr"
+              required
+              value={dueDate || null}
+              onChange={(iso) => setDueDate(iso)}
             />
           </CardContent>
         </Card>
