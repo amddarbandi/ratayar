@@ -10,7 +10,7 @@ Last updated: 2026-10-08
 
 ## Phase 1 — Business Critical (BIZ)
 
-- [ ] BIZ-001 Admin CRUD plans UI (backend done, frontend pending)
+- [x] BIZ-001 Admin CRUD plans UI (done)
 - [-] BIZ-002 ZarinPal integration (deferred — using card-to-card)
 - [~] BIZ-003 Subscription lifecycle: purchase/renew/cancel (backend done, UI pending)
 - [x] BIZ-004 Plan selection + upgrade flow (with receipt upload)
