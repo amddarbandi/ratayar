@@ -129,12 +129,18 @@ export class DocumentsService {
     if (!doc || doc.deletedAt) throw new NotFoundException('سند یافت نشد');
     if (doc.userId !== userId) throw new ForbiddenException('دسترسی ندارید');
 
-    // Soft delete in DB
+    try {
+      await this.minio.removeFile(doc.storageKey);
+    } catch (e: any) {
+      this.logger.warn(`MinIO delete failed for ${doc.storageKey}: ${e.message}`);
+    }
+
     await this.prisma.document.update({
       where: { id },
       data: { deletedAt: new Date() },
     });
 
+    this.logger.log(`Document removed: ${doc.name}`);
     return { success: true };
   }
 
@@ -157,13 +163,16 @@ export class DocumentsService {
   }
 
   async stream(userId: string, id: string) {
-    const doc = await this.findOne(userId, id);
-    const buffer = await this.minio.getFile(doc.storageKey);
+    const doc = await this.prisma.document.findUnique({ where: { id } });
+    if (!doc || doc.deletedAt) throw new NotFoundException('سند یافت نشد');
+    if (doc.userId !== userId) throw new ForbiddenException('دسترسی ندارید');
+
+    const stream = await this.minio.getObjectStream(doc.storageKey);
     return {
-      buffer,
+      stream,
       mimeType: doc.mimeType,
+      size: Number(doc.size),
       name: doc.name,
-      size: doc.size,
     };
   }
 

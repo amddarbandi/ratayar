@@ -46,8 +46,8 @@ Last updated: 2026-10-08
 - [ ] FILES-010 Persian OCR
 - [ ] FILES-011 Bulk upload / drag-drop
 - [ ] FILES-012 Archive old documents
-- [x] API-003 documents.remove should also delete from MinIO — pending
-- [x] API-002 documents.stream should pipe, not buffer — pending
+- [x] API-003 documents.remove also deletes from MinIO (done)
+- [x] API-002 documents.stream pipes from MinIO, no RAM buffer (done)
 
 ## Phase 4 — Security (SEC)
 

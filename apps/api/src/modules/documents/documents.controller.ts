@@ -55,7 +55,7 @@ export class DocumentsController {
       'Content-Disposition',
       `inline; filename="${encodeURIComponent(file.name)}"`,
     );
-    res.end(file.buffer);
+    file.stream.pipe(res);
   }
 
   @Get(':id/download')
