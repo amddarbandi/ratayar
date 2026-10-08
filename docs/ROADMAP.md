@@ -21,7 +21,11 @@ Last updated: 2026-10-08
 - [ ] BIZ-009 Rate limiting per plan
 - [ ] BIZ-010 Proration on upgrade/downgrade
 
-## Phase 2 — Persian Calendar (CAL)
+## Phase 2 — Persian Calendar (CAL)  [🔴 HIGH PRIORITY — user directive 2026-10-08]
+
+> **User directive:** ALL dates in the entire panel must be Jalali (شمسی).
+> No Gregorian display anywhere in UI. API still stores/computes in ISO.**
+
 
 - [ ] CAL-001 Jalali DatePicker (react-multi-date-picker)
 - [ ] CAL-002 Display all dates as Jalali
@@ -106,7 +110,12 @@ Last updated: 2026-10-08
 - [ ] PRICE-009 Sparkline 24h in widget
 - [ ] PRICE-010 Fallback between sources
 
-## Phase 9 — Clock & Calendar Day (CLOCK)
+## Phase 9 — Clock & Calendar Day (CLOCK)  [🔴 HIGH PRIORITY]
+
+> **User directive:** build a calendar page similar to time.ir — showing
+> Jalali date, Gregorian date, Hijri date, day of week, daily events,
+> holidays, prayer times, and family members' local times.
+
 
 - [ ] CLOCK-001 "Today" menu in sidebar
 - [ ] CLOCK-002 Analog SVG clock
@@ -119,7 +128,13 @@ Last updated: 2026-10-08
 - [ ] CLOCK-009 Today's events at a glance
 - [ ] CLOCK-010 Small clock widget in dashboard
 
-## Phase 10 — Calculators & Tools (CALC)
+## Phase 10 — Calculators & Tools (CALC)  [🔴 HIGH PRIORITY]
+
+> **User directive:** two separate top-level menus:
+>   1. "کانورت‌ها" — unit converters (weight/length/volume/temp/
+>      currency/percent/date). **No file conversion.**
+>   2. "Subnet Calculator" — IPv4 with full details + IPv6 support.
+
 
 - [ ] CALC-001 "Calculators" menu in sidebar
 - [ ] CALC-002 Scientific calculator
@@ -145,6 +160,13 @@ Last updated: 2026-10-08
 - [ ] CALC-022 Unix timestamp converter
 - [ ] CALC-023 QR code generator
 - [ ] CALC-024 Password generator
+
+### CALC — user directive additions
+
+- [ ] CALC-MENU "کانورت‌ها" top-level menu item
+- [ ] CALC-MENU-2 "Subnet Calculator" top-level menu item
+- [ ] CALC-011-ADV IPv4 calculator with full detail (network, broadcast, usable range, mask, wildcard, class, type, CIDR list)
+- [ ] CALC-012-ADV IPv6 calculator (prefix, expanded, compressed, range, number of addresses)
 
 ## Phase 11 — UX/UI
 
