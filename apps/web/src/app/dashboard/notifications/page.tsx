@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { notificationsApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { toJalaliShort } from '@/lib/jalali';
 
 const priorityConfig: any = {
   critical: { bg: 'bg-red-500/10', border: 'border-red-500/30', color: 'text-red-400' },
@@ -57,7 +58,7 @@ export default function NotificationsPage() {
     if (diff < 3600) return `${Math.floor(diff / 60)} دقیقه پیش`;
     if (diff < 86400) return `${Math.floor(diff / 3600)} ساعت پیش`;
     if (diff < 604800) return `${Math.floor(diff / 86400)} روز پیش`;
-    return d.toLocaleDateString('fa-IR');
+    return toJalaliShort(date);
   };
 
   return (
