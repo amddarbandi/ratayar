@@ -69,3 +69,20 @@ If a new page cannot match the design system yet, hide it behind a
 feature flag until it does.
 
 Last updated: 2026-10-08
+
+## Menu order convention (fixed)
+
+Top navigation on the homepage — from left to right (RTL):
+1. ویژگی‌ها (#features)
+2. چطور کار می‌کند (#how)
+3. قیمت‌ها (#pricing)
+4. درباره ما (#about)
+5. تبدیل
+6. بازار
+7. تقویم
+8. IP          <- last
+
+Dashboard sidebar — IP is the last item, calendar right before
+settings. Both orders are frozen by user directive 2026-10-09.
+
+New features must be inserted BEFORE تقویم/IP, never after IP.

@@ -25,12 +25,13 @@ const navItems = [
   { href: '/dashboard/storage', label: 'فضای ذخیره‌سازی', icon: HardDrive },
   { href: '/dashboard/converters', label: 'تبدیل', icon: Repeat },
   { href: '/dashboard/market', label: 'بازار و قیمت‌ها', icon: TrendingUp },
-  { href: '/dashboard/network', label: 'IP', icon: Network },
   { href: '/dashboard/reports', label: 'گزارش‌ها', icon: BarChart3 },
   { href: '/dashboard/tickets', label: 'تیکت‌های پشتیبانی', icon: MessageSquare },
   { href: '/dashboard/notifications', label: 'اعلان‌ها', icon: Bell },
   { href: '/dashboard/upgrade', label: 'ارتقای پلن', icon: Crown },
+  { href: '/dashboard/calendar', label: 'تقویم', icon: Calendar },
   { href: '/dashboard/settings', label: 'تنظیمات', icon: Settings },
+  { href: '/dashboard/network', label: 'IP', icon: Network },
 ];
 
 const adminItems = [

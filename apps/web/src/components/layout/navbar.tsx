@@ -11,8 +11,11 @@ const navLinks = [
   { href: '#features', label: 'ویژگی‌ها' },
   { href: '#how', label: 'چطور کار می‌کند' },
   { href: '#pricing', label: 'قیمت‌ها' },
-  { href: '/dashboard/converters', label: 'تبدیل' },
   { href: '#about', label: 'درباره ما' },
+  { href: '/dashboard/converters', label: 'تبدیل' },
+  { href: '/dashboard/market', label: 'بازار' },
+  { href: '/dashboard/calendar', label: 'تقویم' },
+  { href: '/dashboard/network', label: 'IP' },
 ];
 
 export function Navbar() {
