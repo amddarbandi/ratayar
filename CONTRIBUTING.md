@@ -20,8 +20,8 @@
 - [ ] `npx tsc --noEmit` = صفر خطا
 - [ ] `pnpm build` = موفق
 - [ ] `pm2 logs` = بدون خطای جدید
-- [ ] ورودی در `docs/CHANGELOG.md` زیر `[Unreleased]` اضافه شد
-- [ ] ورودی در `docs/KNOWN-ISSUES.md` به‌روزرسانی شد (اگر باگ بود)
+- [ ] ورودی در `docs/CHANGELOG.md` زیر `[Unreleased]`
+- [ ] ورودی در `docs/KNOWN-ISSUES.md` (اگر باگ بود)
 - [ ] Commit message با فرمت استاندارد
 - [ ] `git push` انجام شد
 
@@ -29,55 +29,50 @@
 
 ## 📝 فرمت Commit Message
 
-<type>(<scope>): <subject>
+[200~<type>(<scope>): <subject>
 
-<body — چرا این تغییر لازم بود>
+<body>
 Fix:
 
 <تغییر ۱>
 
-<تغییر ۲>
-
-Resolves: <ID از KNOWN-ISSUES> (اگر مربوط بود)
-
-
+Resolves: <ID>~
 
 | type | کاربرد |
 |---|---|
 | `fix` | رفع باگ |
 | `feat` | قابلیت جدید |
 | `docs` | فقط مستندات |
-| `refactor` | بازنویسی بدون تغییر رفتار |
-| `chore` | کارهای جانبی |
-| `test` | افزودن/اصلاح تست |
+| `refactor` | بازنویسی |
+| `chore` | کار جانبی |
+| `test` | تست |
 
-### نمونه:
+نمونه:
 
 
 ---
 
-## 📂 ساختار مستندات
+## 📂 مستندات
 
-| فایل | چه زمانی به‌روزرسانی شود |
+| فایل | زمان به‌روزرسانی |
 |---|---|
-| `docs/CHANGELOG.md` | **همیشه** — هر تغییر قابل توجه |
-| `docs/KNOWN-ISSUES.md` | فقط اگر باگ جدید کشف/رفع شد |
-| `docs/ARCHITECTURE.md` | فقط اگر ساختار یا معماری تغییر کرد |
-| `docs/QUICKSTART.md` | فقط اگر مراحل راه‌اندازی تغییر کرد |
-| `PROJECT-MEMORY.md` | فقط برای تغییرات بزرگ یا milestone |
+| `CHANGELOG.md` | همیشه |
+| `KNOWN-ISSUES.md` | باگ جدید/رفع |
+| `ARCHITECTURE.md` | تغییر معماری |
+| `QUICKSTART.md` | تغییر راه‌اندازی |
 
 ---
 
-## 🏷 شناسه‌گذاری باگ‌ها (Issue ID)
+## 🏷 شناسه باگ‌ها
 
 | پیشوند | حوزه |
 |---|---|
-| `SEC-NNN` | امنیت |
-| `API-NNN` | بک‌اند / API |
-| `WEB-NNN` | فرانت‌اند |
-| `PWA-NNN` | PWA / Service Worker |
-| `DB-NNN` | پایگاه داده / Migration |
-| `BUILD-NNN` | build / deploy / زیرساخت |
+| `SEC-` | امنیت |
+| `API-` | بک‌اند |
+| `WEB-` | فرانت‌اند |
+| `PWA-` | Service Worker |
+| `DB-` | پایگاه داده |
+| `BUILD-` | زیرساخت |
 
 ---
 
@@ -85,41 +80,29 @@ Resolves: <ID از KNOWN-ISSUES> (اگر مربوط بود)
 
 | Branch | کاربرد |
 |---|---|
-| `main` | Production — همیشه قابل deploy |
+| `main` | Production |
 | `feat/<name>` | فیچر جدید |
 | `fix/<name>` | رفع باگ |
-| `hotfix/<name>` | رفع فوری روی main |
-
-### چرخه کار:
-
-1. از `main` branch بگیر: `git checkout -b fix/api-001-uuid`
-2. تغییر بده + مستندات را به‌روز کن
-3. Commit + push
-4. PR به `main` بزن
-5. بعد از تأیید، merge و تگ بزن
+| `hotfix/<name>` | رفع فوری |
 
 ---
 
 ## ✅ Definition of Done
 
-یک کار وقتی «تمام» است که:
-
-1. کد نوشته، تست، و build شده
-2. مستندات (CHANGELOG + KNOWN-ISSUES) به‌روز شده
-3. Commit message استاندارد دارد
-4. Push شده روی remote
-5. اگر فیچر است: در `docs/ARCHITECTURE.md` توضیح داده شده
-6. اگر باگ است: در `KNOWN-ISSUES.md` از Open به Resolved منتقل شده
+1. کد تست و build شده
+2. CHANGELOG + KNOWN-ISSUES به‌روز شده
+3. Commit message استاندارد
+4. Push شده
 
 ---
 
 ## 🚫 ممنوع
 
-- commit بدون پیام واضح (`git commit -m "fix"`)
-- commit بدون به‌روزرسانی CHANGELOG
-- push مستقیم به `main` (مگر hotfix با اطلاع تیم)
-- گذاشتن `.env`، کلید، یا توکن در repo
-- گذاشتن `dist/`، `node_modules/`، یا فایل‌های temp در git
+- commit بدون پیام
+- commit بدون CHANGELOG
+- push مستقیم به `main`
+- `.env` / توکن در repo
+- `dist/` / `node_modules/` در git
 
 ---
 
