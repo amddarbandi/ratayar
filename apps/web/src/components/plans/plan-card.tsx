@@ -1,3 +1,5 @@
+import { useRouter } from 'next/navigation';
+
 interface PlanCardProps {
   plan: {
     id: string;
@@ -17,6 +19,7 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan }: PlanCardProps) {
+  const router = useRouter();
   const fmtNum = (n: number) =>
     n === -1 ? 'بی‌نهایت' : n.toLocaleString('fa-IR');
 
@@ -53,7 +56,10 @@ export function PlanCard({ plan }: PlanCardProps) {
         <li>💾 {fmtStorage(plan.maxStorageMB)} فضا</li>
         <li>⬆️ هر فایل {plan.maxUploadMB} MB</li>
       </ul>
-      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
+      <button
+        onClick={() => router.push(`/dashboard/upgrade?plan=${plan.code}`)}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+      >
         {plan.code === 'free' ? 'شروع رایگان' : 'انتخاب و ارتقا'}
       </button>
     </div>
