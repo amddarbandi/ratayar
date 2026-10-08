@@ -9,6 +9,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LogoIcon } from '@/components/brand/logo';
 
 const items = [
   { href: '/admin', label: 'داشبورد', icon: LayoutDashboard },
@@ -51,9 +52,7 @@ export default function AdminLayout({
         <aside className="w-64 min-h-screen border-l border-white/10 bg-black/30 backdrop-blur sticky top-0 h-screen flex flex-col">
           <div className="p-6 border-b border-white/10">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
+              <LogoIcon size={40} />
               <div>
                 <div className="text-white font-bold">پنل مدیریت</div>
                 <div className="text-white/40 text-xs">راتایار</div>

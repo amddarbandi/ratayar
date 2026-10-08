@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Sparkles, Shield, Zap, Users } from 'lucide-react';
+import { ArrowLeft, Sparkles, Shield, Zap, Users, Calendar, Package, Wallet, TrendingUp } from 'lucide-react';
+import { LogoIcon } from '@/components/brand/logo';
 
 const badges = [
   { icon: Shield, label: 'امنیت بانکی' },
@@ -107,14 +108,76 @@ export function Hero() {
         >
           <div className="relative rounded-3xl overflow-hidden glass-strong p-2 shadow-2xl shadow-purple-500/20">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-transparent to-cyan-500/20" />
-            <div className="relative rounded-2xl bg-[#0A0A0F] p-8 min-h-[400px] flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center animate-float">
-                  <Sparkles className="w-10 h-10 text-white" />
+            <div className="relative rounded-2xl bg-gradient-to-br from-[#0A0A0F] via-[#12101c] to-[#0d0f15] p-6 md:p-10 min-h-[400px] overflow-hidden">
+              {/* ambient glow */}
+              <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-purple-500/20 rounded-full blur-[100px] pointer-events-none" />
+              <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-cyan-500/20 rounded-full blur-[100px] pointer-events-none" />
+
+              <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto" dir="rtl">
+                {/* Logo badge */}
+                <div className="md:col-span-3 flex items-center justify-center mb-2">
+                  <div className="flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+                    <LogoIcon size={28} />
+                    <span className="text-sm text-white/70">
+                      پیش‌نمایش داشبورد
+                    </span>
+                  </div>
                 </div>
-                <p className="text-white/40 text-lg">
-                  داشبورد زیبای راتایار
-                </p>
+
+                {/* Stat cards */}
+                <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-purple-500/15 to-white/[0.02] p-4 backdrop-blur-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center">
+                      <Calendar className="w-4 h-4 text-white" />
+                    </div>
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="text-white/50 text-xs">تعهدات فعال</div>
+                  <div className="text-white text-2xl font-black">۱۲</div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-500/15 to-white/[0.02] p-4 backdrop-blur-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                      <Package className="w-4 h-4 text-white" />
+                    </div>
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="text-white/50 text-xs">ارزش دارایی‌ها</div>
+                  <div className="text-white text-2xl font-black">۸۵۰M</div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-500/15 to-white/[0.02] p-4 backdrop-blur-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                      <Wallet className="w-4 h-4 text-white" />
+                    </div>
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="text-white/50 text-xs">مصرف ماه</div>
+                  <div className="text-white text-2xl font-black">۴.۲M</div>
+                </div>
+
+                {/* Mini chart */}
+                <div className="md:col-span-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl mt-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-white text-sm font-bold">
+                      روند انضباط
+                    </span>
+                    <span className="text-xs text-emerald-400">+۱۸٪</span>
+                  </div>
+                  <div className="flex items-end gap-1 h-16">
+                    {[40, 55, 35, 70, 60, 80, 65, 90, 75, 95, 85, 100].map(
+                      (h, i) => (
+                        <div
+                          key={i}
+                          style={{ height: `${h}%` }}
+                          className="flex-1 rounded-t-md bg-gradient-to-t from-purple-500/40 to-cyan-400/80"
+                        />
+                      ),
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
