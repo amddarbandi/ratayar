@@ -16,6 +16,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { dashboardApi, reportsApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { toJalaliShort, relativeJalali } from '@/lib/jalali';
 
 const priorityConfig: any = {
   critical: { badge: 'bg-red-500/20 text-red-300 border-red-500/30', icon: AlertCircle, iconColor: 'text-red-400', iconBg: 'bg-red-500/10' },
@@ -32,14 +33,7 @@ const formatPrice = (price: number) => {
 };
 
 const formatDate = (date: string) => {
-  const d = new Date(date);
-  const now = new Date();
-  const diff = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return `${Math.abs(diff)} روز گذشته`;
-  if (diff === 0) return 'امروز';
-  if (diff === 1) return 'فردا';
-  if (diff < 30) return `${diff} روز دیگر`;
-  return d.toLocaleDateString('fa-IR');
+  return `${toJalaliShort(date)} · ${relativeJalali(date)}`;
 };
 
 export default function DashboardPage() {
