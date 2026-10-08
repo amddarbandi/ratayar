@@ -268,12 +268,25 @@ Last updated: 2026-10-08
 - [x] Migration: 20261008083117_add_plans_subscriptions_payments_tickets
 - [x] Seed: 4 plans (free / personal / family / business)
 
-## Next up (in order)
+## Next up (in order) — updated 2026-10-08
 
-1. PlanLimitGuard + enforcement in documents / obligations / assets / family (BIZ-006, BIZ-007)
-2. Frontend: public plans page + upgrade flow with receipt upload
-3. Frontend: storage dashboard
-4. Frontend: user tickets page
-5. Admin panel: plan CRUD + payment review + ticket reply
-6. API-002 / API-003 (documents stream + MinIO delete)
-7. Phase 2 (Jalali calendar) — foundation for most features
+### Current focus (per user directive)
+
+1. **Phase 2 — Jalali calendar (CAL-001..008)** — HIGH
+   All date inputs/outputs become Jalali across the panel.
+
+2. **Phase 9 — Clock & time.ir-like calendar (CLOCK-001..010)** — HIGH
+   Dedicated page: Jalali/Gregorian/Hijri, events, holidays,
+   prayer times, family local times.
+
+3. **Phase 10 — Converters + Subnet Calculator (CALC)** — HIGH
+   Two new top-level menus:
+   - "کانورت‌ها" (unit conversions, NO file conversion)
+   - "Subnet Calculator" (IPv4 full detail + IPv6)
+
+### Afterwards (previous plan)
+
+4. INF-001 — GitHub Actions CI
+5. API-004 — Kavenegar SMS
+6. BIZ-005 — Invoice PDF
+7. BIZ-003 — Renewal / cancel / downgrade UI
