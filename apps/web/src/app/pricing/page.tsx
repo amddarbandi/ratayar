@@ -34,21 +34,21 @@ export default function PricingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4" dir="rtl">
+    <div className="" dir="rtl">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+          <h1 className="text-4xl font-bold text-white mb-3">
             پلن‌های راتایار
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-white/60">
             پلنی را انتخاب کنید که با نیاز شما هماهنگ است
           </p>
         </div>
 
         {loading && (
-          <div className="text-center text-gray-500">در حال بارگذاری...</div>
+          <div className="text-center text-white/40">در حال بارگذاری...</div>
         )}
-        {error && <div className="text-center text-red-600">{error}</div>}
+        {error && <div className="text-center text-red-400">{error}</div>}
 
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
