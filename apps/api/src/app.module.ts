@@ -20,6 +20,7 @@ import { SearchModule } from './modules/search/search.module';
 import { TermsModule } from './modules/terms/terms.module';
 import { PlansModule } from './modules/plans/plans.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { ReminderTask } from './common/tasks/reminder.task';
 
 @Module({
@@ -47,6 +48,7 @@ import { ReminderTask } from './common/tasks/reminder.task';
     TermsModule,
     PlansModule,
     SubscriptionsModule,
+    PaymentsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
