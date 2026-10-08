@@ -132,3 +132,19 @@ each fully verified before the next.
 Any user-visible outage (502, pm2 errored, blank page) must be logged
 in docs/OUTAGES.md with: cause, timeline, fix commit, prevention rule
 added.
+
+UI consistency rules (see docs/UI-GUIDELINES.md)
+Same visual language everywhere — dark glass theme, neon accents.
+
+No light backgrounds on any authenticated page.
+
+Use shared UI components (Card, Button, Input, Modal). Never raw
+divs for surfaces.
+
+Every page must be verified visually, not just curl 200.
+
+Homepage is the shop window — must show a live dashboard preview.
+
+Any UI drift must be fixed in the next commit.
+
+Full rules: docs/UI-GUIDELINES.md
