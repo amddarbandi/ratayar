@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sparkles } from 'lucide-react';
+import { LogoWordmark } from '@/components/brand/logo';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
@@ -43,12 +44,8 @@ export function Navbar() {
           )}
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center overflow-hidden">
-              <Sparkles className="w-5 h-5 text-white relative z-10" />
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
-            </div>
-            <span className="text-xl font-bold gradient-text">راتایار</span>
+          <Link href="/" className="group">
+            <LogoWordmark />
           </Link>
 
           {/* Desktop Nav */}

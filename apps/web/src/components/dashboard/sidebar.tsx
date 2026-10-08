@@ -9,6 +9,7 @@ import {
   BarChart3, MessageSquare, HardDrive, Crown, Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LogoWordmark } from '@/components/brand/logo';
 import { useAuthStore } from '@/stores/auth-store';
 import { authApi } from '@/lib/api';
 import { toast } from 'sonner';
@@ -107,11 +108,8 @@ export function DashboardSidebar({
     <aside className="hidden lg:flex w-72 min-h-screen flex-col glass-strong border-l border-white/10 sticky top-0 h-screen">
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-xl font-bold gradient-text">راتایار</span>
+        <Link href="/dashboard">
+          <LogoWordmark />
         </Link>
       </div>
 
