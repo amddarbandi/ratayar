@@ -240,6 +240,25 @@
 
 ---
 
+### BUILD-002: PM2 crash loop — `MODULE_NOT_FOUND` برای `dist/main.js` — ✅ 2026-10-08
+- **رفع با:** commit `94e1b4b` روی branch `feat/plans-subscriptions`
+- **فایل تغییر یافته:** `apps/api/tsconfig.json` (+3/-3)
+- **ریشه مشکل:**
+  - `include` شامل هم `src/**/*` و هم `prisma/**/*` بود
+  - TypeScript نمی‌توانست `rootDir` را تشخیص دهد → آن را روی ریشه پروژه تنظیم می‌کرد
+  - خروجی در `dist/src/main.js` و `dist/prisma/**` ساخته می‌شد
+  - PM2 به `apps/api/dist/main.js` اشاره می‌کرد → `MODULE_NOT_FOUND` → ۱۹۴ بار restart
+- **راه‌حل:**
+  - افزودن صریح `"rootDir": "./src"`
+  - محدود کردن `include` به `["src/**/*"]`
+  - انتقال `prisma` به `exclude` (schema توسط nest build کامپایل نمی‌شود)
+- **Verification:**
+  - `ls dist/main.js` = ✅ (3054 bytes)
+  - `ls dist/modules/plans/` = ✅
+  - `pm2 logs` = `🚀 Ratayar API running on port 4000`
+  - ۷ روت Plans در startup map شدند
+  - Prisma/Redis/MinIO = ✅ همه connect
+
 ## نحوه استفاده
 
 - هر باگ جدید: ID منحصر به فرد (MODULE-NNN)

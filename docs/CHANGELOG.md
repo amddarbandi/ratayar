@@ -9,8 +9,24 @@
 
 ## [Unreleased]
 
-### در حال کار
-- رفع باگ BUILD-001 (۲ خطای import در `documents/page.tsx`)
+### Fixed
+- **api**: رفع حلقه کرش PM2 (`MODULE_NOT_FOUND` برای `dist/main.js`)
+  - ریشه: `tsconfig.json` شامل `prisma/**/*` بود → `rootDir` روی ریشه پروژه → خروجی در `dist/src/main.js`
+  - راه‌حل: `rootDir=./src`، `include` فقط `src/**/*`، انتقال `prisma` به `exclude`
+  - Commit: `94e1b4b` — جزئیات: `KNOWN-ISSUES.md#build-002`
+
+### Added
+- **api**: ماژول Plans با ۷ روت:
+  - `GET /api/plans` — لیست پلن‌ها
+  - `GET /api/plans/code/:code` — دریافت پلن با کد
+  - `GET /api/plans/admin/all` — لیست مدیریتی
+  - `GET /api/plans/:id` — پلن تکی
+  - `POST /api/plans` — ایجاد پلن
+  - `PATCH /api/plans/:id` — ویرایش پلن
+  - `DELETE /api/plans/:id` — حذف پلن
+- **db**: migration `20261008083117_add_plans_subscriptions_payments_tickets`
+- **db**: seed `prisma/seed-plans.ts` — ۴ پلن: رایگان، شخصی، خانواده، کسب‌وکار
+
 
 ### برنامه‌ریزی‌شده
 - رفع باگ‌های Critical (SEC-001 تا SEC-005)
