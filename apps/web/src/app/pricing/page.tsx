@@ -28,7 +28,7 @@ export default function PricingPage() {
   useEffect(() => {
     plansApi
       .list()
-      .then((data: any) => setPlans(data))
+      .then((res) => setPlans(res.data))
       .catch((e: any) => setError(e.message || 'خطا در بارگذاری'))
       .finally(() => setLoading(false));
   }, []);
