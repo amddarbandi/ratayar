@@ -23,6 +23,7 @@ import { PlansModule } from './modules/plans/plans.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
+import { MarketModule } from './modules/market/market.module';
 import { ReminderTask } from './common/tasks/reminder.task';
 
 @Module({
@@ -53,6 +54,7 @@ import { ReminderTask } from './common/tasks/reminder.task';
     SubscriptionsModule,
     PaymentsModule,
     TicketsModule,
+    MarketModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
