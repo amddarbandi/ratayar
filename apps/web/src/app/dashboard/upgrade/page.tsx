@@ -2,7 +2,14 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Crown, Upload, Loader2, Check } from 'lucide-react';
 import { plansApi, paymentApi, subscriptionApi } from '@/lib/api';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface Plan {
   id: string;
@@ -31,8 +38,7 @@ function UpgradeContent() {
   const [file, setFile] = useState<File | null>(null);
   const [trackingCode, setTrackingCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([plansApi.list(), subscriptionApi.me()])
@@ -45,7 +51,8 @@ function UpgradeContent() {
           if (found) setSelected(found);
         }
       })
-      .catch(() => setError('خطا در بارگذاری اطلاعات'));
+      .catch(() => toast.error('خطا در بارگذاری اطلاعات'))
+      .finally(() => setLoading(false));
   }, [preselected]);
 
   const fmt = (n: number) => (n === -1 ? 'بی‌نهایت' : n.toLocaleString('fa-IR'));
@@ -54,10 +61,8 @@ function UpgradeContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     if (!selected || !file) {
-      setError('پلن و تصویر رسید الزامی است');
+      toast.error('پلن و تصویر رسید الزامی است');
       return;
     }
     setSubmitting(true);
@@ -69,13 +74,13 @@ function UpgradeContent() {
       if (trackingCode) form.append('trackingCode', trackingCode);
 
       await paymentApi.create(form);
-      setSuccess(
-        'درخواست پرداخت شما ثبت شد. ادمین پس از بررسی، پلن را فعال می‌کند.',
+      toast.success(
+        'درخواست پرداخت ثبت شد. ادمین پس از بررسی، پلن را فعال می‌کند.',
       );
       setFile(null);
       setTrackingCode('');
     } catch (e: any) {
-      setError(
+      toast.error(
         e?.response?.data?.message || 'خطا در ارسال درخواست. دوباره تلاش کنید.',
       );
     } finally {
@@ -84,36 +89,68 @@ function UpgradeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4" dir="rtl">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">ارتقای پلن</h1>
-        <p className="text-gray-600 mb-8">
-          پلن فعلی شما: <strong>{currentCode}</strong>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <div>
+        <div className="flex items-center gap-3 mb-1">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+            <Crown className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-white">ارتقای پلن</h1>
+        </div>
+        <p className="text-white/50">
+          پلن فعلی: <strong className="text-white/80">{currentCode}</strong>
         </p>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          {plans.map((plan) => {
+      {loading && (
+        <div className="text-center py-12 text-white/40">
+          <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+          در حال بارگذاری...
+        </div>
+      )}
+
+      {/* Plans grid */}
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {plans.map((plan, i) => {
             const isCurrent = plan.code === currentCode;
             const isSelected = selected?.id === plan.id;
             return (
-              <button
+              <motion.button
                 key={plan.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
                 type="button"
                 disabled={isCurrent}
                 onClick={() => setSelected(plan)}
-                className={`text-right p-5 rounded-2xl border-2 transition ${
+                className={cn(
+                  'text-right p-5 rounded-3xl border-2 transition-all backdrop-blur-xl',
                   isSelected
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-purple-500/60 bg-gradient-to-br from-purple-500/20 to-cyan-500/5 shadow-lg shadow-purple-500/20'
                     : isCurrent
-                      ? 'border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed'
-                      : 'border-gray-200 bg-white hover:border-blue-300'
-                }`}
+                      ? 'border-white/10 bg-white/[0.03] opacity-60 cursor-not-allowed'
+                      : 'border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] hover:border-purple-500/40',
+                )}
               >
-                <div className="font-bold text-lg mb-1">{plan.name}</div>
-                <div className="text-sm text-gray-600 mb-2">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="font-bold text-lg text-white">
+                    {plan.name}
+                  </div>
+                  {isSelected && (
+                    <Check className="w-5 h-5 text-purple-400" />
+                  )}
+                  {isCurrent && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60">
+                      فعلی
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm text-white/60 mb-3">
                   {fmtPrice(plan.priceMonthly)} تومان/ماه
                 </div>
-                <ul className="text-xs text-gray-500 space-y-1">
+                <ul className="text-xs text-white/50 space-y-1">
                   <li>👥 {fmt(plan.maxMembers)} کاربر</li>
                   <li>📋 {fmt(plan.maxObligations)} تعهد</li>
                   <li>📄 {fmt(plan.maxDocuments)} سند</li>
@@ -124,123 +161,156 @@ function UpgradeContent() {
                       : `${plan.maxStorageMB} MB`}
                   </li>
                 </ul>
-                {isCurrent && (
-                  <div className="mt-2 text-xs text-gray-700 font-bold">
-                    پلن فعلی
-                  </div>
-                )}
-              </button>
+              </motion.button>
             );
           })}
         </div>
+      )}
 
-        {selected && !selected.code.match(/^free$/) && (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl shadow p-6 max-w-2xl mx-auto"
-          >
-            <h2 className="text-xl font-bold mb-4">
-              پرداخت برای پلن «{selected.name}»
-            </h2>
+      {/* Payment form */}
+      {selected && selected.code !== 'free' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">
+                  پرداخت برای پلن «{selected.name}»
+                </h2>
+                <p className="text-white/50 text-sm">
+                  مبلغ نهایی:{' '}
+                  <strong className="text-white">
+                    {totalAmount.toLocaleString('fa-IR')} تومان
+                  </strong>
+                </p>
+              </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-sm">
-              <p className="font-bold mb-2">اطلاعات پرداخت:</p>
-              <p>
-                مبلغ نهایی:{' '}
-                <strong>{totalAmount.toLocaleString('fa-IR')} تومان</strong>
-              </p>
-              <p className="mt-2 text-gray-700">
-                لطفاً مبلغ را به شماره کارت زیر واریز کنید و سپس تصویر رسید را
-                آپلود نمایید:
-              </p>
-              <p className="font-mono text-lg mt-2 bg-white border rounded p-2 text-center">
-                6037-XXXX-XXXX-XXXX
-              </p>
-              <p className="text-gray-500 mt-1 text-xs">
-                (شماره کارت از طرف ادمین اعلام می‌شود)
-              </p>
-            </div>
+              {/* Card info panel */}
+              <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-cyan-500/5 p-5 space-y-2">
+                <p className="text-sm text-white/80 font-medium">
+                  مبلغ را به شماره کارت زیر واریز کنید، سپس تصویر رسید را
+                  آپلود نمایید:
+                </p>
+                <p
+                  className="font-mono text-lg text-white bg-black/30 border border-white/10 rounded-xl p-3 text-center tracking-wider"
+                  dir="ltr"
+                >
+                  6037-XXXX-XXXX-XXXX
+                </p>
+                <p className="text-xs text-white/40">
+                  شماره کارت توسط ادمین اعلام می‌شود.
+                </p>
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                مدت اشتراک (ماه)
-              </label>
-              <select
-                value={months}
-                onChange={(e) => setMonths(Number(e.target.value))}
-                className="w-full border rounded-lg p-2"
-              >
-                {[1, 2, 3, 6, 12].map((m) => (
-                  <option key={m} value={m}>
-                    {m} ماه
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Months */}
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  مدت اشتراک
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {[1, 2, 3, 6, 12].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setMonths(m)}
+                      className={cn(
+                        'p-3 rounded-xl text-sm font-medium transition-all border-2',
+                        months === m
+                          ? 'bg-purple-500/20 border-purple-500/50 text-white'
+                          : 'bg-white/5 border-transparent text-white/60 hover:bg-white/10',
+                      )}
+                    >
+                      {m} ماه
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                کد پیگیری (اختیاری)
-              </label>
-              <input
-                type="text"
+              {/* Tracking code */}
+              <Input
+                label="کد پیگیری (اختیاری)"
+                placeholder="شماره پیگیری بانکی"
                 value={trackingCode}
                 onChange={(e) => setTrackingCode(e.target.value)}
-                className="w-full border rounded-lg p-2"
-                placeholder="شماره پیگیری بانکی"
+                dir="ltr"
               />
-            </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-1">
-                تصویر رسید (JPG/PNG/WebP/PDF — حداکثر ۵MB)
-              </label>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,application/pdf"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="w-full border rounded-lg p-2"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-4 text-sm">
-                {error}
+              {/* File upload */}
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  تصویر رسید
+                  <span className="text-white/40 text-xs mr-2">
+                    (JPG / PNG / WebP / PDF — حداکثر ۵ مگابایت)
+                  </span>
+                </label>
+                <label
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-2 w-full p-6 rounded-2xl border-2 border-dashed cursor-pointer transition-all',
+                    file
+                      ? 'border-purple-500/50 bg-purple-500/10'
+                      : 'border-white/15 bg-white/[0.02] hover:border-purple-500/40 hover:bg-white/[0.05]',
+                  )}
+                >
+                  <Upload
+                    className={cn(
+                      'w-6 h-6',
+                      file ? 'text-purple-400' : 'text-white/40',
+                    )}
+                  />
+                  <span className="text-sm text-white/70">
+                    {file ? file.name : 'انتخاب فایل رسید'}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                </label>
               </div>
-            )}
-            {success && (
-              <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-lg mb-4 text-sm">
-                {success}
-              </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={submitting || !file}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-bold"
-            >
-              {submitting ? 'در حال ارسال...' : 'ارسال درخواست پرداخت'}
-            </button>
+              {/* Submit */}
+              <Button
+                type="button"
+                variant="gradient"
+                size="lg"
+                className="w-full"
+                onClick={handleSubmit}
+                disabled={submitting || !file}
+                isLoading={submitting}
+              >
+                ارسال درخواست پرداخت
+              </Button>
 
-            <p className="text-xs text-gray-500 mt-3 text-center">
-              پس از تأیید ادمین، پلن شما به‌طور خودکار فعال می‌شود.
-            </p>
-          </form>
-        )}
+              <p className="text-xs text-white/40 text-center">
+                پس از تأیید ادمین، پلن شما به‌طور خودکار فعال می‌شود و تیکت
+                اطلاع‌رسانی برای شما ارسال خواهد شد.
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
-        {selected?.code === 'free' && (
-          <div className="text-center text-gray-500">
+      {selected && selected.code === 'free' && (
+        <Card>
+          <CardContent className="p-8 text-center text-white/60">
             پلن رایگان نیازی به پرداخت ندارد.
-          </div>
-        )}
-      </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
 
 export default function UpgradePage() {
   return (
-    <Suspense fallback={<div className="p-10">در حال بارگذاری...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-white/40 text-center py-12">بارگذاری...</div>
+      }
+    >
       <UpgradeContent />
     </Suspense>
   );
