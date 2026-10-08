@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { obligationsApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { relativeJalali, toJalaliShort } from '@/lib/jalali';
 
 const categories = [
   { key: 'all', label: 'همه', emoji: '📋' },
@@ -78,15 +79,11 @@ export default function ObligationsPage() {
   const obligations = data?.data || [];
 
   const formatDate = (date: string) => {
-    const d = new Date(date);
-    const now = new Date();
-    const diff = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return toJalaliShort(date);
+  };
 
-    if (diff < 0) return `${Math.abs(diff)} روز گذشته`;
-    if (diff === 0) return 'امروز';
-    if (diff === 1) return 'فردا';
-    if (diff < 30) return `${diff} روز دیگر`;
-    return d.toLocaleDateString('fa-IR');
+  const relativeText = (date: string) => {
+    return relativeJalali(date);
   };
 
   return (
@@ -195,7 +192,9 @@ export default function ObligationsPage() {
                               'px-3 py-1 rounded-full text-xs border whitespace-nowrap',
                               config.badge
                             )}>
-                              {isCompleted ? 'انجام شد' : formatDate(ob.dueDate)}
+                              {isCompleted
+                                ? 'انجام شد'
+                                : `${formatDate(ob.dueDate)} · ${relativeText(ob.dueDate)}`}
                             </span>
                           </div>
                           {ob.description && (
