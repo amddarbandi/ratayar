@@ -11,6 +11,7 @@ const navLinks = [
   { href: '#features', label: 'ویژگی‌ها' },
   { href: '#how', label: 'چطور کار می‌کند' },
   { href: '#pricing', label: 'قیمت‌ها' },
+  { href: '/dashboard/converters', label: 'تبدیل' },
   { href: '#about', label: 'درباره ما' },
 ];
 
