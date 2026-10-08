@@ -9,8 +9,65 @@
 
 ## [Unreleased]
 
-### در حال کار
-- رفع باگ BUILD-001 (۲ خطای import در `documents/page.tsx`)
+### Added (branch feat/plans-subscriptions)
+
+- **api/subscriptions**: user subscription lifecycle
+  - GET /me (auto-provisions free plan), GET /history, POST /cancel
+  - GET /admin/all (admin)
+  - Service: getActivePlan for enforcement, activate for payment approval
+  - Docs: docs/modules/subscriptions.md
+
+- **api/payments**: card-to-card payments
+  - POST / (receipt upload, auto-creates admin ticket)
+  - GET /me, GET /admin/all, POST /admin/:id/approve, POST /admin/:id/reject
+  - On approve: activates subscription + closes ticket
+  - Docs: docs/modules/payments.md
+
+- **api/tickets**: user <-> admin ticketing
+  - 7 routes: user create/list/get/reply + admin list/reply/status
+  - No user-to-user messaging
+  - Docs: docs/modules/tickets.md
+
+- **auth/RolesGuard**: @Roles decorator + role in JWT payload
+  - Enables admin-only endpoints across payments and tickets
+
+- **docs/ROADMAP.md**: master tracking file for all 168 tasks
+- **docs/modules/**: architecture docs per module
+
+### Fixed
+
+- BUILD-002: PM2 MODULE_NOT_FOUND loop
+  - Root cause: tsconfig include contained prisma/**, so tsc inferred
+    rootDir as project root; emit went to dist/src/main.js
+  - Fix: explicit rootDir=./src, include only src/**/*, prisma in exclude
+  - Also: incremental=false to prevent tsbuildinfo skipping emit after
+    deleteOutDir=true
+
+- API-001: UUID validation in DocumentsController
+  - ParseUUIDPipe on all 4 :id endpoints
+
+
+
+### Fixed
+- **api**: UUID validation در `DocumentsController` — افزودن `ParseUUIDPipe` به ۴ endpoint `:id` (findOne/stream/download/remove). رفع 500 روی UUID نامعتبر. (KNOWN-ISSUES#API-001)
+
+- **api**: رفع حلقه کرش PM2 (`MODULE_NOT_FOUND` برای `dist/main.js`)
+  - ریشه: `tsconfig.json` شامل `prisma/**/*` بود → `rootDir` روی ریشه پروژه → خروجی در `dist/src/main.js`
+  - راه‌حل: `rootDir=./src`، `include` فقط `src/**/*`، انتقال `prisma` به `exclude`
+  - Commit: `94e1b4b` — جزئیات: `KNOWN-ISSUES.md#build-002`
+
+### Added
+- **api**: ماژول Plans با ۷ روت:
+  - `GET /api/plans` — لیست پلن‌ها
+  - `GET /api/plans/code/:code` — دریافت پلن با کد
+  - `GET /api/plans/admin/all` — لیست مدیریتی
+  - `GET /api/plans/:id` — پلن تکی
+  - `POST /api/plans` — ایجاد پلن
+  - `PATCH /api/plans/:id` — ویرایش پلن
+  - `DELETE /api/plans/:id` — حذف پلن
+- **db**: migration `20261008083117_add_plans_subscriptions_payments_tickets`
+- **db**: seed `prisma/seed-plans.ts` — ۴ پلن: رایگان، شخصی، خانواده، کسب‌وکار
+
 
 ### برنامه‌ریزی‌شده
 - رفع باگ‌های Critical (SEC-001 تا SEC-005)

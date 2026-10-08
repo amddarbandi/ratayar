@@ -256,3 +256,72 @@ export const termsApi = {
 const _storageApi = {
   getStats: () => api.get('/documents/storage'),
 };
+
+// ═══════════════════════════════════════════
+// Plans API
+// ═══════════════════════════════════════════
+
+export const plansApi = {
+  list: () => api.get('/plans'),
+  byCode: (code: string) => api.get(`/plans/code/${code}`),
+};
+
+// ═══════════════════════════════════════════
+// Subscription API
+// ═══════════════════════════════════════════
+
+export const subscriptionApi = {
+  me: () => api.get('/subscriptions/me'),
+  history: () => api.get('/subscriptions/history'),
+  cancel: () => api.post('/subscriptions/cancel'),
+};
+
+// ═══════════════════════════════════════════
+// Plan limits / usage
+// ═══════════════════════════════════════════
+
+export const planApi = {
+  usage: () => api.get('/plan/usage'),
+};
+
+// ═══════════════════════════════════════════
+// Payment API (card-to-card)
+// ═══════════════════════════════════════════
+
+export const paymentApi = {
+  create: (data: FormData) =>
+    api.post('/payments', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  mine: () => api.get('/payments/me'),
+  adminAll: (status?: string) =>
+    api.get(`/payments/admin/all${status ? `?status=${status}` : ''}`),
+  adminApprove: (id: string, adminNote?: string) =>
+    api.post(`/payments/admin/${id}/approve`, { adminNote }),
+  adminReject: (id: string, adminNote?: string) =>
+    api.post(`/payments/admin/${id}/reject`, { adminNote }),
+};
+
+// ═══════════════════════════════════════════
+// Ticket API
+// ═══════════════════════════════════════════
+
+export const ticketApi = {
+  create: (data: {
+    subject: string;
+    category?: string;
+    priority?: string;
+    body: string;
+  }) => api.post('/tickets', data),
+  mine: () => api.get('/tickets/me'),
+  get: (id: string) => api.get(`/tickets/${id}`),
+  reply: (id: string, body: string) =>
+    api.post(`/tickets/${id}/messages`, { body }),
+  adminAll: (status?: string) =>
+    api.get(`/tickets/admin/all${status ? `?status=${status}` : ''}`),
+  adminReply: (id: string, body: string) =>
+    api.post(`/tickets/admin/${id}/messages`, { body }),
+  adminSetStatus: (id: string, status: string, note?: string) =>
+    api.patch(`/tickets/admin/${id}/status`, { status, note }),
+};
+

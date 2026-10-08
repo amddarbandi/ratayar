@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     // ۱. بررسی موجود بودن کاربر
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, phone: true, status: true, deletedAt: true },
+      select: { id: true, phone: true, role: true, status: true, deletedAt: true },
     });
 
     if (!user || user.deletedAt || user.status !== 'active') {
@@ -50,6 +50,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     return {
       userId: user.id,
       phone: user.phone,
+      role: user.role,
     };
   }
 }

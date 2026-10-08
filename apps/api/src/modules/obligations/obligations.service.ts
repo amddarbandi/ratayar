@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { PlanLimitsService } from '../../common/plan-limits/plan-limits.service';
 import { CreateObligationDto } from './dto/create-obligation.dto';
 import { UpdateObligationDto } from './dto/update-obligation.dto';
 
@@ -7,9 +8,13 @@ import { UpdateObligationDto } from './dto/update-obligation.dto';
 export class ObligationsService {
   private readonly logger = new Logger(ObligationsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly planLimits: PlanLimitsService,
+  ) {}
 
   async create(userId: string, dto: CreateObligationDto) {
+    await this.planLimits.checkObligationLimit(userId);
     const obligation = await this.prisma.obligation.create({
       data: {
         userId,

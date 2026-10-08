@@ -4,6 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { PlanLimitsModule } from './common/plan-limits/plan-limits.module';
 import { RedisModule } from './common/redis/redis.module';
 import { MinioModule } from './common/minio/minio.module';
 import { HealthModule } from './modules/health/health.module';
@@ -18,6 +19,10 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { SearchModule } from './modules/search/search.module';
 import { TermsModule } from './modules/terms/terms.module';
+import { PlansModule } from './modules/plans/plans.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
 import { ReminderTask } from './common/tasks/reminder.task';
 
 @Module({
@@ -29,6 +34,7 @@ import { ReminderTask } from './common/tasks/reminder.task';
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     PrismaModule,
+    PlanLimitsModule,
     RedisModule,
     MinioModule,
     HealthModule,
@@ -43,6 +49,10 @@ import { ReminderTask } from './common/tasks/reminder.task';
     ReportsModule,
     SearchModule,
     TermsModule,
+    PlansModule,
+    SubscriptionsModule,
+    PaymentsModule,
+    TicketsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

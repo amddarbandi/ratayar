@@ -131,4 +131,17 @@ export class MinioService implements OnModuleInit, OnModuleDestroy {
       expirySeconds,
     );
   }
+
+  async getObjectStream(storageKey: string): Promise<any> {
+    return await this.client.getObject(this.bucket, storageKey);
+  }
+
+  async removeFile(storageKey: string): Promise<void> {
+    try {
+      await this.client.removeObject(this.bucket, storageKey);
+      this.logger.log(`MinIO removed: ${storageKey}`);
+    } catch (e: any) {
+      this.logger.error(`MinIO remove failed for ${storageKey}: ${e.message}`);
+    }
+  }
 }
