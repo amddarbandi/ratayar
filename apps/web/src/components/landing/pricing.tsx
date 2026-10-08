@@ -134,14 +134,14 @@ export function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`relative bento-item p-8 ${
+              className={`relative bento-item p-8 !overflow-visible ${
                 plan.highlighted
                   ? 'ring-2 ring-purple-500/50 shadow-2xl shadow-purple-500/20 lg:scale-105'
                   : ''
               }`}
             >
               {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-medium shadow-lg">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 text-white text-xs font-bold shadow-xl shadow-purple-500/50 border border-white/20 backdrop-blur-md ring-2 ring-white/10 whitespace-nowrap">
                   <Sparkles className="w-3 h-3 inline mr-1" />
                   {plan.badge}
                 </div>
