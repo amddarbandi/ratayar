@@ -13,13 +13,6 @@
 
 ## 🟠 High — مهم
 
-### API-001: UUID validation در `documents.findOne`
-- **فایل:** `apps/api/src/modules/documents/documents.service.ts:94`
-- **مشکل:** `id` بدون validation به Prisma داده می‌شود
-- **تأثیر:** `PrismaClientKnownRequestError: UUID invalid` → 500 response
-- **راه‌حل:** `@Param('id', new ParseUUIDPipe())` در controller یا `validate` در service
-- **وضعیت:** 🟠 Open (یک بار در 22:48 رخ داد)
-
 ### API-002: `documents.stream` کل فایل در RAM
 - **فایل:** `apps/api/src/modules/documents/documents.service.ts`
 - **مشکل:** `getFile` تمام buffer را لود می‌کند سپس `res.end(buffer)`
@@ -258,6 +251,12 @@
   - `pm2 logs` = `🚀 Ratayar API running on port 4000`
   - ۷ روت Plans در startup map شدند
   - Prisma/Redis/MinIO = ✅ همه connect
+
+### API-001: UUID validation در DocumentsController — ✅ 2026-10-08
+- **فایل:** `apps/api/src/modules/documents/documents.controller.ts`
+- **ریشه:** `@Param('id')` بدون validation → UUID نامعتبر به Prisma → 500
+- **راه‌حل:** افزودن `ParseUUIDPipe` به ۴ endpoint دارای `:id` (findOne/stream/download/remove)
+- **Verification:** tsc صفر خطا، build موفق
 
 ## نحوه استفاده
 

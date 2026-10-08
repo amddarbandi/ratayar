@@ -1,7 +1,7 @@
 import {
   Controller, Get, Post, Delete, Param, UseGuards, Req,
   Query, UploadedFile, UseInterceptors, HttpCode, HttpStatus,
-  Body, BadRequestException, Res,
+  Body, BadRequestException, Res, ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
@@ -42,12 +42,12 @@ export class DocumentsController {
   }
 
   @Get(':id')
-  findOne(@Req() req: any, @Param('id') id: string) {
+  findOne(@Req() req: any, @Param('id', new ParseUUIDPipe()) id: string) {
     return this.documents.findOne(req.user.userId, id);
   }
 
   @Get(':id/stream')
-  async stream(@Req() req: any, @Param('id') id: string, @Res() res: any) {
+  async stream(@Req() req: any, @Param('id', new ParseUUIDPipe()) id: string, @Res() res: any) {
     const file = await this.documents.stream(req.user.userId, id);
     res.setHeader('Content-Type', file.mimeType);
     res.setHeader('Content-Length', file.size);
@@ -61,7 +61,7 @@ export class DocumentsController {
   @Get(':id/download')
   getDownloadUrl(
     @Req() req: any,
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Query('inline') inline?: string,
   ) {
     return this.documents.getDownloadUrl(req.user.userId, id, inline === 'true');
@@ -69,7 +69,7 @@ export class DocumentsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  remove(@Req() req: any, @Param('id') id: string) {
+  remove(@Req() req: any, @Param('id', new ParseUUIDPipe()) id: string) {
     return this.documents.remove(req.user.userId, id);
   }
 }

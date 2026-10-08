@@ -10,6 +10,8 @@
 ## [Unreleased]
 
 ### Fixed
+- **api**: UUID validation در `DocumentsController` — افزودن `ParseUUIDPipe` به ۴ endpoint `:id` (findOne/stream/download/remove). رفع 500 روی UUID نامعتبر. (KNOWN-ISSUES#API-001)
+
 - **api**: رفع حلقه کرش PM2 (`MODULE_NOT_FOUND` برای `dist/main.js`)
   - ریشه: `tsconfig.json` شامل `prisma/**/*` بود → `rootDir` روی ریشه پروژه → خروجی در `dist/src/main.js`
   - راه‌حل: `rootDir=./src`، `include` فقط `src/**/*`، انتقال `prisma` به `exclude`
