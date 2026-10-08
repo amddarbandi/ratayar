@@ -5,8 +5,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Sparkles, LayoutDashboard, Calendar, Package, Wallet, Users,
-  FileText, Settings, LogOut, Bell, Network, Search, Command,
-  BarChart3,
+  FileText, Settings, LogOut, Bell, Network, Search,
+  BarChart3, MessageSquare, HardDrive, Crown, Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
@@ -21,9 +21,16 @@ const navItems = [
   { href: '/dashboard/family', label: 'خانواده', icon: Users },
   { href: '/dashboard/family-tree', label: 'شجره‌نامه', icon: Network },
   { href: '/dashboard/documents', label: 'اسناد', icon: FileText },
+  { href: '/dashboard/storage', label: 'فضای ذخیره‌سازی', icon: HardDrive },
   { href: '/dashboard/reports', label: 'گزارش‌ها', icon: BarChart3 },
+  { href: '/dashboard/tickets', label: 'تیکت‌های پشتیبانی', icon: MessageSquare },
   { href: '/dashboard/notifications', label: 'اعلان‌ها', icon: Bell },
+  { href: '/dashboard/upgrade', label: 'ارتقای پلن', icon: Crown },
   { href: '/dashboard/settings', label: 'تنظیمات', icon: Settings },
+];
+
+const adminItems = [
+  { href: '/admin', label: 'پنل مدیریت', icon: Shield },
 ];
 
 export function DashboardSidebar({
@@ -37,6 +44,8 @@ export function DashboardSidebar({
   const refreshToken = useAuthStore((s) => s.refreshToken);
   const logout = useAuthStore((s) => s.logout);
 
+  const isAdmin = (user as any)?.role === 'admin';
+
   const isMac =
     typeof navigator !== 'undefined' &&
     navigator.platform.toLowerCase().includes('mac');
@@ -48,6 +57,50 @@ export function DashboardSidebar({
     logout();
     toast.success('خروج موفق');
     router.push('/');
+  };
+
+  const renderItem = (item: { href: string; label: string; icon: any }, options?: { admin?: boolean }) => {
+    const isActive =
+      pathname === item.href ||
+      (item.href !== '/dashboard' && pathname.startsWith(item.href));
+
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        className={cn(
+          'relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
+          isActive
+            ? options?.admin
+              ? 'bg-gradient-to-l from-red-500/20 to-transparent text-white'
+              : 'bg-gradient-to-l from-purple-500/20 to-transparent text-white'
+            : 'text-white/60 hover:text-white hover:bg-white/5',
+        )}
+      >
+        {isActive && (
+          <motion.div
+            layoutId="sidebar-active"
+            className={cn(
+              'absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-l-full',
+              options?.admin
+                ? 'bg-gradient-to-b from-red-400 to-orange-400'
+                : 'bg-gradient-to-b from-purple-400 to-cyan-400',
+            )}
+          />
+        )}
+        <item.icon
+          className={cn(
+            'w-5 h-5 transition-colors',
+            isActive
+              ? options?.admin
+                ? 'text-red-400'
+                : 'text-purple-400'
+              : 'text-white/40 group-hover:text-white/70',
+          )}
+        />
+        <span className="font-medium text-sm">{item.label}</span>
+      </Link>
+    );
   };
 
   return (
@@ -92,45 +145,24 @@ export function DashboardSidebar({
               {user?.phone}
             </div>
           </div>
+          {isAdmin && (
+            <div className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+              ادمین
+            </div>
+          )}
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== '/dashboard' && pathname.startsWith(item.href));
+        {navItems.map((item) => renderItem(item))}
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
-                isActive
-                  ? 'bg-gradient-to-l from-purple-500/20 to-transparent text-white'
-                  : 'text-white/60 hover:text-white hover:bg-white/5',
-              )}
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="sidebar-active"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-l-full bg-gradient-to-b from-purple-400 to-cyan-400"
-                />
-              )}
-              <item.icon
-                className={cn(
-                  'w-5 h-5 transition-colors',
-                  isActive
-                    ? 'text-purple-400'
-                    : 'text-white/40 group-hover:text-white/70',
-                )}
-              />
-              <span className="font-medium text-sm">{item.label}</span>
-            </Link>
-          );
-        })}
+        {isAdmin && (
+          <div className="pt-3 mt-3 border-t border-white/10">
+            <div className="text-[10px] text-white/30 px-4 pb-2">مدیریت</div>
+            {adminItems.map((item) => renderItem(item, { admin: true }))}
+          </div>
+        )}
       </nav>
 
       {/* Logout */}
