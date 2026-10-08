@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import {
+  MessageSquare, Plus, X, Loader2, Send, ChevronLeft,
+} from 'lucide-react';
 import { ticketApi } from '@/lib/api';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface Ticket {
   id: string;
@@ -13,7 +22,6 @@ interface Ticket {
   messageCount: number;
   createdAt: string;
   updatedAt: string;
-  closedAt?: string;
 }
 
 const CATEGORIES: Record<string, string> = {
@@ -32,10 +40,19 @@ const PRIORITIES: Record<string, string> = {
 };
 
 const STATUSES: Record<string, { text: string; cls: string }> = {
-  open: { text: 'باز', cls: 'bg-blue-100 text-blue-800' },
-  answered: { text: 'پاسخ داده شد', cls: 'bg-green-100 text-green-800' },
-  pending_user: { text: 'در انتظار شما', cls: 'bg-yellow-100 text-yellow-800' },
-  closed: { text: 'بسته', cls: 'bg-gray-200 text-gray-700' },
+  open: { text: 'باز', cls: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' },
+  answered: {
+    text: 'پاسخ داده شد',
+    cls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+  },
+  pending_user: {
+    text: 'در انتظار شما',
+    cls: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+  },
+  closed: {
+    text: 'بسته',
+    cls: 'bg-white/10 text-white/50 border-white/20',
+  },
 };
 
 export default function TicketsPage() {
@@ -47,14 +64,13 @@ export default function TicketsPage() {
   const [priority, setPriority] = useState('normal');
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
   const load = () => {
     setLoading(true);
     ticketApi
       .mine()
       .then((res) => setTickets(res.data))
-      .catch(() => setError('خطا در بارگذاری تیکت‌ها'))
+      .catch(() => toast.error('خطا در بارگذاری تیکت‌ها'))
       .finally(() => setLoading(false));
   };
 
@@ -62,14 +78,14 @@ export default function TicketsPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     if (!subject || !body) {
-      setError('موضوع و متن الزامی است');
+      toast.error('موضوع و متن الزامی است');
       return;
     }
     setSubmitting(true);
     try {
       await ticketApi.create({ subject, category, priority, body });
+      toast.success('تیکت ثبت شد');
       setSubject('');
       setBody('');
       setCategory('other');
@@ -77,147 +93,217 @@ export default function TicketsPage() {
       setShowForm(false);
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.message || 'خطا در ثبت تیکت');
+      toast.error(e?.response?.data?.message || 'خطا در ثبت تیکت');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4" dir="rtl">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">تیکت‌های پشتیبانی</h1>
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
-          >
-            {showForm ? 'انصراف' : '+ تیکت جدید'}
-          </button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-1">
+            تیکت‌های پشتیبانی
+          </h1>
+          <p className="text-white/50">
+            گفتگو مستقیم با تیم پشتیبانی راتایار
+          </p>
         </div>
+        <button
+          onClick={() => setShowForm((v) => !v)}
+          className={cn(
+            'inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-medium transition-all shadow-lg hover:scale-105',
+            showForm
+              ? 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
+              : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white shadow-purple-500/30',
+          )}
+        >
+          {showForm ? (
+            <>
+              <X className="w-5 h-5" />
+              انصراف
+            </>
+          ) : (
+            <>
+              <Plus className="w-5 h-5" />
+              تیکت جدید
+            </>
+          )}
+        </button>
+      </div>
 
-        {showForm && (
-          <form
-            onSubmit={submit}
-            className="bg-white rounded-2xl shadow p-6 mb-6"
-          >
-            <h2 className="text-lg font-bold mb-4">ایجاد تیکت جدید</h2>
+      {/* New ticket form */}
+      {showForm && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card>
+            <CardContent className="p-6 space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-white">تیکت جدید</h2>
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-sm mb-1">موضوع *</label>
-              <input
-                type="text"
+              <Input
+                label="موضوع"
+                placeholder="خلاصه‌ای از مشکل یا درخواست"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full border rounded-lg p-2"
-                placeholder="خلاصه‌ای از مشکل یا درخواست"
-                required
-                minLength={3}
               />
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-white/80 mb-2">
+                    دسته
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(CATEGORIES).map(([k, v]) => (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => setCategory(k)}
+                        className={cn(
+                          'p-2.5 rounded-xl text-xs font-medium transition-all border',
+                          category === k
+                            ? 'bg-purple-500/20 border-purple-500/50 text-white'
+                            : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10',
+                        )}
+                      >
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white/80 mb-2">
+                    اولویت
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(PRIORITIES).map(([k, v]) => (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => setPriority(k)}
+                        className={cn(
+                          'p-2.5 rounded-xl text-xs font-medium transition-all border',
+                          priority === k
+                            ? 'bg-purple-500/20 border-purple-500/50 text-white'
+                            : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10',
+                        )}
+                      >
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm mb-1">دسته</label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full border rounded-lg p-2"
-                >
-                  {Object.entries(CATEGORIES).map(([k, v]) => (
-                    <option key={k} value={k}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  توضیحات
+                </label>
+                <textarea
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  placeholder="جزئیات مشکل یا درخواست خود را بنویسید..."
+                  rows={5}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.07] focus:ring-4 focus:ring-purple-500/10 transition-all resize-none"
+                />
               </div>
-              <div>
-                <label className="block text-sm mb-1">اولویت</label>
-                <select
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value)}
-                  className="w-full border rounded-lg p-2"
-                >
-                  {Object.entries(PRIORITIES).map(([k, v]) => (
-                    <option key={k} value={k}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </div>
+
+              <Button
+                type="button"
+                variant="gradient"
+                size="lg"
+                className="w-full"
+                onClick={submit}
+                disabled={submitting}
+                isLoading={submitting}
+              >
+                <Send className="w-5 h-5" />
+                ارسال تیکت
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* List */}
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-24 rounded-3xl bg-white/5 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : tickets.length === 0 ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center">
+              <MessageSquare className="w-8 h-8 text-purple-400" />
             </div>
-
-            <div className="mb-4">
-              <label className="block text-sm mb-1">توضیحات *</label>
-              <textarea
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                className="w-full border rounded-lg p-2 h-32"
-                placeholder="جزئیات مشکل یا درخواست خود را بنویسید..."
-                required
-                minLength={5}
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-4 text-sm">
-                {error}
-              </div>
-            )}
-
+            <h3 className="text-xl font-bold text-white mb-2">
+              هنوز تیکتی ثبت نکردی
+            </h3>
+            <p className="text-white/50 mb-6">
+              اگر سؤالی داری یا مشکلی پیش آمده، تیکت جدید بساز
+            </p>
             <button
-              type="submit"
-              disabled={submitting}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg"
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium hover:scale-105 transition-all"
             >
-              {submitting ? 'در حال ارسال...' : 'ارسال تیکت'}
+              <Plus className="w-5 h-5" />
+              ساخت اولین تیکت
             </button>
-          </form>
-        )}
-
-        {loading && (
-          <div className="text-center text-gray-500 py-10">در حال بارگذاری...</div>
-        )}
-
-        {!loading && tickets.length === 0 && (
-          <div className="bg-white rounded-2xl shadow p-10 text-center text-gray-500">
-            هنوز تیکتی ثبت نکرده‌اید.
-          </div>
-        )}
-
-        {!loading && tickets.length > 0 && (
-          <div className="space-y-3">
-            {tickets.map((t) => {
-              const st = STATUSES[t.status] || STATUSES.open;
-              return (
-                <Link
-                  key={t.id}
-                  href={`/dashboard/tickets/${t.id}`}
-                  className="block bg-white rounded-2xl shadow hover:shadow-md transition p-5"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="font-bold text-lg">{t.subject}</div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${st.cls}`}
-                    >
-                      {st.text}
-                    </span>
-                  </div>
-                  <div className="flex gap-3 text-xs text-gray-500 flex-wrap">
-                    <span>دسته: {CATEGORIES[t.category] || t.category}</span>
-                    <span>اولویت: {PRIORITIES[t.priority] || t.priority}</span>
-                    <span>💬 {t.messageCount} پیام</span>
-                    <span>
-                      آخرین به‌روز:{' '}
-                      {new Date(t.updatedAt).toLocaleDateString('fa-IR')}
-                    </span>
-                  </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {tickets.map((t, i) => {
+            const st = STATUSES[t.status] || STATUSES.open;
+            return (
+              <motion.div
+                key={t.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
+              >
+                <Link href={`/dashboard/tickets/${t.id}`}>
+                  <Card className="hover:border-purple-500/30 transition-all cursor-pointer">
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <h3 className="font-bold text-white text-lg flex-1">
+                          {t.subject}
+                        </h3>
+                        <span
+                          className={cn(
+                            'px-3 py-1 rounded-full text-xs border whitespace-nowrap',
+                            st.cls,
+                          )}
+                        >
+                          {st.text}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-white/50 flex-wrap">
+                        <span>{CATEGORIES[t.category] || t.category}</span>
+                        <span>اولویت: {PRIORITIES[t.priority]}</span>
+                        <span>💬 {t.messageCount} پیام</span>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
