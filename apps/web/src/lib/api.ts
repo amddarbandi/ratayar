@@ -325,3 +325,10 @@ export const ticketApi = {
     api.patch(`/tickets/admin/${id}/status`, { status, note }),
 };
 
+// ═══════════════════════════════════════════
+// Market API
+// ═══════════════════════════════════════════
+
+export const marketApi = {
+  prices: () => api.get('/market/prices'),
+};

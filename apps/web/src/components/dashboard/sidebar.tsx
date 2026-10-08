@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import {
   Sparkles, LayoutDashboard, Calendar, Package, Wallet, Users,
   FileText, Settings, LogOut, Bell, Network, Search,
-  BarChart3, MessageSquare, HardDrive, Crown, Shield, Repeat,
+  BarChart3, MessageSquare, HardDrive, Crown, Shield, Repeat, TrendingUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LogoWordmark } from '@/components/brand/logo';
@@ -23,7 +23,8 @@ const navItems = [
   { href: '/dashboard/family-tree', label: 'شجره‌نامه', icon: Network },
   { href: '/dashboard/documents', label: 'اسناد', icon: FileText },
   { href: '/dashboard/storage', label: 'فضای ذخیره‌سازی', icon: HardDrive },
-  { href: '/dashboard/converters', label: 'کانورت‌ها', icon: Repeat },
+  { href: '/dashboard/converters', label: 'تبدیل', icon: Repeat },
+  { href: '/dashboard/market', label: 'بازار و قیمت‌ها', icon: TrendingUp },
   { href: '/dashboard/reports', label: 'گزارش‌ها', icon: BarChart3 },
   { href: '/dashboard/tickets', label: 'تیکت‌های پشتیبانی', icon: MessageSquare },
   { href: '/dashboard/notifications', label: 'اعلان‌ها', icon: Bell },
