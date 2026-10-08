@@ -270,19 +270,30 @@ Last updated: 2026-10-08
 
 ## Next up (in order) — updated 2026-10-08
 
-### Current focus (per user directive)
+### Current focus (per user directive, updated 2026-10-09)
 
-1. **Phase 2 — Jalali calendar (CAL-001..008)** — HIGH
-   All date inputs/outputs become Jalali across the panel.
+Order of work:
 
-2. **Phase 9 — Clock & time.ir-like calendar (CLOCK-001..010)** — HIGH
-   Dedicated page: Jalali/Gregorian/Hijri, events, holidays,
-   prayer times, family local times.
+1. **B — Converters (کانورت‌ها)** — HIGH — IN PROGRESS
+   Very graphical, colorful, appealing from a 7-year-old to an
+   80-year-old. Unit conversions only (NO file conversion).
+   Categories: weight, length, volume, temperature, area, time,
+   data size, speed, pressure, energy, currency.
+   Design: big category cards with emojis, live conversion as you
+   type, swap button, copy result, quick reference table.
 
-3. **Phase 10 — Converters + Subnet Calculator (CALC)** — HIGH
-   Two new top-level menus:
-   - "کانورت‌ها" (unit conversions, NO file conversion)
-   - "Subnet Calculator" (IPv4 full detail + IPv6)
+2. **C — Subnet Calculator** — HIGH — NEXT
+   Engineering / network theme (router, switch, cables, racks).
+   IPv4 with full detail (network, broadcast, mask, wildcard, host
+   range, CIDR list, class, type) + IPv6 (compressed / expanded,
+   prefix, range, total addresses).
+
+3. **A — Clock / time.ir-like page** — HIGH — AFTER C
+   Analog SVG clock (square + round), Jalali + Gregorian + Hijri,
+   daily events, holidays, prayer times (adhan), family local times.
+
+Everything must be recorded in GitHub (roadmap, module docs, commit
+messages, changelog).
 
 ### Afterwards (previous plan)
 
