@@ -81,3 +81,54 @@ Resolves: API-001
 - dist/ or node_modules/ in git
 
 Last updated: 2026-10-08
+
+## Outage prevention rules
+
+### Rule 1 — Never run pnpm/npm install on production without env guard
+
+Forbidden on production:
+- pnpm install
+- pnpm install --force
+- npm install
+- pnpm install --no-frozen-lockfile
+
+Why: pnpm respects NODE_ENV=production and silently removes every
+devDependency (autoprefixer, postcss plugins, ts-node...). The next
+build fails and pm2 web goes errored.
+
+If deps really must change:
+  CI=true NODE_ENV=development pnpm install --frozen-lockfile
+
+After any install: verify autoprefixer exists in node_modules before
+touching anything else.
+
+### Rule 2 — Never restart pm2 before .next/BUILD_ID exists
+
+check: ls apps/web/.next/BUILD_ID
+
+If missing: do not restart. Rollback the offending commit and rebuild.
+
+### Rule 3 — Build first, then commit, then push
+
+Sequence:
+  1. edit files
+  2. pnpm build locally / turbo run build --filter=...
+  3. verify BUILD_ID exists
+  4. pm2 restart (if API, also verify /api/health)
+  5. curl smoke test (200 on affected routes)
+  6. git commit
+  7. git push
+
+Never commit code that has not been built and smoked on this server.
+
+### Rule 4 — Small blocks only
+
+No commit should touch more than 2-3 files unless it is a pure docs
+commit. Multi-file refactors must be split across multiple commits,
+each fully verified before the next.
+
+### Rule 5 — Outage log
+
+Any user-visible outage (502, pm2 errored, blank page) must be logged
+in docs/OUTAGES.md with: cause, timeline, fix commit, prevention rule
+added.
