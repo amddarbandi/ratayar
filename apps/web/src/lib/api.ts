@@ -256,3 +256,21 @@ export const termsApi = {
 const _storageApi = {
   getStats: () => api.get('/documents/storage'),
 };
+
+
+// ═══════════════════════════════════════════
+// Plans API
+// ═══════════════════════════════════════════
+
+export const plansApi = {
+  list: async () => {
+    const res = await fetch(`${API_URL}/api/plans`);
+    if (!res.ok) throw new Error('Failed to load plans');
+    return res.json();
+  },
+  byCode: async (code: string) => {
+    const res = await fetch(`${API_URL}/api/plans/code/${code}`);
+    if (!res.ok) throw new Error('Plan not found');
+    return res.json();
+  },
+};

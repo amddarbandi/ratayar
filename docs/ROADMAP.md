@@ -13,7 +13,7 @@ Last updated: 2026-10-08
 - [ ] BIZ-001 Admin CRUD plans UI (backend done, frontend pending)
 - [-] BIZ-002 ZarinPal integration (deferred — using card-to-card)
 - [~] BIZ-003 Subscription lifecycle: purchase/renew/cancel (backend done, UI pending)
-- [ ] BIZ-004 Plan selection + upgrade page (frontend)
+- [~] BIZ-004 Plan selection page done; upgrade flow pending
 - [ ] BIZ-005 Invoice + PDF receipt
 - [ ] BIZ-006 Plan limit enforcement (max oblig/assets/docs) — NEXT
 - [ ] BIZ-007 Upload size limit per plan — NEXT
