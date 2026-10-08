@@ -1,73 +1,104 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
+import { plansApi } from '@/lib/api';
 
-const plans = [
+interface ApiPlan {
+  id: string;
+  code: string;
+  name: string;
+  description?: string;
+  priceMonthly: string;
+  maxMembers: number;
+  maxObligations: number;
+  maxAssets: number;
+  maxDocuments: number;
+  maxStorageMB: number;
+  maxUploadMB: number;
+  isPopular?: boolean;
+}
+
+interface DisplayPlan {
+  name: string;
+  price: string;
+  period: string;
+  features: string[];
+  cta: string;
+  href: string;
+  highlighted: boolean;
+  badge?: string;
+}
+
+const FALLBACK: DisplayPlan[] = [
   {
     name: 'رایگان',
     price: '۰',
     period: 'همیشه',
-    features: [
-      '۱۰ تعهد',
-      '۱ کاربر',
-      'یادآور پیامکی',
-      'پشتیبانی ایمیل',
-    ],
+    features: ['۵ تعهد', '۱ کاربر', '۱ سند', 'پشتیبانی ایمیل'],
     cta: 'شروع رایگان',
     href: '/register',
     highlighted: false,
   },
-  {
-    name: 'شخصی',
-    price: '۴۹,۰۰۰',
-    period: 'ماهانه',
-    features: [
-      'تعهد نامحدود',
-      'دارایی نامحدود',
-      'یادآور پیامکی + پوش',
-      'گزارش کامل',
-      'پشتیبانی چت',
-    ],
-    cta: 'انتخاب شخصی',
-    href: '/register?plan=personal',
-    highlighted: true,
-    badge: 'محبوب‌ترین',
-  },
-  {
-    name: 'خانواده',
-    price: '۱۴۹,۰۰۰',
-    period: 'ماهانه',
-    features: [
-      'تا ۶ کاربر',
-      'همه امکانات شخصی',
-      'داشبورد خانوادگی',
-      'تقسیم کار',
-      'پشتیبانی کامل',
-    ],
-    cta: 'انتخاب خانواده',
-    href: '/register?plan=family',
-    highlighted: false,
-  },
-  {
-    name: 'کسب‌وکار',
-    price: '۴۹۹,۰۰۰',
-    period: 'ماهانه',
-    features: [
-      'تا ۱۰ کاربر',
-      'کارت تعهد مشتری',
-      'انطباق خودکار',
-      'گزارش کسب‌وکار',
-      'پشتیبانی اختصاصی',
-    ],
-    cta: 'انتخاب کسب‌وکار',
-    href: '/register?plan=business',
-    highlighted: false,
-  },
 ];
 
+function fmtNum(n: number) {
+  if (n === -1) return 'بی‌نهایت';
+  return n.toLocaleString('fa-IR');
+}
+
+function fmtStorage(mb: number) {
+  if (mb >= 1024) return `${(mb / 1024).toFixed(0)} GB`;
+  return `${mb} MB`;
+}
+
+function toDisplay(p: ApiPlan): DisplayPlan {
+  const price = Number(p.priceMonthly);
+  const isFree = price === 0;
+  const features: string[] = [];
+
+  if (p.maxMembers > 1) features.push(`تا ${fmtNum(p.maxMembers)} کاربر`);
+  else features.push('۱ کاربر');
+
+  features.push(`${fmtNum(p.maxObligations)} تعهد`);
+  features.push(`${fmtNum(p.maxAssets)} دارایی`);
+  features.push(`${fmtNum(p.maxDocuments)} سند`);
+  features.push(`${fmtStorage(p.maxStorageMB)} فضا`);
+
+  const cta = isFree ? 'شروع رایگان' : `انتخاب ${p.name}`;
+  const href = isFree ? '/register' : `/register?plan=${p.code}`;
+
+  return {
+    name: p.name,
+    price: price.toLocaleString('fa-IR'),
+    period: isFree ? 'همیشه' : 'ماهانه',
+    features,
+    cta,
+    href,
+    highlighted: !!p.isPopular,
+    badge: p.isPopular ? 'محبوب‌ترین' : undefined,
+  };
+}
+
 export function Pricing() {
+  const [plans, setPlans] = useState<DisplayPlan[]>(FALLBACK);
+
+  useEffect(() => {
+    plansApi
+      .list()
+      .then((res) => {
+        const data: ApiPlan[] = res.data;
+        if (Array.isArray(data) && data.length > 0) {
+          setPlans(data.map(toDisplay));
+        }
+      })
+      .catch(() => {
+        /* keep fallback */
+      });
+  }, []);
+
   return (
     <section id="pricing" className="relative py-24">
       <div className="container mx-auto px-4">
@@ -91,7 +122,11 @@ export function Pricing() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 ${
+            plans.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+          } gap-6`}
+        >
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -126,9 +161,7 @@ export function Pricing() {
                   </span>
                   <span className="text-white/50 text-sm">تومان</span>
                 </div>
-                <span className="text-white/50 text-sm">
-                  {plan.period}
-                </span>
+                <span className="text-white/50 text-sm">{plan.period}</span>
               </div>
 
               <ul className="space-y-3 mb-8">
