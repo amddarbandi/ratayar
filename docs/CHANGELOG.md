@@ -9,6 +9,45 @@
 
 ## [Unreleased]
 
+### Added (branch feat/plans-subscriptions)
+
+- **api/subscriptions**: user subscription lifecycle
+  - GET /me (auto-provisions free plan), GET /history, POST /cancel
+  - GET /admin/all (admin)
+  - Service: getActivePlan for enforcement, activate for payment approval
+  - Docs: docs/modules/subscriptions.md
+
+- **api/payments**: card-to-card payments
+  - POST / (receipt upload, auto-creates admin ticket)
+  - GET /me, GET /admin/all, POST /admin/:id/approve, POST /admin/:id/reject
+  - On approve: activates subscription + closes ticket
+  - Docs: docs/modules/payments.md
+
+- **api/tickets**: user <-> admin ticketing
+  - 7 routes: user create/list/get/reply + admin list/reply/status
+  - No user-to-user messaging
+  - Docs: docs/modules/tickets.md
+
+- **auth/RolesGuard**: @Roles decorator + role in JWT payload
+  - Enables admin-only endpoints across payments and tickets
+
+- **docs/ROADMAP.md**: master tracking file for all 168 tasks
+- **docs/modules/**: architecture docs per module
+
+### Fixed
+
+- BUILD-002: PM2 MODULE_NOT_FOUND loop
+  - Root cause: tsconfig include contained prisma/**, so tsc inferred
+    rootDir as project root; emit went to dist/src/main.js
+  - Fix: explicit rootDir=./src, include only src/**/*, prisma in exclude
+  - Also: incremental=false to prevent tsbuildinfo skipping emit after
+    deleteOutDir=true
+
+- API-001: UUID validation in DocumentsController
+  - ParseUUIDPipe on all 4 :id endpoints
+
+
+
 ### Fixed
 - **api**: UUID validation در `DocumentsController` — افزودن `ParseUUIDPipe` به ۴ endpoint `:id` (findOne/stream/download/remove). رفع 500 روی UUID نامعتبر. (KNOWN-ISSUES#API-001)
 
