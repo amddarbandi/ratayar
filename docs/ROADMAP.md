@@ -12,7 +12,7 @@ Last updated: 2026-10-08
 
 - [x] BIZ-001 Admin CRUD plans UI (done)
 - [-] BIZ-002 ZarinPal integration (deferred — using card-to-card)
-- [~] BIZ-003 Subscription lifecycle: purchase/renew/cancel (backend done, UI pending)
+- [~] BIZ-003 Subscription lifecycle (backend + UI done; renewal/proration pending)
 - [x] BIZ-004 Plan selection + upgrade flow (with receipt upload)
 - [ ] BIZ-005 Invoice + PDF receipt
 - [ ] BIZ-006 Plan limit enforcement (max oblig/assets/docs) — NEXT
@@ -52,6 +52,7 @@ Last updated: 2026-10-08
 ## Phase 4 — Security (SEC)
 
 - [x] SEC-001 to SEC-005 (all resolved, see CHANGELOG 0.95.6)
+- [x] SEC-016 PlansController admin guard (was missing RolesGuard)
 - [ ] SEC-006 Token -> httpOnly cookie
 - [ ] SEC-007 Email verification
 - [ ] SEC-008 Forgot password flow
