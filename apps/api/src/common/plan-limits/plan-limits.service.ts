@@ -35,7 +35,7 @@ export class PlanLimitsService {
     if (this.isUnlimited(plan.maxObligations)) return;
 
     const count = await this.prisma.obligation.count({
-      where: { userId, deletedAt: null },
+      where: { userId },
     });
     if (count >= plan.maxObligations) {
       throw new ForbiddenException(
@@ -114,7 +114,7 @@ export class PlanLimitsService {
         where: { userId, deletedAt: null },
         _sum: { size: true },
       }),
-      this.prisma.obligation.count({ where: { userId, deletedAt: null } }),
+      this.prisma.obligation.count({ where: { userId } }),
       this.prisma.asset.count({ where: { userId } }),
     ]);
 

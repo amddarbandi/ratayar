@@ -4,6 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { PlanLimitsModule } from './common/plan-limits/plan-limits.module';
 import { RedisModule } from './common/redis/redis.module';
 import { MinioModule } from './common/minio/minio.module';
 import { HealthModule } from './modules/health/health.module';
@@ -33,6 +34,7 @@ import { ReminderTask } from './common/tasks/reminder.task';
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     PrismaModule,
+    PlanLimitsModule,
     RedisModule,
     MinioModule,
     HealthModule,

@@ -4,6 +4,7 @@ import {
 import { createHash } from 'crypto';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { MinioService } from '../../common/minio/minio.service';
+import { PlanLimitsService } from '../../common/plan-limits/plan-limits.service';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
@@ -24,6 +25,7 @@ export class DocumentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly minio: MinioService,
+    private readonly planLimits: PlanLimitsService,
   ) {}
 
   async upload(
@@ -34,6 +36,9 @@ export class DocumentsService {
     expiresAt?: string,
   ) {
     if (!file) throw new BadRequestException('فایلی ارسال نشده');
+
+    // Plan-based enforcement (format + per-file + count + storage)
+    await this.planLimits.checkDocumentLimit(userId, file);
 
     if (file.size > MAX_FILE_SIZE) {
       throw new BadRequestException(

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { PlanLimitsService } from '../../common/plan-limits/plan-limits.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
 
@@ -7,9 +8,13 @@ import { UpdateAssetDto } from './dto/update-asset.dto';
 export class AssetsService {
   private readonly logger = new Logger(AssetsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly planLimits: PlanLimitsService,
+  ) {}
 
   async create(userId: string, dto: CreateAssetDto) {
+    await this.planLimits.checkAssetLimit(userId);
     const asset = await this.prisma.asset.create({
       data: {
         userId,
