@@ -163,8 +163,8 @@ Last updated: 2026-10-08
 
 ### CALC — user directive additions
 
-- [ ] CALC-MENU "کانورت‌ها" top-level menu item
-- [ ] CALC-MENU-2 "Subnet Calculator" top-level menu item
+- [ ] CALC-MENU "تبدیل" top-level menu item (renamed from کانورت‌ها)
+- [ ] CALC-MENU-2 "ماشین حساب شبکه" top-level menu item
 - [ ] CALC-011-ADV IPv4 calculator with full detail (network, broadcast, usable range, mask, wildcard, class, type, CIDR list)
 - [ ] CALC-012-ADV IPv6 calculator (prefix, expanded, compressed, range, number of addresses)
 
@@ -294,6 +294,14 @@ Order of work:
 
 Everything must be recorded in GitHub (roadmap, module docs, commit
 messages, changelog).
+
+### Also HIGH (new — user directive 2026-10-09)
+
+4. **بازار و قیمت‌ها (Market & Prices) — PRICE-001..010**
+   Separate top-level menu, distinct from converters.
+   Categories: طلا و سکه, ارز, ارز دیجیتال
+   Includes a live cross-category converter.
+   Architecture: docs/modules/market-prices.md
 
 ### Afterwards (previous plan)
 
