@@ -15,6 +15,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { toJalaliShort } from '@/lib/jalali';
 
 const typeConfig: any = {
   identity: { label: 'هویتی', color: 'text-purple-400', bg: 'bg-purple-500/10', emoji: '🪪' },
@@ -35,7 +36,7 @@ const formatSize = (bytes: number) => {
 };
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('fa-IR');
+  return toJalaliShort(date);
 };
 
 export default function DocumentsPage() {
