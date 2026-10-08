@@ -2,7 +2,14 @@
 
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ArrowRight, Loader2, Send } from 'lucide-react';
 import { ticketApi } from '@/lib/api';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { toJalaliDateTime } from '@/lib/jalali';
 
 interface Message {
   id: string;
@@ -18,8 +25,6 @@ interface TicketDetail {
   category: string;
   priority: string;
   status: string;
-  referenceType?: string;
-  referenceId?: string;
   createdAt: string;
   updatedAt: string;
   closedAt?: string;
@@ -27,10 +32,22 @@ interface TicketDetail {
 }
 
 const STATUSES: Record<string, { text: string; cls: string }> = {
-  open: { text: 'باز', cls: 'bg-blue-100 text-blue-800' },
-  answered: { text: 'پاسخ داده شد', cls: 'bg-green-100 text-green-800' },
-  pending_user: { text: 'در انتظار شما', cls: 'bg-yellow-100 text-yellow-800' },
-  closed: { text: 'بسته', cls: 'bg-gray-200 text-gray-700' },
+  open: {
+    text: 'باز',
+    cls: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+  },
+  answered: {
+    text: 'پاسخ داده شد',
+    cls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+  },
+  pending_user: {
+    text: 'در انتظار شما',
+    cls: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+  },
+  closed: {
+    text: 'بسته',
+    cls: 'bg-white/10 text-white/50 border-white/20',
+  },
 };
 
 export default function TicketDetailPage({
@@ -41,7 +58,6 @@ export default function TicketDetailPage({
   const { id } = use(params);
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -49,14 +65,13 @@ export default function TicketDetailPage({
     ticketApi
       .get(id)
       .then((res) => setTicket(res.data))
-      .catch(() => setError('تیکت یافت نشد'))
+      .catch(() => toast.error('تیکت یافت نشد'))
       .finally(() => setLoading(false));
   };
 
   useEffect(load, [id]);
 
-  const send = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const send = async () => {
     if (!reply.trim()) return;
     setSending(true);
     try {
@@ -64,106 +79,124 @@ export default function TicketDetailPage({
       setReply('');
       load();
     } catch (e: any) {
-      setError(e?.response?.data?.message || 'خطا در ارسال پیام');
+      toast.error(e?.response?.data?.message || 'خطا در ارسال پیام');
     } finally {
       setSending(false);
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="p-10 text-center text-gray-500" dir="rtl">
+      <div className="text-white/40 text-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
         در حال بارگذاری...
       </div>
     );
-  if (error && !ticket)
+  }
+
+  if (!ticket) {
     return (
-      <div className="p-10 text-center text-red-600" dir="rtl">
-        {error}
-      </div>
+      <Card>
+        <CardContent className="p-8 text-center text-white/60">
+          تیکت یافت نشد.
+        </CardContent>
+      </Card>
     );
-  if (!ticket) return null;
+  }
 
   const st = STATUSES[ticket.status] || STATUSES.open;
   const isClosed = ticket.status === 'closed';
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4" dir="rtl">
-      <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3">
         <Link
           href="/dashboard/tickets"
-          className="text-sm text-blue-600 hover:underline mb-4 inline-block"
+          className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
         >
-          ← بازگشت به تیکت‌ها
+          <ArrowRight className="w-5 h-5" />
         </Link>
-
-        <div className="bg-white rounded-2xl shadow p-6 mb-6">
-          <div className="flex justify-between items-start mb-2">
-            <h1 className="text-2xl font-bold">{ticket.subject}</h1>
-            <span className={`text-xs px-2 py-1 rounded-full ${st.cls}`}>
-              {st.text}
-            </span>
-          </div>
-          <div className="text-xs text-gray-500">
-            ایجاد: {new Date(ticket.createdAt).toLocaleString('fa-IR')}
-          </div>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-white">{ticket.subject}</h1>
+          <p className="text-white/50 text-sm">
+            ایجاد: {toJalaliDateTime(ticket.createdAt)}
+          </p>
         </div>
+        <span
+          className={cn(
+            'px-3 py-1 rounded-full text-xs border whitespace-nowrap',
+            st.cls,
+          )}
+        >
+          {st.text}
+        </span>
+      </div>
 
-        <div className="space-y-4 mb-6">
-          {ticket.messages.map((m) => {
-            const isAdmin = m.senderRole === 'admin';
-            return (
-              <div
-                key={m.id}
-                className={`rounded-2xl p-4 shadow ${
-                  isAdmin
-                    ? 'bg-blue-50 border border-blue-200 ml-8'
-                    : 'bg-white mr-8'
-                }`}
-              >
-                <div className="flex justify-between items-center mb-2 text-xs text-gray-500">
-                  <span className="font-bold">
-                    {isAdmin ? '👤 پشتیبانی' : '👤 شما'}
-                  </span>
-                  <span>{new Date(m.createdAt).toLocaleString('fa-IR')}</span>
-                </div>
-                <div className="whitespace-pre-wrap text-sm leading-6">
-                  {m.body}
-                </div>
+      {/* Messages */}
+      <div className="space-y-3">
+        {ticket.messages.map((m, i) => {
+          const isAdmin = m.senderRole === 'admin';
+          return (
+            <motion.div
+              key={m.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+              className={cn(
+                'rounded-3xl p-5 border backdrop-blur-xl',
+                isAdmin
+                  ? 'ml-12 bg-gradient-to-br from-purple-500/10 to-cyan-500/5 border-purple-500/30'
+                  : 'mr-12 bg-gradient-to-br from-white/[0.07] to-white/[0.02] border-white/10',
+              )}
+            >
+              <div className="flex items-center justify-between mb-2 text-xs text-white/50">
+                <span className="font-bold text-white/80">
+                  {isAdmin ? '👤 پشتیبانی راتایار' : '👤 شما'}
+                </span>
+                <span>{toJalaliDateTime(m.createdAt)}</span>
               </div>
-            );
-          })}
-        </div>
+              <div className="text-white/90 text-sm whitespace-pre-wrap leading-7">
+                {m.body}
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-4 text-sm">
-            {error}
-          </div>
-        )}
-
-        {isClosed ? (
-          <div className="bg-gray-100 border border-gray-300 rounded-2xl p-4 text-center text-gray-600 text-sm">
+      {/* Reply */}
+      {isClosed ? (
+        <Card>
+          <CardContent className="p-5 text-center text-white/60 text-sm">
             این تیکت بسته شده است. برای پیگیری مجدد، تیکت جدید بسازید.
-          </div>
-        ) : (
-          <form onSubmit={send} className="bg-white rounded-2xl shadow p-4">
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-5 space-y-4">
             <textarea
               value={reply}
               onChange={(e) => setReply(e.target.value)}
-              className="w-full border rounded-lg p-3 h-24 mb-3"
               placeholder="پاسخ خود را بنویسید..."
+              rows={4}
               disabled={sending}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.07] focus:ring-4 focus:ring-purple-500/10 transition-all resize-none"
             />
-            <button
-              type="submit"
+            <Button
+              type="button"
+              variant="gradient"
+              size="lg"
+              className="w-full"
+              onClick={send}
               disabled={sending || !reply.trim()}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg"
+              isLoading={sending}
             >
-              {sending ? 'در حال ارسال...' : 'ارسال پاسخ'}
-            </button>
-          </form>
-        )}
-      </div>
+              <Send className="w-5 h-5" />
+              ارسال پاسخ
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
