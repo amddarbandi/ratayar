@@ -1,109 +1,83 @@
-# راهنمای مشارکت در پروژه راتایار
+# Contributing to Ratayar
 
-> این سند **الزامی** است. هر تغییر کد، بدون رعایت این قوانین، merge نخواهد شد.
+> Mandatory workflow. Code changes without docs updates will not be merged.
 
----
+## Golden rule
 
-## 🎯 قاعده طلایی
+Every code change = one commit + corresponding docs update.
 
-**هر تغییر کد = یک commit + به‌روزرسانی مستندات مربوطه.**
+## Pre-commit checklist
 
-کدی که مستند نشده باشد، انگار نوشته نشده است.
+- [ ] Code changed and tested
+- [ ] npx tsc --noEmit: zero errors
+- [ ] pnpm build: success
+- [ ] pm2 logs: no new errors
+- [ ] Entry added to docs/CHANGELOG.md under [Unreleased]
+- [ ] Entry added to docs/KNOWN-ISSUES.md if bug-related
+- [ ] Commit message follows format
+- [ ] git push done
 
----
+## Commit message format
 
-## 📋 چک‌لیست هر تغییر (اجباری)
+TYPE(SCOPE): SUBJECT
 
-قبل از هر commit:
+BODY
 
-- [ ] کد تغییر یافته و تست شده
-- [ ] `npx tsc --noEmit` = صفر خطا
-- [ ] `pnpm build` = موفق
-- [ ] `pm2 logs` = بدون خطای جدید
-- [ ] ورودی در `docs/CHANGELOG.md` زیر `[Unreleased]`
-- [ ] ورودی در `docs/KNOWN-ISSUES.md` (اگر باگ بود)
-- [ ] Commit message با فرمت استاندارد
-- [ ] `git push` انجام شد
-
----
-
-## 📝 فرمت Commit Message
-
-[200~<type>(<scope>): <subject>
-
-<body>
 Fix:
+- change 1
+- change 2
 
-<تغییر ۱>
+Resolves: ID
 
-Resolves: <ID>~
+Types: fix, feat, docs, refactor, chore, test.
 
-| type | کاربرد |
-|---|---|
-| `fix` | رفع باگ |
-| `feat` | قابلیت جدید |
-| `docs` | فقط مستندات |
-| `refactor` | بازنویسی |
-| `chore` | کار جانبی |
-| `test` | تست |
+Example:
 
-نمونه:
+fix(api): validate UUID in documents.findOne
 
+Prisma throws on invalid UUIDs.
 
----
+Fix:
+- add ParseUUIDPipe on @Param('id')
 
-## 📂 مستندات
+Resolves: API-001
 
-| فایل | زمان به‌روزرسانی |
-|---|---|
-| `CHANGELOG.md` | همیشه |
-| `KNOWN-ISSUES.md` | باگ جدید/رفع |
-| `ARCHITECTURE.md` | تغییر معماری |
-| `QUICKSTART.md` | تغییر راه‌اندازی |
+## Docs structure
 
----
+- docs/CHANGELOG.md - always
+- docs/KNOWN-ISSUES.md - new/resolved bug
+- docs/ARCHITECTURE.md - architecture change
+- docs/QUICKSTART.md - setup change
 
-## 🏷 شناسه باگ‌ها
+## Issue ID prefixes
 
-| پیشوند | حوزه |
-|---|---|
-| `SEC-` | امنیت |
-| `API-` | بک‌اند |
-| `WEB-` | فرانت‌اند |
-| `PWA-` | Service Worker |
-| `DB-` | پایگاه داده |
-| `BUILD-` | زیرساخت |
+- SEC-NNN: security
+- API-NNN: backend
+- WEB-NNN: frontend
+- PWA-NNN: service worker
+- DB-NNN: database
+- BUILD-NNN: infrastructure
 
----
+## Git flow
 
-## 🌿 Git Flow
+- main: production
+- feat/NAME: new feature
+- fix/NAME: bug fix
+- hotfix/NAME: urgent main fix
 
-| Branch | کاربرد |
-|---|---|
-| `main` | Production |
-| `feat/<name>` | فیچر جدید |
-| `fix/<name>` | رفع باگ |
-| `hotfix/<name>` | رفع فوری |
+## Definition of Done
 
----
+1. Code tested and built
+2. CHANGELOG + KNOWN-ISSUES updated
+3. Standard commit message
+4. Pushed to remote
 
-## ✅ Definition of Done
+## Forbidden
 
-1. کد تست و build شده
-2. CHANGELOG + KNOWN-ISSUES به‌روز شده
-3. Commit message استاندارد
-4. Push شده
+- Commit without message
+- Commit without CHANGELOG
+- Direct push to main
+- .env or secrets in repo
+- dist/ or node_modules/ in git
 
----
-
-## 🚫 ممنوع
-
-- commit بدون پیام
-- commit بدون CHANGELOG
-- push مستقیم به `main`
-- `.env` / توکن در repo
-- `dist/` / `node_modules/` در git
-
----
-
-**آخرین به‌روزرسانی:** 2026-10-08
+Last updated: 2026-10-08
