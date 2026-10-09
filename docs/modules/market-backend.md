@@ -1,7 +1,7 @@
 # Backend: market module
 
 Path: apps/api/src/modules/market/
-Status: done (backend only, frontend pending)
+Status: done (backend complete)
 
 ## Providers
 
@@ -9,53 +9,34 @@ Status: done (backend only, frontend pending)
 |---|---|---|
 | TgjuProvider | call1.tgju.org/ajax.json | currency, gold, coin (Rial -> Toman /10) |
 | WallexProvider | api.wallex.ir/v1/markets | crypto in Toman |
-| CoinGeckoProvider | api.coingecko.com | crypto in USD (reference) |
+| CoinGeckoProvider | api.coingecko.com | crypto in USD |
 
-All sources tested from Iran on 2026-10-09:
-- TGJU works (real market reference)
-- Wallex works
-- CoinGecko works
-- Bonbast fails (Cloudflare)
-- Binance fails (blocked)
-- exchangerate.host requires key (skipped)
+## Endpoints
 
-## Endpoint
+- GET /api/market/prices              — full payload (cached 60s)
+- GET /api/market/history/:symbol     — time-series from PriceSnapshot
+  query: ?days=30 (1..365)
 
-GET /api/market/prices  (JWT required)
+## Cache
 
-Returns:
-{
-  usdToman: number,             // averaged TGJU + Wallex USDT
-  fetchedAt: ISO string,
-  items: [{
-    key, symbol, label, category,
-    priceToman: number | null,
-    priceUsd: number | null,
-    change24h: number | null,
-    ts: ISO string | null
-  }]
-}
+RedisService key `market:prices` TTL 60s.
+`getPrices(useCache=true)` — cache first; `getPrices(false)` forces fresh.
+MarketTasks cron refreshes every 60s proactively.
 
-## Categories
+## Snapshots
 
-- currency: USD, EUR, GBP, AED, TRY
-- gold: GOLD18, GOLD24, MESGHAL, XAU (ounce)
-- coin: SEKKE_EMAMI, SEKKE_BAHAR, NIM, ROB
-- crypto: USDT, BTC, ETH, XAUT, BNB, SOL, XRP, TRX, DOGE, ADA
+Table PriceSnapshot (symbol, priceToman, priceUsd, change24h, ts).
+Index (symbol, ts).
 
-## USD reference
+MarketTasks cron writes snapshots every 5 minutes.
+History endpoint reads from this table.
 
-Average of TGJU price_dollar_rl and Wallex USDTTMN when within 5%;
-otherwise TGJU wins. This lets all USD prices be computed consistently.
+## Schedule
 
-## XAU (gold ounce)
-
-Comes from TGJU as USD. Service multiplies by usdToman to give a
-Toman value, and keeps priceUsd as the raw value.
+- EVERY_MINUTE  -> getPrices(false)   (keeps cache warm)
+- */5 * * * *   -> writeSnapshots()    (keeps history light)
 
 ## Not yet
 
-- Redis cache (60s) — currently fetched on each request
-- Scheduled job for proactive refresh
-- change24h for gold/currency (TGJU doesn't provide)
-- Cross-category converter endpoint
+- Alerts (PRICE-007)
+- 60-minute intraday snapshots (only 5-min today)

@@ -25,8 +25,12 @@ model User {
   termsVersion    String?   @map("terms_version") @db.VarChar(20)
   deletedAt       DateTime? @map("deleted_at")
 
-  ownedFamilies   Family[]  @relation("FamilyOwner")
+  ownedFamilies   Family[]         @relation("FamilyOwner")
   memberships     FamilyMember[]
+  subscriptions   Subscription[]
+  paymentRequests PaymentRequest[]
+  tickets         Ticket[]
+  ticketMessages  TicketMessage[]
 
   @@index([phone])
   @@index([status])
@@ -44,8 +48,8 @@ model Family {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  owner         User      @relation("FamilyOwner", fields: [ownerId], references: [id])
-  members       FamilyMember[]
+  owner   User           @relation("FamilyOwner", fields: [ownerId], references: [id])
+  members FamilyMember[]
 
   @@map("families")
 }
@@ -59,8 +63,8 @@ model FamilyMember {
   permissions Json     @default("{}")
   joinedAt    DateTime @default(now()) @map("joined_at")
 
-  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([familyId, userId])
   @@index([familyId])
@@ -69,21 +73,21 @@ model FamilyMember {
 }
 
 model Obligation {
-  id              String    @id @default(uuid()) @db.Uuid
-  userId          String    @map("user_id") @db.Uuid
-  title           String    @db.VarChar(200)
-  description     String?
-  dueDate         DateTime  @map("due_date")
-  category        String    @default("life") @db.VarChar(20)
-  priority        String    @default("normal") @db.VarChar(20)
-  status          String    @default("active") @db.VarChar(20)
-  repeatType      String    @default("once") @map("repeat_type") @db.VarChar(20)
-  repeatInterval  Int?      @map("repeat_interval")
-  alertDays       Int[]     @default([30, 7, 1]) @map("alert_days")
-  assetId         String?   @map("asset_id") @db.Uuid
-  completedAt     DateTime? @map("completed_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  title          String    @db.VarChar(200)
+  description    String?
+  dueDate        DateTime  @map("due_date")
+  category       String    @default("life") @db.VarChar(20)
+  priority       String    @default("normal") @db.VarChar(20)
+  status         String    @default("active") @db.VarChar(20)
+  repeatType     String    @default("once") @map("repeat_type") @db.VarChar(20)
+  repeatInterval Int?      @map("repeat_interval")
+  alertDays      Int[]     @default([30, 7, 1]) @map("alert_days")
+  assetId        String?   @map("asset_id") @db.Uuid
+  completedAt    DateTime? @map("completed_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@index([userId])
   @@index([dueDate])
@@ -92,20 +96,20 @@ model Obligation {
 }
 
 model Asset {
-  id              String    @id @default(uuid()) @db.Uuid
-  userId          String    @map("user_id") @db.Uuid
-  type            String    @db.VarChar(30)
-  name            String    @db.VarChar(200)
-  model           String?   @db.VarChar(100)
-  year            Int?
-  purchasePrice   BigInt?   @map("purchase_price")
-  currentValue    BigInt?   @map("current_value")
-  metadata        Json      @default("{}")
-  notes           String?
-  status          String    @default("active") @db.VarChar(20)
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  deletedAt       DateTime? @map("deleted_at")
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  type          String    @db.VarChar(30)
+  name          String    @db.VarChar(200)
+  model         String?   @db.VarChar(100)
+  year          Int?
+  purchasePrice BigInt?   @map("purchase_price")
+  currentValue  BigInt?   @map("current_value")
+  metadata      Json      @default("{}")
+  notes         String?
+  status        String    @default("active") @db.VarChar(20)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
 
   @@index([userId])
   @@index([type])
@@ -119,7 +123,7 @@ model Asset {
 model Transaction {
   id          String    @id @default(uuid()) @db.Uuid
   userId      String    @map("user_id") @db.Uuid
-  type        String    @db.VarChar(20)   // income | expense
+  type        String    @db.VarChar(20) // income | expense
   category    String    @db.VarChar(50)
   amount      BigInt
   description String?
@@ -135,13 +139,13 @@ model Transaction {
 }
 
 model Budget {
-  id          String    @id @default(uuid()) @db.Uuid
-  userId      String    @map("user_id") @db.Uuid
-  category    String    @db.VarChar(50)
-  amount      BigInt
-  period      String    @default("monthly") @db.VarChar(20)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  category  String   @db.VarChar(50)
+  amount    BigInt
+  period    String   @default("monthly") @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([userId, category, period])
   @@index([userId])
@@ -154,7 +158,7 @@ model Budget {
 model Notification {
   id            String    @id @default(uuid()) @db.Uuid
   userId        String    @map("user_id") @db.Uuid
-  type          String    @db.VarChar(30)   // obligation | family | system
+  type          String    @db.VarChar(30) // obligation | family | system
   title         String    @db.VarChar(200)
   body          String?
   priority      String    @default("normal") @db.VarChar(20) // critical | important | normal
@@ -176,26 +180,150 @@ model Notification {
 // DOCUMENTS
 // ============================================
 model Document {
-  id            String    @id @default(uuid()) @db.Uuid
-  userId        String    @map("user_id") @db.Uuid
-  name          String    @db.VarChar(200)
-  type          String    @db.VarChar(50)   // identity | property | vehicle | insurance | medical | business | family | other
-  mimeType      String    @map("mime_type") @db.VarChar(100)
-  size          BigInt
-  storageKey    String    @map("storage_key") @db.VarChar(500)
-  bucket        String    @default("documents") @db.VarChar(100)
-  hash          String?   @db.VarChar(64)   // SHA-256 checksum
-  encrypted     Boolean   @default(false)
-  ocrText       String?   @map("ocr_text")
-  metadata      Json      @default("{}")
-  tags          String[]  @default([])
-  expiresAt     DateTime? @map("expires_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  name       String    @db.VarChar(200)
+  type       String    @db.VarChar(50) // identity | property | vehicle | insurance | medical | business | family | other
+  mimeType   String    @map("mime_type") @db.VarChar(100)
+  size       BigInt
+  storageKey String    @map("storage_key") @db.VarChar(500)
+  bucket     String    @default("documents") @db.VarChar(100)
+  hash       String?   @db.VarChar(64) // SHA-256 checksum
+  encrypted  Boolean   @default(false)
+  ocrText    String?   @map("ocr_text")
+  metadata   Json      @default("{}")
+  tags       String[]  @default([])
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
 
   @@index([userId])
   @@index([type])
   @@index([deletedAt])
   @@map("documents")
+}
+
+// ============================================
+// PLANS & SUBSCRIPTIONS
+// ============================================
+model Plan {
+  id             String   @id @default(uuid()) @db.Uuid
+  code           String   @unique @db.VarChar(30)
+  name           String   @db.VarChar(100)
+  description    String?
+  priceMonthly   BigInt   @map("price_monthly")
+  priceYearly    BigInt?  @map("price_yearly")
+  maxMembers     Int      @default(1) @map("max_members")
+  maxObligations Int      @default(5) @map("max_obligations") // -1 = unlimited
+  maxAssets      Int      @default(10) @map("max_assets") // -1 = unlimited
+  maxDocuments   Int      @default(1) @map("max_documents") // -1 = unlimited
+  maxStorageMB   Int      @default(50) @map("max_storage_mb")
+  maxUploadMB    Int      @default(1) @map("max_upload_mb")
+  allowedFormats String[] @default(["pdf", "jpg", "jpeg", "png", "docx", "xlsx"]) @map("allowed_formats")
+  features       Json     @default("{}")
+  isActive       Boolean  @default(true) @map("is_active")
+  isPopular      Boolean  @default(false) @map("is_popular")
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  subscriptions Subscription[]
+  payments      PaymentRequest[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  planId      String    @map("plan_id") @db.Uuid
+  status      String    @default("active") @db.VarChar(20)
+  startedAt   DateTime  @default(now()) @map("started_at")
+  expiresAt   DateTime? @map("expires_at")
+  cancelledAt DateTime? @map("cancelled_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model PaymentRequest {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  planId       String    @map("plan_id") @db.Uuid
+  amount       BigInt
+  method       String    @default("card_to_card") @db.VarChar(20)
+  receiptKey   String    @map("receipt_key") @db.VarChar(500)
+  receiptMime  String?   @map("receipt_mime") @db.VarChar(100)
+  trackingCode String?   @map("tracking_code") @db.VarChar(100)
+  status       String    @default("pending") @db.VarChar(20)
+  adminNote    String?   @map("admin_note")
+  reviewedBy   String?   @map("reviewed_by") @db.Uuid
+  reviewedAt   DateTime? @map("reviewed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("payment_requests")
+}
+
+// ============================================
+// TICKETS
+// ============================================
+model Ticket {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  subject       String    @db.VarChar(200)
+  category      String    @default("other") @db.VarChar(30)
+  priority      String    @default("normal") @db.VarChar(20)
+  status        String    @default("open") @db.VarChar(20)
+  referenceId   String?   @map("reference_id") @db.Uuid
+  referenceType String?   @map("reference_type") @db.VarChar(30)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  closedAt      DateTime? @map("closed_at")
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages TicketMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("tickets")
+}
+
+model TicketMessage {
+  id          String   @id @default(uuid()) @db.Uuid
+  ticketId    String   @map("ticket_id") @db.Uuid
+  senderId    String   @map("sender_id") @db.Uuid
+  senderRole  String   @map("sender_role") @db.VarChar(20)
+  body        String
+  attachments String[] @default([])
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User   @relation(fields: [senderId], references: [id])
+
+  @@index([ticketId])
+  @@map("ticket_messages")
+}
+
+model PriceSnapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  symbol     String   @db.VarChar(30)
+  priceToman BigInt?  @map("price_toman")
+  priceUsd   Decimal? @db.Decimal(20, 8) @map("price_usd")
+  change24h  Decimal? @db.Decimal(10, 4) @map("change_24h")
+  ts         DateTime @default(now())
+  @@index([symbol, ts])
+  @@map("price_snapshots")
 }

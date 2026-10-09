@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { TgjuProvider } from './providers/tgju.provider';
 import { WallexProvider } from './providers/wallex.provider';
 import { CoinGeckoProvider } from './providers/coingecko.provider';
+import { MarketCacheService } from './market-cache.service';
+import { PrismaService } from '../../common/prisma/prisma.service';
 
 export interface MarketItem {
   key: string;
@@ -22,9 +24,21 @@ export class MarketService {
     private readonly tgju: TgjuProvider,
     private readonly wallex: WallexProvider,
     private readonly coingecko: CoinGeckoProvider,
+    private readonly cache: MarketCacheService,
+    private readonly prisma: PrismaService,
   ) {}
 
-  async getPrices() {
+  async getPrices(useCache = true) {
+    if (useCache) {
+      const cached = await this.cache.get();
+      if (cached) return cached;
+    }
+    const fresh = await this.fetchFresh();
+    await this.cache.set(fresh);
+    return fresh;
+  }
+
+  async fetchFresh() {
     const [tgju, wallex, gecko] = await Promise.all([
       this.tgju.fetch(),
       this.wallex.fetch(),
@@ -84,6 +98,45 @@ export class MarketService {
       items,
       fetchedAt: new Date().toISOString(),
     };
+  }
+
+
+  async getHistory(symbol: string, days = 30) {
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+
+    const rows = await this.prisma.priceSnapshot.findMany({
+      where: {
+        symbol: symbol.toUpperCase(),
+        ts: { gte: since },
+      },
+      orderBy: { ts: 'asc' },
+    });
+
+    return rows.map((r) => ({
+      ts: r.ts.toISOString(),
+      priceToman: r.priceToman != null ? Number(r.priceToman) : null,
+      priceUsd: r.priceUsd != null ? Number(r.priceUsd) : null,
+      change24h: r.change24h != null ? Number(r.change24h) : null,
+    }));
+  }
+
+  async writeSnapshots() {
+    const payload = await this.getPrices(false);
+    const rows = payload.items
+      .filter((it: MarketItem) => it.priceToman != null || it.priceUsd != null)
+      .map((it: MarketItem) => ({
+        symbol: it.symbol,
+        priceToman: it.priceToman != null ? BigInt(Math.round(it.priceToman)) : null,
+        priceUsd: it.priceUsd != null ? String(it.priceUsd) : null,
+        change24h: it.change24h != null ? String(it.change24h) : null,
+      }));
+
+    if (rows.length === 0) return 0;
+
+    await this.prisma.priceSnapshot.createMany({ data: rows });
+    this.logger.log(`Snapshots written: ${rows.length}`);
+    return rows.length;
   }
 
   private pickUsdToman(tgju?: number, wallex?: number): number | null {
