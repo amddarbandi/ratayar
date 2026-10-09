@@ -83,10 +83,21 @@ export function Navbar() {
             </Link>
           </div>
 
+          {/* Mobile Login (compact) */}
+          <Link
+            href="/login"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="ورود"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H3m0 0l3-3m-3 3l3 3m6-9h6a2 2 0 012 2v10a2 2 0 01-2 2h-6" />
+            </svg>
+          </Link>
+
           {/* Mobile Toggle */}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden p-2 text-white/80 hover:text-white"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Toggle menu"
           >
             {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -100,21 +111,37 @@ export function Navbar() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="md:hidden mt-2 glass-strong rounded-2xl p-4 space-y-2"
+              className="md:hidden mt-2 glass-strong rounded-2xl p-4 space-y-2 max-h-[80vh] overflow-y-auto"
             >
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="block px-4 py-3 rounded-xl text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {/* Anchor links */}
+              <div className="space-y-1">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center min-h-[48px] px-4 rounded-xl text-white/80 hover:text-white hover:bg-white/5 transition-colors text-base"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-white/10 my-3" />
+
+              {/* Auth buttons */}
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center min-h-[48px] px-5 rounded-xl bg-white/5 border border-white/10 text-white text-center font-medium hover:bg-white/10 transition-colors"
+              >
+                ورود
+              </Link>
               <Link
                 href="/register"
-                className="block mt-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white text-center font-medium"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center min-h-[48px] px-5 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white text-center font-medium shadow-lg shadow-purple-500/30"
               >
                 شروع رایگان
               </Link>

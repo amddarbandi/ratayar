@@ -311,11 +311,11 @@ messages, changelog).
 7. BIZ-003 — Renewal / cancel / downgrade UI
 
 
-### MOB-013 Login button on mobile navbar (CRITICAL)
+### MOB-013 Login button on mobile navbar (CRITICAL) — DONE
 Desktop navbar shows ورود / ثبت‌نام. Mobile has no such button.
 Add compact login/CTA button inside the mobile menu (and drawer).
 
-### MOB-014 Full mobile menu parity (CRITICAL)
+### MOB-014 Full mobile menu parity (CRITICAL) — DONE
 Mobile navbar must contain EVERY link desktop has:
 - #features #how #pricing #about (anchors)
 - /dashboard/converters تبدیل
