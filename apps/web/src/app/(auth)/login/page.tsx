@@ -156,7 +156,7 @@ export default function LoginPage() {
         </div>
 
         <Card>
-          <CardContent className="p-8">
+          <CardContent className="p-5 md:p-8">
             {step === 'credentials' && (
               <form onSubmit={handleCredentialsSubmit} className="space-y-5">
                 <Input

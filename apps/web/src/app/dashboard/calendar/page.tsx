@@ -239,7 +239,7 @@ export default function CalendarPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Clock */}
         <Card>
-          <CardContent className="p-8">
+          <CardContent className="p-5 md:p-8">
             <AnalogClock time={now} shape={shape} />
             <motion.div
               key={now.getSeconds()}
