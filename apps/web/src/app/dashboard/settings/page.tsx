@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { settingsApi, authApi } from '@/lib/api';
+import { JalaliDatePicker } from '@/components/common/jalali-date-picker';
 import { useAuthStore } from '@/stores/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -115,12 +116,10 @@ function ProfileTab() {
               placeholder="علی رضایی"
             />
 
-            <Input
+            <JalaliDatePicker
               label="تاریخ تولد"
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              dir="ltr"
+              value={birthDate || null}
+              onChange={(iso) => setBirthDate(iso)}
             />
 
             <Input
