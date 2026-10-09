@@ -331,4 +331,6 @@ export const ticketApi = {
 
 export const marketApi = {
   prices: () => api.get('/market/prices'),
+  history: (symbol: string, days = 30) =>
+    api.get(`/market/history/${symbol}?days=${days}`),
 };

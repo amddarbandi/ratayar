@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, TrendingUp, TrendingDown } from 'lucide-react';
 import { marketApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
+import { PriceSparkline } from '@/components/market/price-sparkline';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -256,6 +257,11 @@ function PriceCard({ item, delay }: { item: Item; delay: number }) {
             })}
           </div>
         )}
+
+        {/* Sparkline */}
+        <div className="mt-3 -mx-1" dir="ltr">
+          <PriceSparkline symbol={item.symbol} days={30} height={36} width={240} />
+        </div>
       </div>
     </motion.div>
   );
