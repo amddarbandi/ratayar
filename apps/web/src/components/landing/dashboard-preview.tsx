@@ -67,8 +67,7 @@ export function DashboardPreview() {
             <span className="gradient-text">در یک نگاه</span>
           </h2>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            داشبوردی که با یک نگاه بهت می‌گه چی مهمه، چی عقب افتاده و چقدر
-            پیشرفت کردی.
+            برای خانواده‌هایی که می‌خواهند زندگی‌شان را منظم نگه دارند
           </p>
         </motion.div>
 

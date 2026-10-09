@@ -44,8 +44,7 @@ export function Footer() {
               <LogoWordmark />
             </Link>
             <p className="text-white/50 text-sm leading-7 max-w-xs">
-              دستیار هوشمند زندگی از ۷ سال تا ۱۰۰ سال — مدیریت تعهدات،
-              دارایی‌ها، اسناد و خانواده در یک اپ.
+              دستیار هوشمند زندگی — مدیریت تعهدات، دارایی‌ها، اسناد و خانواده در یک اپ
             </p>
             <div className="flex items-center gap-2 mt-4 text-xs text-emerald-300/80">
               <Shield className="w-3.5 h-3.5" />

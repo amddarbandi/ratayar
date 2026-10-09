@@ -1,7 +1,7 @@
 {
   "name": "راتایار — دستیار هوشمند زندگی",
   "short_name": "راتایار",
-  "description": "دستیار هوشمند زندگی از ۷ سال تا ۱۰۰ سال",
+  "description": "دستیار هوشمند زندگی",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

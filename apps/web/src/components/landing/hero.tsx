@@ -50,9 +50,7 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            از ۷ سال تا ۱۰۰ سال. از فرد تا خانواده. از خانواده تا کسب‌وکار.
-            <br />
-            همه چیز در یک پلتفرم مدرن، هوشمند و امن.
+            دستیار هوشمند زندگی — مدیریت تعهدات، دارایی‌ها، اسناد و خانواده در یک اپ
           </motion.p>
 
           {/* CTAs */}
