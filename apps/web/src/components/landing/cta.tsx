@@ -35,7 +35,7 @@ export function CTA() {
             </h2>
 
             <p className="text-white/60 text-lg mb-10 max-w-2xl mx-auto">
-              هزاران کاربر ایرانی همین حالا از راتایار استفاده می‌کنند.
+              زندگی را ساده‌تر، منظم‌تر و امن‌تر کن
             </p>
 
             <Link

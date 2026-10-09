@@ -48,6 +48,9 @@ export function HowItWorks() {
             <span className="text-white">در </span>
             <span className="gradient-text-2">۴ قدم ساده</span>
           </h2>
+          <p className="text-white/60 text-lg max-w-2xl mx-auto mt-4">
+            هیچ تعهدی فراموش نمی‌شود، هیچ هزینه‌ای از قلم نمی‌افتد
+          </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">

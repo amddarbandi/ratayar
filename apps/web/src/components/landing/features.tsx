@@ -85,8 +85,7 @@ export function Features() {
             <span className="text-white"> در یک اپ</span>
           </h2>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            راتایار تمام ابزارهایی که برای مدیریت زندگی مدرن نیاز دارید را در یک
-            پلتفرم زیبا جمع کرده است.
+            دستیار هوشمند مدیریت زندگی روزمره
           </p>
         </motion.div>
 
