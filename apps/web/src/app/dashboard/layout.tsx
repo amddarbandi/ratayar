@@ -7,6 +7,7 @@ import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { DashboardHeader } from '@/components/dashboard/header';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { SearchModal } from '@/components/search/search-modal';
+import { MobileNav } from '@/components/dashboard/mobile-nav';
 import { useSearchShortcut } from '@/hooks/use-search-shortcut';
 
 export default function DashboardLayout({
@@ -57,6 +58,7 @@ export default function DashboardLayout({
         </div>
       </div>
 
+      <MobileNav />
       <InstallPrompt />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
