@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Query, Param, Body, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Query, Param, Body, Req, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -81,6 +81,62 @@ export class AdminController {
   setUserRole(@Param('id') id: string, @Body('role') role: string) {
     if (!role) throw new BadRequestException('role الزامی است');
     return this.admin.setUserRole(id, role);
+  }
+
+
+  // ═══════════════════════════════════════════
+  // Subscriptions
+  // ═══════════════════════════════════════════
+  @Get('subscriptions')
+  listSubscriptions(
+    @Query('status') status?: string,
+    @Query('planCode') planCode?: string,
+    @Query('expiringIn') expiringIn?: string,
+    @Query('q') q?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.admin.listSubscriptions({
+      status,
+      planCode,
+      expiringIn: expiringIn ? parseInt(expiringIn, 10) : undefined,
+      q,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    });
+  }
+
+  @Post('subscriptions/:id/extend')
+  extendSubscription(
+    @Param('id') id: string,
+    @Body('months') months: number,
+  ) {
+    return this.admin.extendSubscription(id, Number(months) || 1);
+  }
+
+  @Post('subscriptions/:id/cancel')
+  cancelSubscription(@Param('id') id: string) {
+    return this.admin.cancelSubscription(id);
+  }
+
+  // ═══════════════════════════════════════════
+  // Revenue
+  // ═══════════════════════════════════════════
+  @Get('revenue')
+  getRevenue() {
+    return this.admin.getRevenue();
+  }
+
+  // ═══════════════════════════════════════════
+  // Refund
+  // ═══════════════════════════════════════════
+  @Post('payments/:id/refund')
+  refundPayment(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body('reason') reason?: string,
+  ) {
+    return this.admin.refundPayment(id, req.user.userId, reason || '');
   }
 
 }
