@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
+import { MinioService } from '../../common/minio/minio.service';
 
 @Injectable()
 export class AdminService {
@@ -9,6 +10,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly minio: MinioService,
   ) {}
 
   // ═══════════════════════════════════════════
@@ -558,6 +560,195 @@ export class AdminService {
         status: 'refunded',
         adminNote: reason || 'بازگشت پرداخت توسط ادمین',
       },
+    });
+    return { ok: true };
+  }
+
+
+  // ═══════════════════════════════════════════
+  // Documents oversight
+  // ═══════════════════════════════════════════
+  async listDocuments(opts: {
+    q?: string;
+    type?: string;
+    userId?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const where: any = { deletedAt: null };
+    if (opts.q) where.name = { contains: opts.q };
+    if (opts.type) where.type = opts.type;
+    if (opts.userId) where.userId = opts.userId;
+
+    const [items, total] = await Promise.all([
+      this.prisma.document.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(opts.limit ?? 30, 100),
+        skip: opts.offset ?? 0,
+      }),
+      this.prisma.document.count({ where }),
+    ]);
+
+    const userIds = [...new Set(items.map((d) => d.userId))];
+    const users = userIds.length
+      ? await this.prisma.user.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, phone: true, fullName: true },
+        })
+      : [];
+    const userMap = new Map(users.map((u) => [u.id, u]));
+
+    return {
+      items: items.map((d) => ({
+        id: d.id,
+        name: d.name,
+        type: d.type,
+        mimeType: d.mimeType,
+        size: Number(d.size),
+        sizeMB: +(Number(d.size) / 1024 / 1024).toFixed(3),
+        storageKey: d.storageKey,
+        createdAt: d.createdAt,
+        expiresAt: d.expiresAt,
+        user: userMap.get(d.userId) || null,
+      })),
+      total,
+    };
+  }
+
+  async deleteDocument(id: string) {
+    const doc = await this.prisma.document.findUnique({ where: { id } });
+    if (!doc) throw new Error('سند یافت نشد');
+
+    // best-effort MinIO delete
+    try {
+      await this.minio.removeFile(doc.storageKey);
+    } catch {}
+
+    await this.prisma.document.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+    return { ok: true };
+  }
+
+  // ═══════════════════════════════════════════
+  // Obligations oversight
+  // ═══════════════════════════════════════════
+  async listObligations(opts: {
+    q?: string;
+    category?: string;
+    priority?: string;
+    userId?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const where: any = {};
+    if (opts.q) where.title = { contains: opts.q };
+    if (opts.category) where.category = opts.category;
+    if (opts.priority) where.priority = opts.priority;
+    if (opts.userId) where.userId = opts.userId;
+
+    const [items, total] = await Promise.all([
+      this.prisma.obligation.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(opts.limit ?? 30, 100),
+        skip: opts.offset ?? 0,
+      }),
+      this.prisma.obligation.count({ where }),
+    ]);
+
+    const userIds = [...new Set(items.map((o) => o.userId))];
+    const users = userIds.length
+      ? await this.prisma.user.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, phone: true, fullName: true },
+        })
+      : [];
+    const userMap = new Map(users.map((u) => [u.id, u]));
+
+    return {
+      items: items.map((o) => ({
+        id: o.id,
+        title: o.title,
+        dueDate: o.dueDate,
+        category: o.category,
+        priority: o.priority,
+        status: o.status,
+        createdAt: o.createdAt,
+        user: userMap.get(o.userId) || null,
+      })),
+      total,
+    };
+  }
+
+  async bulkDeleteObligations(ids: string[]) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      throw new Error('هیچ شناسه‌ای ارسال نشده');
+    }
+    const r = await this.prisma.obligation.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return { deleted: r.count };
+  }
+
+  // ═══════════════════════════════════════════
+  // Notifications oversight
+  // ═══════════════════════════════════════════
+  async listNotifications(opts: {
+    status?: string;
+    userId?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const where: any = {};
+    if (opts.status) where.status = opts.status;
+    if (opts.userId) where.userId = opts.userId;
+
+    const [items, total] = await Promise.all([
+      this.prisma.notification.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(opts.limit ?? 30, 100),
+        skip: opts.offset ?? 0,
+      }),
+      this.prisma.notification.count({ where }),
+    ]);
+
+    const userIds = [...new Set(items.map((n) => n.userId))];
+    const users = userIds.length
+      ? await this.prisma.user.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, phone: true, fullName: true },
+        })
+      : [];
+    const userMap = new Map(users.map((u) => [u.id, u]));
+
+    return {
+      items: items.map((n) => ({
+        id: n.id,
+        type: n.type,
+        status: n.status,
+        priority: n.priority,
+        title: n.title,
+        body: n.body,
+        scheduledFor: n.scheduledFor,
+        sentAt: n.sentAt,
+        readAt: n.readAt,
+        createdAt: n.createdAt,
+        user: userMap.get(n.userId) || null,
+      })),
+      total,
+    };
+  }
+
+  async retryNotification(id: string) {
+    const n = await this.prisma.notification.findUnique({ where: { id } });
+    if (!n) throw new Error('اعلان یافت نشد');
+    await this.prisma.notification.update({
+      where: { id },
+      data: { status: 'pending', sentAt: null },
     });
     return { ok: true };
   }

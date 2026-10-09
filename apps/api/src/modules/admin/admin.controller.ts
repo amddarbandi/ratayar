@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Patch, Query, Param, Body, Req, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Query, Param, Body, Req, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AdminService } from './admin.service';
+import { Audited } from '../../common/audit/audited.decorator';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -137,6 +138,79 @@ export class AdminController {
     @Body('reason') reason?: string,
   ) {
     return this.admin.refundPayment(id, req.user.userId, reason || '');
+  }
+
+
+  // ═══════════════════════════════════════════
+  // Content oversight
+  // ═══════════════════════════════════════════
+  @Get('documents')
+  listDocuments(
+    @Query('q') q?: string,
+    @Query('type') type?: string,
+    @Query('userId') userId?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.admin.listDocuments({
+      q,
+      type,
+      userId,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    });
+  }
+
+  @Delete('documents/:id')
+  @Audited({ action: 'document.admin.delete', targetType: 'document' })
+  deleteDocument(@Param('id') id: string) {
+    return this.admin.deleteDocument(id);
+  }
+
+  @Get('obligations')
+  listObligations(
+    @Query('q') q?: string,
+    @Query('category') category?: string,
+    @Query('priority') priority?: string,
+    @Query('userId') userId?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.admin.listObligations({
+      q,
+      category,
+      priority,
+      userId,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    });
+  }
+
+  @Post('obligations/bulk-delete')
+  @Audited({ action: 'obligation.admin.bulk-delete', targetType: 'obligation' })
+  bulkDeleteObligations(@Body('ids') ids: string[]) {
+    return this.admin.bulkDeleteObligations(ids || []);
+  }
+
+  @Get('notifications')
+  listNotifications(
+    @Query('status') status?: string,
+    @Query('userId') userId?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.admin.listNotifications({
+      status,
+      userId,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    });
+  }
+
+  @Post('notifications/:id/retry')
+  @Audited({ action: 'notification.admin.retry', targetType: 'notification' })
+  retryNotification(@Param('id') id: string) {
+    return this.admin.retryNotification(id);
   }
 
 }
