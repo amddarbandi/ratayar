@@ -309,3 +309,64 @@ messages, changelog).
 5. API-004 — Kavenegar SMS
 6. BIZ-005 — Invoice PDF
 7. BIZ-003 — Renewal / cancel / downgrade UI
+
+## Mobile-First Audit (BLOCKING — user directive 2026-10-09)
+
+### MOB-001 Bottom navigation bar for phones
+- Fixed bottom bar with 5 primary items
+- More sheet for the rest
+- Hidden on md+ (sidebar takes over)
+- Priority: CRITICAL
+
+### MOB-002 Hamburger drawer for tablet
+- md to lg range
+- Slide-in sidebar
+- Priority: HIGH
+
+### MOB-003 Typography scale audit
+- Every page: body >= 14px, no text-[10px] as base
+- Headings scale: text-2xl md:text-3xl etc
+- Priority: HIGH
+
+### MOB-004 Card padding responsive
+- p-8 -> p-4 md:p-8 across all cards
+- Priority: HIGH
+
+### MOB-005 Horizontal scroll audit
+- Every page tested at 360px
+- break-all on long strings
+- Priority: CRITICAL
+
+### MOB-006 Grid collapse audit
+- All grids: grid-cols-1 base, expand up
+- Priority: HIGH
+
+### MOB-007 Market cards optimize
+- Smaller sparkline on mobile
+- Stack layout
+- Priority: HIGH
+
+### MOB-008 Network calculator mobile
+- Inputs full width
+- Results stack vertically
+- Priority: HIGH
+
+### MOB-009 Calendar mobile
+- Analog clock scales down
+- Prayer grid 2 cols
+- Priority: MEDIUM
+
+### MOB-010 Landing page mobile
+- Hero readable
+- Dashboard preview scaled
+- Pricing single column
+- Priority: HIGH
+
+### MOB-011 Forms 16px font (iOS zoom prevention)
+- All inputs
+- Priority: HIGH
+
+### MOB-012 Admin pages mobile
+- Tables -> cards
+- Priority: MEDIUM
+

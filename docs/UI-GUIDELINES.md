@@ -86,3 +86,8 @@ Dashboard sidebar — IP is the last item, calendar right before
 settings. Both orders are frozen by user directive 2026-10-09.
 
 New features must be inserted BEFORE تقویم/IP, never after IP.
+
+## Rule 10 — Mobile is the primary target
+
+See docs/MOBILE-FIRST.md. No page ships without passing the mobile
+audit. Desktop is the enhancement, not the baseline.
