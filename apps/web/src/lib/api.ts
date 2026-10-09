@@ -334,3 +334,20 @@ export const marketApi = {
   history: (symbol: string, days = 30) =>
     api.get(`/market/history/${symbol}?days=${days}`),
 };
+
+// ═══════════════════════════════════════════
+// Admin API
+// ═══════════════════════════════════════════
+
+export const adminApi = {
+  overview: () => api.get('/admin/overview'),
+  auditLog: (params?: Record<string, string | number>) => {
+    const qs = params
+      ? '?' +
+        Object.entries(params)
+          .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
+          .join('&')
+      : '';
+    return api.get(`/admin/audit-log${qs}`);
+  },
+};
