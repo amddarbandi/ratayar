@@ -346,6 +346,59 @@ Redesign footer to be attractive on mobile AND desktop.
 Admin pages must work on mobile (tables -> cards).
 Also: admin panel delivery review with user.
 
+
+
+## Admin Master Plan (user directive 2026-10-10)
+
+Full platform control. See docs/ADMIN-MASTER-PLAN.md.
+
+### Phase 1 — Foundation (NEXT)
+- [ ] ADM-001 AuditLog model + interceptor + @Audited()
+- [ ] ADM-002 /admin/overview KPIs + charts
+- [ ] ADM-003 /admin/health extended (cron, queue, minio)
+
+### Phase 2 — Users (CRITICAL)
+- [ ] ADM-004 /admin/users list + search + filter + paginate
+- [ ] ADM-005 /admin/users/[id] full profile
+- [ ] ADM-006 edit user (name, role, status)
+- [ ] ADM-007 ban / unban
+- [ ] ADM-008 reset password (send SMS)
+- [ ] ADM-009 impersonate (short-lived JWT)
+- [ ] ADM-010 view + kill sessions
+- [ ] ADM-011 admin notes on user
+
+### Phase 3 — Business
+- [ ] ADM-012 /admin/subscriptions (list, filter)
+- [ ] ADM-013 force extend / cancel subscription
+- [ ] ADM-014 refund payment
+- [ ] ADM-015 /admin/revenue (MRR, charts)
+- [ ] ADM-016 /admin/invoices list + resend
+
+### Phase 4 — Content oversight
+- [ ] ADM-017 /admin/documents all users + delete
+- [ ] ADM-018 /admin/obligations all + bulk delete
+- [ ] ADM-019 /admin/notifications queue + retry
+- [ ] ADM-020 ticket assignment + macros
+
+### Phase 5 — Communication
+- [ ] ADM-021 /admin/broadcast (SMS/push/email)
+- [ ] ADM-022 /admin/messages direct to user
+
+### Phase 6 — System
+- [ ] ADM-023 /admin/settings
+- [ ] ADM-024 /admin/flags
+- [ ] ADM-025 /admin/audit-log page
+- [ ] ADM-026 /admin/backup export
+
+### Phase 7 — Advanced
+- [ ] ADM-027 /admin/analytics DAU/MAU/retention
+- [ ] ADM-028 /admin/abuse blocks
+- [ ] ADM-029 /admin/content (FAQ, calendar, terms)
+- [ ] ADM-030 /admin/api-keys
+
+### Mobile
+- [ ] MOB-018 admin pages mobile (blocking for all ADM items)
+
 ## Mobile-First Audit (BLOCKING — user directive 2026-10-09)
 
 ### MOB-001 Bottom navigation bar for phones
