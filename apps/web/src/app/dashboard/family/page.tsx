@@ -314,7 +314,7 @@ export default function FamilyPage() {
                               type="button"
                               onClick={() => setInviteRelation(rel.key)}
                               className={cn(
-                                'py-1.5 px-1 rounded-lg text-[11px] transition-all',
+                                'py-1.5 px-1 rounded-lg text-xs md:text-sm transition-all',
                                 inviteRelation === rel.key
                                   ? 'bg-purple-500/20 border-2 border-purple-500/50 text-white'
                                   : 'bg-white/5 border-2 border-transparent text-white/60 hover:bg-white/10',
@@ -343,7 +343,7 @@ export default function FamilyPage() {
                           {copied ? 'کپی شد' : 'کپی کد'}
                         </button>
                       </div>
-                      <div className="text-center text-white/50 text-[11px]">
+                      <div className="text-center text-white/50 text-xs md:text-sm">
                         این کد را به {invitePhone} بفرست — اعتبار ۷ روز
                       </div>
                       <Button onClick={closeInvite} variant="default" size="md" className="w-full">بستن</Button>
@@ -410,7 +410,7 @@ function CreateFamilyForm({ onSuccess }: { onSuccess: () => void }) {
             )}
           >
             {p.popular && (
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-medium">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[11px] md:text-xs font-medium">
                 محبوب
               </span>
             )}

@@ -127,7 +127,7 @@ export function DashboardSidebar({
           <span className="text-sm text-white/50 group-hover:text-white/70 transition-colors flex-1 text-right">
             جستجو
           </span>
-          <kbd className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[10px]">
+          <kbd className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[11px] md:text-xs">
             {isMac ? '⌘' : 'Ctrl'}K
           </kbd>
         </button>
@@ -148,7 +148,7 @@ export function DashboardSidebar({
             </div>
           </div>
           {isAdmin && (
-            <div className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+            <div className="text-[11px] md:text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
               ادمین
             </div>
           )}
@@ -161,7 +161,7 @@ export function DashboardSidebar({
 
         {isAdmin && (
           <div className="pt-3 mt-3 border-t border-white/10">
-            <div className="text-[10px] text-white/30 px-4 pb-2">مدیریت</div>
+            <div className="text-[11px] md:text-xs text-white/30 px-4 pb-2">مدیریت</div>
             {adminItems.map((item) => renderItem(item, { admin: true }))}
           </div>
         )}

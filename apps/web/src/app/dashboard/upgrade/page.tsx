@@ -142,7 +142,7 @@ function UpgradeContent() {
                     <Check className="w-5 h-5 text-purple-400" />
                   )}
                   {isCurrent && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60">
+                    <span className="text-[11px] md:text-xs px-2 py-0.5 rounded-full bg-white/10 text-white/60">
                       فعلی
                     </span>
                   )}

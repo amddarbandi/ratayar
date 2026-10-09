@@ -98,3 +98,8 @@ audit. Desktop is the enhancement, not the baseline.
 - The phrase "ساخته شده با ❤️ در ایران" is forbidden (user directive 2026-10-09).
 - Footer must link to: ابزارها (تبدیل، بازار، تقویم، IP), محصول, شرکت, قانونی.
 - Footer must render correctly at 360px width (single/two-column grid).
+
+## Rule 12 — Typography scale
+
+See docs/TYPOGRAPHY.md. No text below 11px. Body text >= 14px.
+`text-[10px]` is forbidden everywhere outside the bottom-nav bar.

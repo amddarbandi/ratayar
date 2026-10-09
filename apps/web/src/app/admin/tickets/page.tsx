@@ -139,7 +139,7 @@ function Content() {
                     >
                       {st.text}
                     </span>
-                    <span className="text-[10px] text-white/40">
+                    <span className="text-[11px] md:text-xs text-white/40">
                       {PRIORITIES[t.priority]}
                     </span>
                   </div>

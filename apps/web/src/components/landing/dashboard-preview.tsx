@@ -239,7 +239,7 @@ export function DashboardPreview() {
                         ),
                       )}
                     </div>
-                    <div className="flex justify-between text-[10px] text-white/30 mt-2">
+                    <div className="flex justify-between text-[11px] md:text-xs text-white/30 mt-2">
                       <span>فروردین</span>
                       <span>مهر</span>
                     </div>

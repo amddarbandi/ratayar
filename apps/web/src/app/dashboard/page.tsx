@@ -421,7 +421,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center relative">
                       <Bell className="w-5 h-5 text-purple-400" />
-                      <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[11px] md:text-xs font-bold flex items-center justify-center">
                         {stats.unreadNotifications > 9 ? '9+' : stats.unreadNotifications}
                       </span>
                     </div>

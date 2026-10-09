@@ -352,7 +352,7 @@ function IPv6Results({ result }: { result: IPv6Result }) {
                 key={i}
                 className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center"
               >
-                <div className="text-[10px] text-white/40 mb-1">
+                <div className="text-[11px] md:text-xs text-white/40 mb-1">
                   {i * 16}
                 </div>
                 <div className="text-white font-mono text-xs">{g}</div>
@@ -504,7 +504,7 @@ function BinaryRow({
           : 'bg-white/[0.02] border-white/10',
       )}
     >
-      <div className="text-[10px] text-white/40 mb-1">{label}</div>
+      <div className="text-[11px] md:text-xs text-white/40 mb-1">{label}</div>
       <div className="text-white font-mono text-xs break-all" dir="ltr">
         {value}
       </div>

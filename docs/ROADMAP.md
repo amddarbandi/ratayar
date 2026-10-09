@@ -324,7 +324,7 @@ Mobile navbar must contain EVERY link desktop has:
 - /dashboard/network IP
 Plus auth buttons.
 
-### MOB-015 Typography readability on mobile (CRITICAL)
+### MOB-015 Typography readability on mobile (CRITICAL) — DONE
 User feedback: many sections require zoom. 14px minimum body,
 16px minimum on inputs. Small captions only for tertiary labels.
 

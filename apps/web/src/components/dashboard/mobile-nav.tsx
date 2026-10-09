@@ -60,7 +60,7 @@ export function MobileNav() {
                   className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-white/50 active:scale-95 transition-transform"
                 >
                   <item.icon className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">{item.label}</span>
+                  <span className="text-[11px] font-medium">{item.label}</span>
                 </button>
               );
             }
@@ -75,7 +75,7 @@ export function MobileNav() {
                 )}
               >
                 <item.icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-[11px] font-medium">{item.label}</span>
                 {active && (
                   <motion.div
                     layoutId="mobile-nav-indicator"
