@@ -335,9 +335,11 @@ Whole mobile UI reviewed against native-app expectations:
 - Full-width primary actions
 - App-like header/toolbar
 
-### MOB-017 Footer redesign (CRITICAL)
+### MOB-017 Footer redesign (CRITICAL) — DONE
 Remove "ساخته شده با ❤️ در ایران".
-Replace with: "پلتفرم دیگری از گروه مهندسی راتا".
+Replaced with: "پلتفرم دیگری از گروه مهندسی راتا". Footer also
+now links ابزارها (تبدیل/بازار/تقویم/IP)، محصول، شرکت، قانونی and
+uses the brand LogoWordmark. Rule recorded in UI-GUIDELINES R11.
 Redesign footer to be attractive on mobile AND desktop.
 
 ### MOB-018 Admin panel mobile (HIGH)

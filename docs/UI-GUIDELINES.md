@@ -91,3 +91,10 @@ New features must be inserted BEFORE تقویم/IP, never after IP.
 
 See docs/MOBILE-FIRST.md. No page ships without passing the mobile
 audit. Desktop is the enhancement, not the baseline.
+
+## Rule 11 — Footer content
+
+- Bottom-of-page tagline is fixed: **«پلتفرم دیگری از گروه مهندسی راتا»**
+- The phrase "ساخته شده با ❤️ در ایران" is forbidden (user directive 2026-10-09).
+- Footer must link to: ابزارها (تبدیل، بازار، تقویم، IP), محصول, شرکت, قانونی.
+- Footer must render correctly at 360px width (single/two-column grid).
