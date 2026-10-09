@@ -348,6 +348,14 @@ Also: admin panel delivery review with user.
 
 
 
+
+## Copy & messaging (user directive 2026-10-10)
+
+### COPY-001 Revise tagline — remove "۷ سال تا ۱۰۰ سال"
+- Current: "دستیار هوشمند زندگی از ۷ سال تا ۱۰۰ سال ..."
+- Must be replaced or removed. Proposals in docs/COPY-REVIEW.md.
+- Apply after user selection to: footer, hero, metadata, PWA manifest.
+
 ## Admin Master Plan (user directive 2026-10-10)
 
 Full platform control. See docs/ADMIN-MASTER-PLAN.md.
