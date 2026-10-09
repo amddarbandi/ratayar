@@ -327,3 +327,22 @@ model PriceSnapshot {
   @@index([symbol, ts])
   @@map("price_snapshots")
 }
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorId     String?  @map("actor_id") @db.Uuid
+  actorPhone  String?  @map("actor_phone") @db.VarChar(20)
+  actorRole   String?  @map("actor_role") @db.VarChar(20)
+  action      String   @db.VarChar(60)
+  targetType  String?  @map("target_type") @db.VarChar(40)
+  targetId    String?  @map("target_id") @db.VarChar(60)
+  meta        Json     @default("{}")
+  ip          String?  @db.VarChar(60)
+  userAgent   String?  @map("user_agent") @db.VarChar(300)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@index([targetType, targetId])
+  @@map("audit_logs")
+}

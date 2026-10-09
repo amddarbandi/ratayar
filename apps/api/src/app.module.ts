@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { PlanLimitsModule } from './common/plan-limits/plan-limits.module';
+import { AuditService } from './common/audit/audit.service';
+import { AuditInterceptor } from './common/audit/audit.interceptor';
 import { RedisModule } from './common/redis/redis.module';
 import { MinioModule } from './common/minio/minio.module';
 import { HealthModule } from './modules/health/health.module';
@@ -24,6 +26,7 @@ import { SubscriptionsModule } from './modules/subscriptions/subscriptions.modul
 import { PaymentsModule } from './modules/payments/payments.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { MarketModule } from './modules/market/market.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { ReminderTask } from './common/tasks/reminder.task';
 
 @Module({
@@ -55,9 +58,12 @@ import { ReminderTask } from './common/tasks/reminder.task';
     PaymentsModule,
     TicketsModule,
     MarketModule,
+    AdminModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+    AuditService,
     ReminderTask,
   ],
 })
