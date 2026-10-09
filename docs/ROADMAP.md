@@ -310,6 +310,40 @@ messages, changelog).
 6. BIZ-005 — Invoice PDF
 7. BIZ-003 — Renewal / cancel / downgrade UI
 
+
+### MOB-013 Login button on mobile navbar (CRITICAL)
+Desktop navbar shows ورود / ثبت‌نام. Mobile has no such button.
+Add compact login/CTA button inside the mobile menu (and drawer).
+
+### MOB-014 Full mobile menu parity (CRITICAL)
+Mobile navbar must contain EVERY link desktop has:
+- #features #how #pricing #about (anchors)
+- /dashboard/converters تبدیل
+- /dashboard/market بازار
+- /dashboard/calendar تقویم
+- /dashboard/network IP
+Plus auth buttons.
+
+### MOB-015 Typography readability on mobile (CRITICAL)
+User feedback: many sections require zoom. 14px minimum body,
+16px minimum on inputs. Small captions only for tertiary labels.
+
+### MOB-016 Mobile-app feel audit (CRITICAL)
+Whole mobile UI reviewed against native-app expectations:
+- Rounded cards, generous spacing, no pinch-zoom
+- Touch feedback, large tap targets
+- Full-width primary actions
+- App-like header/toolbar
+
+### MOB-017 Footer redesign (CRITICAL)
+Remove "ساخته شده با ❤️ در ایران".
+Replace with: "پلتفرم دیگری از گروه مهندسی راتا".
+Redesign footer to be attractive on mobile AND desktop.
+
+### MOB-018 Admin panel mobile (HIGH)
+Admin pages must work on mobile (tables -> cards).
+Also: admin panel delivery review with user.
+
 ## Mobile-First Audit (BLOCKING — user directive 2026-10-09)
 
 ### MOB-001 Bottom navigation bar for phones
