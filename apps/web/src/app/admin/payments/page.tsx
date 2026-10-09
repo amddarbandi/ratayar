@@ -2,14 +2,16 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { paymentApi, api } from '@/lib/api';
-import { Check, X, ExternalLink } from 'lucide-react';
+import { paymentApi, adminApi } from '@/lib/api';
+import { Check, X, ExternalLink, RotateCcw } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface Payment {
   id: string;
   amount: string;
   method: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'refunded';
   receiptKey: string;
   receiptMime?: string;
   trackingCode?: string;
@@ -34,6 +36,7 @@ function Content() {
   } | null>(null);
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
+  const [refunding, setRefunding] = useState<string | null>(null);
 
   const load = (s?: string) => {
     setLoading(true);
@@ -65,6 +68,21 @@ function Content() {
       setError(e?.response?.data?.message || 'خطا در بررسی');
     } finally {
       setReviewing(null);
+    }
+  };
+
+  const doRefund = async (p: Payment) => {
+    const reason = prompt('دلیل بازگشت پرداخت (اختیاری):') || '';
+    if (!confirm(`مبلغ ${Number(p.amount).toLocaleString('fa-IR')} تومان بازگشت داده شود؟`)) return;
+    setRefunding(p.id);
+    try {
+      await adminApi.refundPayment(p.id, reason);
+      toast.success('پرداخت بازگشت داده شد');
+      load();
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message || 'خطا');
+    } finally {
+      setRefunding(null);
     }
   };
 
@@ -183,16 +201,30 @@ function Content() {
                   </button>
                 </div>
               ) : (
-                <div className="text-sm">
-                  {p.status === 'approved' ? (
-                    <span className="text-green-400">✅ تأیید شده</span>
-                  ) : (
-                    <span className="text-red-400">❌ رد شده</span>
-                  )}
-                  {p.adminNote && (
-                    <span className="text-white/50 mr-3">
-                      یادداشت: {p.adminNote}
-                    </span>
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="text-sm">
+                    {p.status === 'approved' ? (
+                      <span className="text-green-400">✅ تأیید شده</span>
+                    ) : p.status === 'refunded' ? (
+                      <span className="text-amber-400">↩️ بازگشت داده شده</span>
+                    ) : (
+                      <span className="text-red-400">❌ رد شده</span>
+                    )}
+                    {p.adminNote && (
+                      <span className="text-white/50 mr-3 text-xs">
+                        یادداشت: {p.adminNote}
+                      </span>
+                    )}
+                  </div>
+                  {p.status === 'approved' && (
+                    <button
+                      onClick={() => doRefund(p)}
+                      disabled={refunding === p.id}
+                      className="min-h-[40px] px-4 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      <RotateCcw className={cn('w-3.5 h-3.5', refunding === p.id && 'animate-spin')} />
+                      بازگشت پرداخت
+                    </button>
                   )}
                 </div>
               )}

@@ -6,16 +6,24 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth-store';
 import {
   LayoutDashboard, Package, CreditCard, MessageSquare, ChevronLeft,
-  Shield,
+  Shield, Users, Calendar, BarChart3, FileText, ListChecks, Bell, Settings, Activity, HardDrive,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LogoIcon } from '@/components/brand/logo';
 
 const items = [
   { href: '/admin', label: 'داشبورد', icon: LayoutDashboard },
+  { href: '/admin/users', label: 'کاربران', icon: Users },
+  { href: '/admin/subscriptions', label: 'اشتراک‌ها', icon: Calendar },
+  { href: '/admin/revenue', label: 'درآمد', icon: BarChart3 },
   { href: '/admin/plans', label: 'پلن‌ها', icon: Package },
   { href: '/admin/payments', label: 'پرداخت‌ها', icon: CreditCard },
   { href: '/admin/tickets', label: 'تیکت‌ها', icon: MessageSquare },
+  { href: '/admin/documents', label: 'اسناد', icon: FileText },
+  { href: '/admin/obligations', label: 'تعهدات', icon: ListChecks },
+  { href: '/admin/notifications', label: 'اعلان‌ها', icon: Bell },
+  { href: '/admin/audit-log', label: 'لاگ اقدامات', icon: Activity },
+  { href: '/admin/settings', label: 'تنظیمات پلتفرم', icon: Settings },
 ];
 
 export default function AdminLayout({

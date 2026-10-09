@@ -372,4 +372,32 @@ export const adminApi = {
   unbanUser: (id: string) => api.post(`/admin/users/${id}/unban`),
   setUserRole: (id: string, role: string) =>
     api.patch(`/admin/users/${id}/role`, { role }),
+
+  // ─── Subscriptions ───
+  listSubscriptions: (params?: Record<string, string | number | undefined>) => {
+    const clean: Record<string, string> = {};
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        if (v !== undefined && v !== '') clean[k] = String(v);
+      }
+    }
+    const qs = Object.keys(clean).length
+      ? '?' +
+        Object.entries(clean)
+          .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+          .join('&')
+      : '';
+    return api.get(`/admin/subscriptions${qs}`);
+  },
+  extendSubscription: (id: string, months: number) =>
+    api.post(`/admin/subscriptions/${id}/extend`, { months }),
+  cancelSubscription: (id: string) =>
+    api.post(`/admin/subscriptions/${id}/cancel`),
+
+  // ─── Revenue ───
+  revenue: () => api.get('/admin/revenue'),
+
+  // ─── Refund ───
+  refundPayment: (id: string, reason?: string) =>
+    api.post(`/admin/payments/${id}/refund`, { reason }),
 };
