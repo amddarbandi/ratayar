@@ -174,4 +174,194 @@ export class AdminService {
   }) {
     return this.audit.list(opts);
   }
+
+  // ═══════════════════════════════════════════
+  // Users
+  // ═══════════════════════════════════════════
+  async listUsers(opts: {
+    q?: string;
+    status?: string;
+    role?: string;
+    plan?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const where: any = { deletedAt: null };
+    if (opts.q) {
+      where.OR = [
+        { phone: { contains: opts.q } },
+        { fullName: { contains: opts.q } },
+      ];
+    }
+    if (opts.status) where.status = opts.status;
+    if (opts.role) where.role = opts.role;
+
+    const [items, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(opts.limit ?? 30, 100),
+        skip: opts.offset ?? 0,
+        select: {
+          id: true,
+          phone: true,
+          fullName: true,
+          role: true,
+          status: true,
+          createdAt: true,
+          subscriptions: {
+            where: { status: 'active' },
+            take: 1,
+            orderBy: { startedAt: 'desc' },
+            include: { plan: { select: { code: true, name: true } } },
+          },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      items: items.map((u) => ({
+        id: u.id,
+        phone: u.phone,
+        fullName: u.fullName,
+        role: u.role,
+        status: u.status,
+        createdAt: u.createdAt,
+        plan: u.subscriptions[0]?.plan?.code ?? 'free',
+        planName: u.subscriptions[0]?.plan?.name ?? 'رایگان',
+      })),
+      total,
+    };
+  }
+
+  async getUser(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        phone: true,
+        fullName: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+      },
+    });
+    if (!user) return null;
+
+    const [
+      sub,
+      payments,
+      tickets,
+      docs,
+      docsAgg,
+      obligCount,
+      assetCount,
+      auditRecent,
+    ] = await Promise.all([
+      this.prisma.subscription.findFirst({
+        where: { userId: id, status: 'active' },
+        orderBy: { startedAt: 'desc' },
+        include: { plan: true },
+      }),
+      this.prisma.paymentRequest.findMany({
+        where: { userId: id },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        include: { plan: { select: { code: true, name: true } } },
+      }),
+      this.prisma.ticket.findMany({
+        where: { userId: id },
+        orderBy: { updatedAt: 'desc' },
+        take: 10,
+      }),
+      this.prisma.document.count({ where: { userId: id, deletedAt: null } }),
+      this.prisma.document.aggregate({
+        where: { userId: id, deletedAt: null },
+        _sum: { size: true },
+      }),
+      this.prisma.obligation.count({ where: { userId: id } }).catch(() => 0),
+      this.prisma.asset.count({ where: { userId: id } }),
+      this.audit.list({ limit: 10, actorId: id }),
+    ]);
+
+    const storageBytes = Number(docsAgg._sum.size ?? BigInt(0));
+
+    return {
+      user,
+      subscription: sub
+        ? {
+            status: sub.status,
+            startedAt: sub.startedAt,
+            expiresAt: sub.expiresAt,
+            plan: {
+              code: sub.plan.code,
+              name: sub.plan.name,
+              priceMonthly: sub.plan.priceMonthly.toString(),
+              maxObligations: sub.plan.maxObligations,
+              maxDocuments: sub.plan.maxDocuments,
+              maxStorageMB: sub.plan.maxStorageMB,
+            },
+          }
+        : null,
+      payments: payments.map((p) => ({
+        id: p.id,
+        amount: p.amount.toString(),
+        status: p.status,
+        method: p.method,
+        planCode: p.plan.code,
+        planName: p.plan.name,
+        createdAt: p.createdAt,
+        reviewedAt: p.reviewedAt,
+      })),
+      tickets: tickets.map((t) => ({
+        id: t.id,
+        subject: t.subject,
+        status: t.status,
+        category: t.category,
+        priority: t.priority,
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt,
+      })),
+      usage: {
+        documents: docs,
+        storageBytes,
+        storageMB: +(storageBytes / 1024 / 1024).toFixed(2),
+        obligations: obligCount,
+        assets: assetCount,
+      },
+      recentAudit: auditRecent.items,
+    };
+  }
+
+  async banUser(id: string) {
+    await this.prisma.user.update({
+      where: { id },
+      data: { status: 'banned' },
+    });
+    return { ok: true };
+  }
+
+  async unbanUser(id: string) {
+    await this.prisma.user.update({
+      where: { id },
+      data: { status: 'active' },
+    });
+    return { ok: true };
+  }
+
+  async setUserRole(id: string, role: string) {
+    const allowed = ['user', 'admin', 'support', 'billing', 'analyst'];
+    if (!allowed.includes(role)) {
+      throw new Error('نقش نامعتبر');
+    }
+    await this.prisma.user.update({
+      where: { id },
+      data: { role },
+    });
+    return { ok: true };
+  }
+
 }
