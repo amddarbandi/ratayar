@@ -350,4 +350,26 @@ export const adminApi = {
       : '';
     return api.get(`/admin/audit-log${qs}`);
   },
+
+  // ─── Users ───
+  listUsers: (params?: Record<string, string | number | undefined>) => {
+    const clean: Record<string, string> = {};
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        if (v !== undefined && v !== '') clean[k] = String(v);
+      }
+    }
+    const qs = Object.keys(clean).length
+      ? '?' +
+        Object.entries(clean)
+          .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+          .join('&')
+      : '';
+    return api.get(`/admin/users${qs}`);
+  },
+  getUser: (id: string) => api.get(`/admin/users/${id}`),
+  banUser: (id: string) => api.post(`/admin/users/${id}/ban`),
+  unbanUser: (id: string) => api.post(`/admin/users/${id}/unban`),
+  setUserRole: (id: string, role: string) =>
+    api.patch(`/admin/users/${id}/role`, { role }),
 };
