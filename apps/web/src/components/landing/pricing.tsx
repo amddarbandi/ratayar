@@ -1,5 +1,7 @@
 'use client';
 
+import { toFa, fmtStorageMB } from '@/lib/format';
+
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -44,28 +46,20 @@ const FALLBACK: DisplayPlan[] = [
   },
 ];
 
-function fmtNum(n: number) {
-  if (n === -1) return 'بی‌نهایت';
-  return n.toLocaleString('fa-IR');
-}
 
-function fmtStorage(mb: number) {
-  if (mb >= 1024) return `${(mb / 1024).toFixed(0)} GB`;
-  return `${mb} MB`;
-}
 
 function toDisplay(p: ApiPlan): DisplayPlan {
   const price = Number(p.priceMonthly);
   const isFree = price === 0;
   const features: string[] = [];
 
-  if (p.maxMembers > 1) features.push(`تا ${fmtNum(p.maxMembers)} کاربر`);
+  if (p.maxMembers > 1) features.push(`تا ${toFa(p.maxMembers)} کاربر`);
   else features.push('۱ کاربر');
 
-  features.push(`${fmtNum(p.maxObligations)} تعهد`);
-  features.push(`${fmtNum(p.maxAssets)} دارایی`);
-  features.push(`${fmtNum(p.maxDocuments)} سند`);
-  features.push(`${fmtStorage(p.maxStorageMB)} فضا`);
+  features.push(`${toFa(p.maxObligations)} تعهد`);
+  features.push(`${toFa(p.maxAssets)} دارایی`);
+  features.push(`${toFa(p.maxDocuments)} سند`);
+  features.push(`${fmtStorageMB(p.maxStorageMB)} فضا`);
 
   const cta = isFree ? 'شروع رایگان' : `انتخاب ${p.name}`;
   const href = isFree ? '/register' : `/register?plan=${p.code}`;

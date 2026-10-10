@@ -10,7 +10,7 @@ import {
 import { adminApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { fmtCompact } from '@/lib/format';
+import { fmtCompact, fmtStorageMB } from '@/lib/format';
 import { toast } from 'sonner';
 
 interface Overview {
@@ -132,11 +132,7 @@ export default function AdminHome() {
         />
         <KPI
           label="فضای کل"
-          value={
-            k.content.storageMB >= 1024
-              ? `${(k.content.storageMB / 1024).toFixed(2)} GB`
-              : `${k.content.storageMB} MB`
-          }
+          value={fmtStorageMB(k.content.storageMB)}
           sub="مصرف کل پلتفرم"
           icon={HardDrive}
           color="from-amber-500 to-yellow-500"

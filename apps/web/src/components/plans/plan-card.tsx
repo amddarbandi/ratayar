@@ -1,3 +1,4 @@
+import { fmtStorageMB } from '@/lib/format';
 import { useRouter } from 'next/navigation';
 
 interface PlanCardProps {
@@ -29,8 +30,7 @@ export function PlanCard({ plan }: PlanCardProps) {
     return `${n.toLocaleString('fa-IR')} تومان / ماه`;
   };
 
-  const fmtStorage = (mb: number) =>
-    mb >= 1024 ? `${(mb / 1024).toFixed(0)} GB` : `${mb} MB`;
+
 
   return (
     <div
@@ -53,7 +53,7 @@ export function PlanCard({ plan }: PlanCardProps) {
         <li>📋 {fmtNum(plan.maxObligations)} تعهد</li>
         <li>🏠 {fmtNum(plan.maxAssets)} دارایی</li>
         <li>📄 {fmtNum(plan.maxDocuments)} سند</li>
-        <li>💾 {fmtStorage(plan.maxStorageMB)} فضا</li>
+        <li>💾 {fmtStorageMB(plan.maxStorageMB)} فضا</li>
         <li>⬆️ هر فایل {plan.maxUploadMB} MB</li>
       </ul>
       <button
