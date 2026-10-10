@@ -43,9 +43,14 @@ export function Footer() {
             <Link href="/" className="inline-block mb-4">
               <LogoWordmark />
             </Link>
-            <p className="text-white/50 text-sm leading-7 max-w-xs">
-              دستیار هوشمند زندگی — مدیریت تعهدات، دارایی‌ها، اسناد و خانواده در یک اپ
-            </p>
+            <div className="text-center md:text-right max-w-xs">
+              <div className="text-white text-base font-bold mb-1">
+                دستیار هوشمند زندگی
+              </div>
+              <div className="text-white/50 text-sm leading-7">
+                مدیریت تعهدات، دارایی‌ها، اسناد و خانواده در یک اپ
+              </div>
+            </div>
             <div className="flex items-center gap-2 mt-4 text-xs text-emerald-300/80">
               <Shield className="w-3.5 h-3.5" />
               <span>داده‌های شما رمزنگاری‌شده و امن است</span>

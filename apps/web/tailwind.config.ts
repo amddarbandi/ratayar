@@ -26,17 +26,17 @@ const config: Config = {
         // ── CYBERPUNK EMERALD ──
         // purple -> brand (neon emerald #10ffb3)
         purple: {
-          50:  '#e6fff6',
-          100: '#b8ffe4',
-          200: '#7affcb',
-          300: '#3dffb1',
-          400: '#10ffb3',
-          500: '#10ffb3',
-          600: '#0dd79a',
-          700: '#0aab7a',
-          800: '#087f5c',
-          900: '#06543d',
-          950: '#033d2a',
+          50:  '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
+          950: '#022c22',
         },
         // fuchsia -> accent (neon magenta #e935ff)
         fuchsia: {
