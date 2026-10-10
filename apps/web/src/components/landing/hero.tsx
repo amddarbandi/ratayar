@@ -17,17 +17,7 @@ export function Hero() {
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto text-center">
           {/* Top Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6"
-          >
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-sm text-white/80">
-              نسخه بتا — همین حالا امتحان کنید
-            </span>
-          </motion.div>
+
 
           {/* Main Title */}
           <motion.h1

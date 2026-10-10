@@ -323,6 +323,21 @@ export const ticketApi = {
     api.post(`/tickets/admin/${id}/messages`, { body }),
   adminSetStatus: (id: string, status: string, note?: string) =>
     api.patch(`/tickets/admin/${id}/status`, { status, note }),
+
+  // ─── Assignment ───
+  adminListAdmins: () => api.get('/tickets/admin/admins'),
+  adminAssign: (id: string, assigneeId: string | null) =>
+    api.patch(`/tickets/admin/${id}/assign`, { assigneeId }),
+
+  // ─── Macros ───
+  listMacros: () => api.get('/tickets/admin/macros'),
+  createMacro: (data: { name: string; body: string; category?: string }) =>
+    api.post('/tickets/admin/macros', data),
+  updateMacro: (
+    id: string,
+    data: { name?: string; body?: string; category?: string },
+  ) => api.patch(`/tickets/admin/macros/${id}`, data),
+  deleteMacro: (id: string) => api.delete(`/tickets/admin/macros/${id}`),
 };
 
 // ═══════════════════════════════════════════
