@@ -126,3 +126,30 @@
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
+
+/* ═══════════════════════════════════════════ */
+/* MOBILE-TOUCH — safe append, does not modify */
+/* existing rules, only adds new ones           */
+/* ═══════════════════════════════════════════ */
+
+/* iOS Safari zooms the whole page when an input has font-size < 16px.
+   Force 16px on small screens only. */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Remove grey flash on tap (iOS + Android) */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth tap, no double-tap zoom delay */
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
+}
