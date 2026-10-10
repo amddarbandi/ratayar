@@ -115,7 +115,7 @@ export default function MarketPage() {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <div className="text-xs text-white/50 mb-1">
-                  دلار آمریکا (میانگین TGJU + والتکس)
+                  دلار آمریکا
                 </div>
                 <div className="text-4xl font-black text-white" dir="ltr">
                   {data.usdToman.toLocaleString('fa-IR')}
