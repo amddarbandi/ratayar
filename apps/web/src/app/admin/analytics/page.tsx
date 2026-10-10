@@ -6,6 +6,7 @@ import { BarChart3, TrendingUp, Users, Activity, Loader2 } from 'lucide-react';
 import { adminApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { fmtCompact } from '@/lib/format';
 import { toast } from 'sonner';
 import { toJalaliShort } from '@/lib/jalali';
 
@@ -108,7 +109,7 @@ export default function AdminAnalyticsPage() {
         />
         <SmallKPI
           label="درآمد بازه"
-          value={fmtToman(totalRevenue)}
+          value={fmtCompact(totalRevenue)}
           icon={TrendingUp}
           color="from-amber-500 to-orange-500"
         />
@@ -133,18 +134,12 @@ export default function AdminAnalyticsPage() {
         title="درآمد روزانه"
         data={data.revenue.map((r) => ({ day: r.day, value: r.total }))}
         color="from-amber-500/30 to-amber-400/80"
-        formatY={fmtToman}
+        formatY={fmtCompact}
       />
     </div>
   );
 }
 
-function fmtToman(n: number) {
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(0)}K`;
-  return n.toLocaleString('fa-IR');
-}
 
 function SmallKPI({
   label, value, icon: Icon, color,

@@ -6,6 +6,7 @@ import { TrendingUp, ArrowUpRight, ArrowDownRight, DollarSign, Package } from 'l
 import { adminApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { fmtCompact } from '@/lib/format';
 import { toast } from 'sonner';
 
 interface Revenue {
@@ -60,14 +61,14 @@ export default function AdminRevenuePage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-        <Big label="MRR" value={fmtToman(data.mrr)} icon={DollarSign} color="from-emerald-500 to-teal-500" sub="درآمد ماهانه تکرارشده" />
-        <Big label="ARR" value={fmtToman(data.arr)} icon={TrendingUp} color="from-cyan-500 to-blue-500" sub="درآمد سالانه" />
+        <Big label="MRR" value={fmtCompact(data.mrr)} icon={DollarSign} color="from-emerald-500 to-teal-500" sub="درآمد ماهانه تکرارشده" />
+        <Big label="ARR" value={fmtCompact(data.arr)} icon={TrendingUp} color="from-cyan-500 to-blue-500" sub="درآمد سالانه" />
         <Big
           label="این ماه"
-          value={fmtToman(data.thisMonthTotal)}
+          value={fmtCompact(data.thisMonthTotal)}
           icon={DollarSign}
           color="from-purple-500 to-fuchsia-500"
-          sub={`ماه قبل: ${fmtToman(data.lastMonthTotal)}`}
+          sub={`ماه قبل: ${fmtCompact(data.lastMonthTotal)}`}
           trend={data.growthPct}
         />
         <Big
@@ -133,7 +134,7 @@ export default function AdminRevenuePage() {
                     <div className="flex items-center justify-between text-sm mb-1">
                       <span className="text-white/80">{p.name}</span>
                       <span className="text-white/60">
-                        {fmtToman(p.total)} ({p.count.toLocaleString('fa-IR')} تراکنش)
+                        {fmtCompact(p.total)} ({p.count.toLocaleString('fa-IR')} تراکنش)
                       </span>
                     </div>
                     <div className="h-2 rounded-full bg-white/5 overflow-hidden">
@@ -153,12 +154,6 @@ export default function AdminRevenuePage() {
   );
 }
 
-function fmtToman(n: number) {
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(0)}K`;
-  return n.toLocaleString('fa-IR');
-}
 
 function Big({
   label, value, icon: Icon, color, sub, trend,

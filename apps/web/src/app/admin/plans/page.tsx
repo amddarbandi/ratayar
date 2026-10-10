@@ -1,4 +1,5 @@
 'use client';
+import { fmtStorageMB } from '@/lib/format';
 
 import { useEffect, useState } from 'react';
 import { plansApi, api } from '@/lib/api';
@@ -165,9 +166,7 @@ export default function AdminPlansPage() {
                   <td className="p-3">{fmt(p.maxObligations)}</td>
                   <td className="p-3">{fmt(p.maxDocuments)}</td>
                   <td className="p-3">
-                    {p.maxStorageMB >= 1024
-                      ? `${(p.maxStorageMB / 1024).toFixed(0)} GB`
-                      : `${p.maxStorageMB} MB`}
+                    {fmtStorageMB(p.maxStorageMB)}
                   </td>
                   <td className="p-3">
                     {p.isActive ? (

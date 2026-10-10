@@ -10,6 +10,7 @@ import {
 import { adminApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { fmtCompact } from '@/lib/format';
 import { toast } from 'sonner';
 
 interface Overview {
@@ -74,8 +75,8 @@ export default function AdminHome() {
         />
         <KPI
           label="درآمد این ماه"
-          value={fmtToman(k.revenue.thisMonthToman)}
-          sub={`ماه قبل: ${fmtToman(k.revenue.lastMonthToman)}`}
+          value={fmtCompact(k.revenue.thisMonthToman)}
+          sub={`ماه قبل: ${fmtCompact(k.revenue.lastMonthToman)}`}
           icon={TrendingUp}
           color="from-emerald-500 to-teal-500"
           href="/admin/revenue"
@@ -226,12 +227,6 @@ export default function AdminHome() {
   );
 }
 
-function fmtToman(n: number) {
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(0)}K`;
-  return n.toLocaleString('fa-IR');
-}
 
 function KPI({
   label,
