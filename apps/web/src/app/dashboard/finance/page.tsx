@@ -417,7 +417,7 @@ function AddTransactionModal({ onClose, defaultType }: { onClose: () => void; de
           <Card className="p-6">
             <div className="flex items-start justify-between mb-5">
               <h2 className="text-xl font-bold text-white">تراکنش جدید</h2>
-              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white">
+              <button onClick={onClose} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl hover:bg-white/5 text-white/40 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>

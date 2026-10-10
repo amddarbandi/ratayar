@@ -254,7 +254,7 @@ export default function FamilyPage() {
                       <h2 className="text-lg font-bold text-white">دعوت عضو جدید</h2>
                       <p className="text-white/50 text-xs mt-0.5">شماره موبایل را وارد کن</p>
                     </div>
-                    <button onClick={closeInvite} className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors">
+                    <button onClick={closeInvite} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl hover:bg-white/5 text-white/40 hover:text-white transition-colors">
                       <X className="w-5 h-5" />
                     </button>
                   </div>
@@ -410,7 +410,7 @@ function CreateFamilyForm({ onSuccess }: { onSuccess: () => void }) {
             )}
           >
             {p.popular && (
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[11px] md:text-xs font-medium">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs md:text-sm md:text-xs font-medium">
                 محبوب
               </span>
             )}

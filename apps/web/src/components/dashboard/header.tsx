@@ -80,7 +80,7 @@ export function DashboardHeader({
             <span className="text-sm text-white/40 group-hover:text-white/60 transition-colors flex-1">
               جستجو در همه چیز...
             </span>
-            <kbd className="hidden md:flex items-center gap-0.5 px-2 py-0.5 rounded bg-white/10 text-white/50 text-[11px] md:text-xs">
+            <kbd className="hidden md:flex items-center gap-0.5 px-2 py-0.5 rounded bg-white/10 text-white/50 text-xs md:text-sm md:text-xs">
               {isMac ? '⌘' : 'Ctrl'} + K
             </kbd>
           </button>
@@ -206,7 +206,7 @@ function NotificationBell() {
     >
       <Bell className="w-5 h-5" />
       {count > 0 && (
-        <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] md:text-xs font-bold flex items-center justify-center">
+        <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-xs md:text-sm md:text-xs font-bold flex items-center justify-center">
           {count > 9 ? '9+' : count}
         </span>
       )}

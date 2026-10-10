@@ -689,7 +689,7 @@ function UploadModal({ onClose, onSuccess }: any) {
                     )}
                   >
                     <span className="text-base leading-none">{t.emoji}</span>
-                    <span className="text-[11px] md:text-xs leading-tight">{t.label}</span>
+                    <span className="text-xs md:text-sm md:text-xs leading-tight">{t.label}</span>
                   </button>
                 ))}
               </div>
