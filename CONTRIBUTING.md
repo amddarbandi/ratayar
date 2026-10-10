@@ -166,3 +166,22 @@ Enforcement:
 - Every commit that touches apps/web must be verified by running
   the safe script and confirming "✅ deployed".
 - If the script prints "❌ build FAILED" — do NOT commit, fix first.
+
+## Rule — Check current branch before push
+
+Before running `git push origin main`, ALWAYS verify you are ON main:
+
+    git branch --show-current      # must print: main
+
+If it prints anything else, either:
+    git checkout main              # go back to main
+  or
+    git push origin <current>      # push to the correct branch
+
+Lesson learned 2026-10-10: a commit intended for main was accidentally
+made on a `ci-test` branch, then `git push origin main` reported
+"Everything up-to-date" because local main had no new commits. Server
+was silently serving stale code until discovered.
+
+Add this check to every deploy:
+    test "$(git branch --show-current)" = "main" || { echo "NOT ON MAIN"; exit 1; }
