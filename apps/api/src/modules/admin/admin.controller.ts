@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Query, Param, Body, Req, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Query, Param, Body, Req, Res, UseGuards, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -236,6 +236,75 @@ export class AdminController {
   @Audited({ action: 'broadcast.admin.create', targetType: 'broadcast' })
   createBroadcast(@Req() req: any, @Body() dto: any) {
     return this.admin.createBroadcast(req.user.userId, dto);
+  }
+
+
+  // ═══════════════════════════════════════════
+  // Platform Settings
+  // ═══════════════════════════════════════════
+  @Get('settings')
+  listSettings() {
+    return this.admin.listSettings();
+  }
+
+  @Patch('settings/:key')
+  @Audited({ action: 'setting.admin.update', targetType: 'setting' })
+  upsertSetting(
+    @Param('key') key: string,
+    @Body() body: { value: any; description?: string; category?: string },
+    @Req() req: any,
+  ) {
+    return this.admin.upsertSetting(key, body.value, {
+      description: body.description,
+      category: body.category,
+      actorId: req.user.userId,
+    });
+  }
+
+  @Delete('settings/:key')
+  @Audited({ action: 'setting.admin.delete', targetType: 'setting' })
+  deleteSetting(@Param('key') key: string) {
+    return this.admin.deleteSetting(key);
+  }
+
+  // ═══════════════════════════════════════════
+  // Feature Flags
+  // ═══════════════════════════════════════════
+  @Get('flags')
+  listFlags() {
+    return this.admin.listFlags();
+  }
+
+  @Patch('flags/:key')
+  @Audited({ action: 'flag.admin.update', targetType: 'flag' })
+  upsertFlag(
+    @Param('key') key: string,
+    @Body() body: any,
+    @Req() req: any,
+  ) {
+    return this.admin.upsertFlag(key, { ...body, actorId: req.user.userId });
+  }
+
+  @Delete('flags/:key')
+  @Audited({ action: 'flag.admin.delete', targetType: 'flag' })
+  deleteFlag(@Param('key') key: string) {
+    return this.admin.deleteFlag(key);
+  }
+
+  // ═══════════════════════════════════════════
+  // Backup
+  // ═══════════════════════════════════════════
+  @Get('backup')
+  @Audited({ action: 'backup.admin.download', targetType: 'backup' })
+  async backup(@Res() res: any) {
+    const data = await this.admin.createBackup();
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="ratayar-backup-${ts}.json"`,
+    );
+    res.end(JSON.stringify(data, null, 2));
   }
 
 }

@@ -908,4 +908,169 @@ export class AdminService {
     }
   }
 
+
+  // ═══════════════════════════════════════════
+  // Platform Settings
+  // ═══════════════════════════════════════════
+  async listSettings() {
+    const items = await this.prisma.platformSetting.findMany({
+      orderBy: [{ category: 'asc' }, { key: 'asc' }],
+    });
+    return { items };
+  }
+
+  async upsertSetting(
+    key: string,
+    value: any,
+    opts?: { description?: string; category?: string; actorId?: string },
+  ) {
+    if (!key || key.length < 2) throw new Error('کلید الزامی است');
+    const setting = await this.prisma.platformSetting.upsert({
+      where: { key },
+      create: {
+        key,
+        value,
+        description: opts?.description || null,
+        category: opts?.category || 'general',
+        updatedBy: opts?.actorId || null,
+      },
+      update: {
+        value,
+        description: opts?.description ?? undefined,
+        category: opts?.category ?? undefined,
+        updatedBy: opts?.actorId || null,
+      },
+    });
+    return setting;
+  }
+
+  async deleteSetting(key: string) {
+    await this.prisma.platformSetting.delete({ where: { key } });
+    return { ok: true };
+  }
+
+  // ═══════════════════════════════════════════
+  // Feature Flags
+  // ═══════════════════════════════════════════
+  async listFlags() {
+    const items = await this.prisma.featureFlag.findMany({
+      orderBy: { key: 'asc' },
+    });
+    return { items };
+  }
+
+  async upsertFlag(
+    key: string,
+    data: {
+      enabled?: boolean;
+      description?: string;
+      rolloutPct?: number;
+      audience?: string;
+      actorId?: string;
+    },
+  ) {
+    if (!key || key.length < 2) throw new Error('کلید الزامی است');
+    const payload = {
+      enabled: data.enabled ?? false,
+      description: data.description ?? null,
+      rolloutPct: Math.max(0, Math.min(100, data.rolloutPct ?? 100)),
+      audience: data.audience || 'all',
+      updatedBy: data.actorId || null,
+    };
+    const flag = await this.prisma.featureFlag.upsert({
+      where: { key },
+      create: { key, ...payload },
+      update: {
+        enabled: data.enabled ?? undefined,
+        description: data.description ?? undefined,
+        rolloutPct: data.rolloutPct ?? undefined,
+        audience: data.audience ?? undefined,
+        updatedBy: data.actorId || null,
+      },
+    });
+    return flag;
+  }
+
+  async deleteFlag(key: string) {
+    await this.prisma.featureFlag.delete({ where: { key } });
+    return { ok: true };
+  }
+
+  // ═══════════════════════════════════════════
+  // Backup — logical export as JSON
+  // ═══════════════════════════════════════════
+  async createBackup() {
+    const [
+      users, families, familyMembers, obligations, assets, transactions,
+      budgets, notifications, documents, plans, subscriptions, payments,
+      tickets, ticketMessages, auditLogs, priceSnapshots, broadcasts,
+      platformSettings, featureFlags,
+    ] = await Promise.all([
+      this.prisma.user.findMany(),
+      this.prisma.family.findMany(),
+      this.prisma.familyMember.findMany().catch(() => []),
+      this.prisma.obligation.findMany(),
+      this.prisma.asset.findMany(),
+      this.prisma.transaction.findMany().catch(() => []),
+      this.prisma.budget.findMany().catch(() => []),
+      this.prisma.notification.findMany().catch(() => []),
+      this.prisma.document.findMany(),
+      this.prisma.plan.findMany(),
+      this.prisma.subscription.findMany(),
+      this.prisma.paymentRequest.findMany(),
+      this.prisma.ticket.findMany(),
+      this.prisma.ticketMessage.findMany(),
+      this.prisma.auditLog.findMany({ orderBy: { createdAt: 'desc' }, take: 5000 }),
+      this.prisma.priceSnapshot.findMany({ orderBy: { ts: 'desc' }, take: 5000 }).catch(() => []),
+      this.prisma.broadcast.findMany().catch(() => []),
+      this.prisma.platformSetting.findMany().catch(() => []),
+      this.prisma.featureFlag.findMany().catch(() => []),
+    ]);
+
+    const serialize = (arr: any[]) =>
+      JSON.parse(
+        JSON.stringify(arr, (_, v) =>
+          typeof v === 'bigint' ? v.toString() : v,
+        ),
+      );
+
+    return {
+      generatedAt: new Date().toISOString(),
+      version: 1,
+      counts: {
+        users: users.length,
+        families: families.length,
+        obligations: obligations.length,
+        assets: assets.length,
+        documents: documents.length,
+        plans: plans.length,
+        subscriptions: subscriptions.length,
+        payments: payments.length,
+        tickets: tickets.length,
+        auditLogs: auditLogs.length,
+      },
+      data: {
+        users: serialize(users),
+        families: serialize(families),
+        familyMembers: serialize(familyMembers),
+        obligations: serialize(obligations),
+        assets: serialize(assets),
+        transactions: serialize(transactions),
+        budgets: serialize(budgets),
+        notifications: serialize(notifications),
+        documents: serialize(documents),
+        plans: serialize(plans),
+        subscriptions: serialize(subscriptions),
+        payments: serialize(payments),
+        tickets: serialize(tickets),
+        ticketMessages: serialize(ticketMessages),
+        auditLogs: serialize(auditLogs),
+        priceSnapshots: serialize(priceSnapshots),
+        broadcasts: serialize(broadcasts),
+        platformSettings: serialize(platformSettings),
+        featureFlags: serialize(featureFlags),
+      },
+    };
+  }
+
 }
