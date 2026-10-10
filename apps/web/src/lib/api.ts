@@ -440,6 +440,20 @@ export const adminApi = {
     priority?: string;
     scheduledFor?: string;
   }) => api.post('/admin/broadcasts', data),
+
+  // ─── Platform Settings ───
+  listSettings: () => api.get('/admin/settings'),
+  upsertSetting: (key: string, body: { value: any; description?: string; category?: string }) =>
+    api.patch(`/admin/settings/${key}`, body),
+  deleteSetting: (key: string) => api.delete(`/admin/settings/${key}`),
+
+  // ─── Feature Flags ───
+  listFlags: () => api.get('/admin/flags'),
+  upsertFlag: (key: string, body: any) => api.patch(`/admin/flags/${key}`, body),
+  deleteFlag: (key: string) => api.delete(`/admin/flags/${key}`),
+
+  // ─── Backup (binary download; used via direct link) ───
+  backupUrl: () => '/api/admin/backup',
 };
 
 function buildQs(params?: Record<string, string | number | undefined>) {

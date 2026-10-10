@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth-store';
 import {
   LayoutDashboard, Package, CreditCard, MessageSquare, ChevronLeft,
-  Shield, Users, Calendar, BarChart3, FileText, ListChecks, Bell, Settings, Activity, HardDrive, Megaphone,
+  Shield, Users, Calendar, BarChart3, FileText, ListChecks, Bell, Settings, Activity, HardDrive, Megaphone, Flag, Database,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LogoIcon } from '@/components/brand/logo';
@@ -25,6 +25,8 @@ const items = [
   { href: '/admin/broadcast', label: 'ارسال گروهی', icon: Megaphone },
   { href: '/admin/audit-log', label: 'لاگ اقدامات', icon: Activity },
   { href: '/admin/settings', label: 'تنظیمات پلتفرم', icon: Settings },
+  { href: '/admin/flags', label: 'فلگ‌های ویژگی', icon: Flag },
+  { href: '/admin/backup', label: 'بکاپ', icon: Database },
 ];
 
 export default function AdminLayout({
