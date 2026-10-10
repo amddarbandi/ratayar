@@ -8,6 +8,25 @@ Last updated: 2026-10-08
 
 ---
 
+
+## 🎯 Execution order (frozen 2026-10-11)
+
+User directive: the following order is final.
+
+1. **L1** — profile completion popup + national ID validation
+2. **A-3** — bulk message per user
+3. **CI fix** — GitHub Actions currently red
+4. **BIZ-005** — invoice PDF
+5. **B extras** — localStorage/share/percent/date calc
+6. **CALC** — converters extras + calc tools
+7. **SEC-006..015** — remaining security
+8. ... (rest of roadmap)
+99. **API-004** — Kavenegar SMS  (near end)
+100. **PAY-001** — online payment gateway (ZarinPal یا هر درگاه)  (LAST)
+
+`PAY-001` replaces BIZ-002 (previously deferred). Everything else
+proceeds before SMS and payment.
+
 ## Phase 1 — Business Critical (BIZ)
 
 - [x] BIZ-001 Admin CRUD plans UI (done)
