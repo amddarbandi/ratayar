@@ -317,8 +317,18 @@ export const ticketApi = {
   get: (id: string) => api.get(`/tickets/${id}`),
   reply: (id: string, body: string) =>
     api.post(`/tickets/${id}/messages`, { body }),
-  adminAll: (status?: string) =>
-    api.get(`/tickets/admin/all${status ? `?status=${status}` : ''}`),
+  adminAll: (params?: {
+    status?: string;
+    assignedTo?: string;
+    unassigned?: boolean;
+  }) => {
+    const q: string[] = [];
+    if (params?.status) q.push(`status=${encodeURIComponent(params.status)}`);
+    if (params?.assignedTo) q.push(`assignedTo=${encodeURIComponent(params.assignedTo)}`);
+    if (params?.unassigned) q.push('unassigned=true');
+    const qs = q.length ? `?${q.join('&')}` : '';
+    return api.get(`/tickets/admin/all${qs}`);
+  },
   adminReply: (id: string, body: string) =>
     api.post(`/tickets/admin/${id}/messages`, { body }),
   adminSetStatus: (id: string, status: string, note?: string) =>
