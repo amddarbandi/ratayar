@@ -10,34 +10,117 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // ── Semantic (kept) ──
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+        primary: { DEFAULT: 'hsl(var(--primary))', foreground: 'hsl(var(--primary-foreground))' },
+        secondary: { DEFAULT: 'hsl(var(--secondary))', foreground: 'hsl(var(--secondary-foreground))' },
+        destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
+        muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
+        accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
+        card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
+
+        // ── CYBERPUNK EMERALD ──
+        // purple -> brand (neon emerald #10ffb3)
+        purple: {
+          50:  '#e6fff6',
+          100: '#b8ffe4',
+          200: '#7affcb',
+          300: '#3dffb1',
+          400: '#10ffb3',
+          500: '#10ffb3',
+          600: '#0dd79a',
+          700: '#0aab7a',
+          800: '#087f5c',
+          900: '#06543d',
+          950: '#033d2a',
         },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+        // fuchsia -> accent (neon magenta #e935ff)
+        fuchsia: {
+          50:  '#fdf4ff',
+          100: '#fae8ff',
+          200: '#f5d0fe',
+          300: '#f0abfc',
+          400: '#e879f9',
+          500: '#e935ff',
+          600: '#c026d3',
+          700: '#a21caf',
+          800: '#86198f',
+          900: '#701a75',
+          950: '#4a044e',
         },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+        // pink -> same magenta
+        pink: {
+          50:  '#fdf4ff',
+          100: '#fae8ff',
+          200: '#f5d0fe',
+          300: '#f0abfc',
+          400: '#e879f9',
+          500: '#e935ff',
+          600: '#c026d3',
+          700: '#a21caf',
+          800: '#86198f',
+          900: '#701a75',
+          950: '#4a044e',
         },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+        // emerald -> brighter success
+        emerald: {
+          50:  '#e6fff5',
+          100: '#b8ffde',
+          200: '#7affc2',
+          300: '#3dffa8',
+          400: '#22ff8a',
+          500: '#22ff8a',
+          600: '#0fd47f',
+          700: '#0aab66',
+          800: '#087f4d',
+          900: '#065439',
+          950: '#033d27',
         },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+        // amber -> warmer warning
+        amber: {
+          50:  '#fff8e6',
+          100: '#ffedb8',
+          200: '#ffe185',
+          300: '#ffd34d',
+          400: '#ffc344',
+          500: '#ffb020',
+          600: '#e09515',
+          700: '#b87810',
+          800: '#8f5c0a',
+          900: '#664205',
+          950: '#3d2703',
         },
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+        // red -> coral danger
+        red: {
+          50:  '#ffe6ee',
+          100: '#ffb8ce',
+          200: '#ff85a8',
+          300: '#ff5c8a',
+          400: '#ff6f9c',
+          500: '#ff3d7f',
+          600: '#e01e63',
+          700: '#b81850',
+          800: '#8f123e',
+          900: '#660c2c',
+          950: '#3d071a',
+        },
+        // cyan stays (already electric)
+        cyan: {
+          50:  '#ecfeff',
+          100: '#cffafe',
+          200: '#a5f3fc',
+          300: '#67e8f9',
+          400: '#22d3ee',
+          500: '#22d3ee',
+          600: '#0891b2',
+          700: '#0e7490',
+          800: '#155e75',
+          900: '#164e63',
+          950: '#083344',
         },
       },
       borderRadius: {
@@ -64,8 +147,8 @@ const config: Config = {
           '50%': { transform: 'translateY(-10px)' },
         },
         glow: {
-          '0%': { boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)' },
-          '100%': { boxShadow: '0 0 40px rgba(168, 85, 247, 0.8)' },
+          '0%': { boxShadow: '0 0 20px rgba(16, 255, 179, 0.4)' },
+          '100%': { boxShadow: '0 0 40px rgba(16, 255, 179, 0.8)' },
         },
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
