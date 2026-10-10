@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { toJalaliDateTime } from '@/lib/jalali';
+import { EmailSettings } from '@/components/admin/email-settings';
 
 interface Setting {
   key: string;
@@ -124,6 +125,11 @@ export default function AdminSettingsPage() {
           تنظیم جدید
         </button>
       </div>
+
+      {/* Email verification + SMTP settings (special UI) */}
+      <EmailSettings />
+
+      {/* Email verification + SMTP settings (special UI) */}
 
       {loading && items.length === 0 && (
         <div className="space-y-2">

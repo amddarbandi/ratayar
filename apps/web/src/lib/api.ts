@@ -471,6 +471,9 @@ export const adminApi = {
   upsertSetting: (key: string, body: { value: any; description?: string; category?: string }) =>
     api.patch(`/admin/settings/${key}`, body),
   deleteSetting: (key: string) => api.delete(`/admin/settings/${key}`),
+  verifySmtp: () => api.post('/admin/settings/smtp/verify'),
+  testSmtpEmail: (to: string) =>
+    api.post('/admin/settings/smtp/test-email', { to }),
 
   // ─── Feature Flags ───
   listFlags: () => api.get('/admin/flags'),
