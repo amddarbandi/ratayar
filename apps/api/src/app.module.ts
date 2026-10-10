@@ -5,6 +5,8 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { PlanLimitsModule } from './common/plan-limits/plan-limits.module';
+import { PlatformSettingsModule } from './common/settings/settings.module';
+import { MailModule } from './common/mail/mail.module';
 import { AuditService } from './common/audit/audit.service';
 import { AuditInterceptor } from './common/audit/audit.interceptor';
 import { IpBlockGuard } from './common/guards/ip-block.guard';
@@ -41,6 +43,8 @@ import { ReminderTask } from './common/tasks/reminder.task';
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     PrismaModule,
     PlanLimitsModule,
+    PlatformSettingsModule,
+    MailModule,
     RedisModule,
     MinioModule,
     HealthModule,

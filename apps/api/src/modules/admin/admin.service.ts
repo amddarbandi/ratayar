@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { MinioService } from '../../common/minio/minio.service';
+import { MailService } from '../../common/mail/mail.service';
 
 @Injectable()
 export class AdminService {
@@ -11,6 +12,7 @@ export class AdminService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly minio: MinioService,
+    private readonly mail: MailService,
   ) {}
 
   // ═══════════════════════════════════════════
@@ -1224,6 +1226,32 @@ export class AdminService {
         total: Number(r.total),
       })),
     };
+  }
+
+  // ═══════════════════════════════════════════
+  // SMTP verification / test
+  // ═══════════════════════════════════════════
+  async verifySmtp() {
+    const result = await this.mail.verifyConfig();
+    return result;
+  }
+
+  async sendTestEmail(to: string) {
+    if (!to || !to.includes('@')) {
+      throw new Error('ایمیل معتبر نیست');
+    }
+    const html = `
+      <div dir="rtl" style="font-family: Tahoma, sans-serif; padding: 20px;">
+        <h2 style="color:#10b981;">ایمیل تست راتایار</h2>
+        <p>اگر این ایمیل را می‌بینید، تنظیمات SMTP به درستی کار می‌کند.</p>
+        <p style="color:#666;font-size:12px;">زمان: ${new Date().toISOString()}</p>
+      </div>
+    `;
+    const result = await this.mail.send(to, 'تست SMTP — راتایار', html);
+    if (!result.ok) {
+      throw new Error(result.error || 'ارسال ایمیل ناموفق بود');
+    }
+    return { ok: true, messageId: result.messageId };
   }
 
 }

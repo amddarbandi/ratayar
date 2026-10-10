@@ -366,4 +366,23 @@ export class AdminController {
     return this.admin.getAnalytics(days ? parseInt(days, 10) : 30);
   }
 
+  // ═══════════════════════════════════════════
+  // SMTP verification / test
+  // ═══════════════════════════════════════════
+  @Post('settings/smtp/verify')
+  @Audited({ action: 'smtp.admin.verify', targetType: 'setting' })
+  async verifySmtp() {
+    return this.admin.verifySmtp();
+  }
+
+  @Post('settings/smtp/test-email')
+  @Audited({ action: 'smtp.admin.test', targetType: 'setting' })
+  async sendTestEmail(@Body('to') to: string) {
+    try {
+      return await this.admin.sendTestEmail(to);
+    } catch (e: any) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
 }

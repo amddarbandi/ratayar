@@ -12,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RedisService } from '../../common/redis/redis.service';
+import { MailService } from '../../common/mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -24,6 +25,7 @@ export class AuthService {
     private readonly redis: RedisService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly mail: MailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -322,4 +324,107 @@ export class AuthService {
     }
     this.logger.warn(`Failed login attempt ${count} for ${phone}`);
   }
+
+  // ═══════════════════════════════════════════
+  // Email Verification (L2)
+  // ═══════════════════════════════════════════
+  async sendEmailVerification(userId: string, emailRaw: string) {
+    const enabled = await this.mail.isEnabled();
+    if (!enabled) {
+      return { ok: false, message: 'تأیید ایمیل در حال حاضر غیرفعال است' };
+    }
+
+    const email = (emailRaw || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return { ok: false, message: 'ایمیل معتبر نیست' };
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return { ok: false, message: 'کاربر یافت نشد' };
+
+    const conflict = await this.prisma.user.findFirst({
+      where: { email, id: { not: userId } },
+    });
+    if (conflict) {
+      return { ok: false, message: 'این ایمیل قبلاً ثبت شده است' };
+    }
+
+    const token = require('crypto').randomBytes(24).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        email,
+        emailVerified: false,
+        emailVerifyToken: token,
+        emailVerifyExpiresAt: expiresAt,
+      },
+    });
+
+    const webUrl =
+      this.config.get<string>('WEB_URL') || 'https://ratayar.ir';
+    const link = `${webUrl}/verify-email?token=${token}`;
+
+    const html = `
+      <div dir="rtl" style="font-family: Tahoma, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <h2 style="color:#10b981;">تأیید ایمیل راتایار</h2>
+        <p>برای فعال‌سازی ایمیل خود روی دکمه زیر کلیک کنید:</p>
+        <p style="margin: 24px 0;">
+          <a href="${link}"
+             style="background:#10b981;color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;display:inline-block;">
+            تأیید ایمیل
+          </a>
+        </p>
+        <p style="color:#666;font-size:12px;">
+          اگر روی دکمه کار نکرد، این لینک را در مرورگر باز کنید:<br>
+          <span style="word-break:break-all;">${link}</span>
+        </p>
+        <p style="color:#999;font-size:12px;">این لینک تا ۲۴ ساعت معتبر است.</p>
+      </div>
+    `;
+
+    const result = await this.mail.send(
+      email,
+      'تأیید ایمیل — راتایار',
+      html,
+    );
+
+    if (!result.ok) {
+      return { ok: false, message: 'ارسال ایمیل ناموفق بود' };
+    }
+    return { ok: true, message: 'لینک تأیید به ایمیل ارسال شد' };
+  }
+
+  async verifyEmail(token: string) {
+    if (!token || token.length < 10) {
+      return { ok: false, message: 'کد نامعتبر است' };
+    }
+
+    const user = await this.prisma.user.findFirst({
+      where: { emailVerifyToken: token },
+    });
+    if (!user) return { ok: false, message: 'لینک نامعتبر است' };
+
+    if (
+      user.emailVerifyExpiresAt &&
+      user.emailVerifyExpiresAt.getTime() < Date.now()
+    ) {
+      return { ok: false, message: 'لینک منقضی شده است' };
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerified: true,
+        emailVerifiedAt: new Date(),
+        emailVerifyToken: null,
+        emailVerifyExpiresAt: null,
+      },
+    });
+
+    this.logger.log(`✅ Email verified for user ${user.id}`);
+    return { ok: true, message: 'ایمیل با موفقیت تأیید شد', email: user.email };
+  }
+
 }

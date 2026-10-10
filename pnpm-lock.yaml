@@ -50,6 +50,9 @@ importers:
       '@prisma/client':
         specifier: ^5.20.0
         version: 5.22.0(prisma@5.22.0)
+      '@types/nodemailer':
+        specifier: ^8.0.2
+        version: 8.0.2
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -83,6 +86,9 @@ importers:
       multer:
         specifier: ^2.4.0
         version: 2.4.0
+      nodemailer:
+        specifier: ^10.1.0
+        version: 10.1.0
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -1476,6 +1482,9 @@ packages:
 
   '@types/node@22.20.5':
     resolution: {integrity: sha512-U2+DNr+wSjpsTS/wZGYHq7GcwfuSmKiKvoPvK22zwTlRhU91yOniN4qRR5KhIjvif7ysw/dz/hKmfDH0Ris4aA==}
+
+  '@types/nodemailer@8.0.2':
+    resolution: {integrity: sha512-c7M5ox8p0nEOfbJ2E9Qcmt8/QCu/VzsiAhzBiZbvky2PhKZDHpKB3sQHBM5MEZNkCfBOaS6S9//AGPRTNB7IaA==}
 
   '@types/offscreencanvas@2019.7.3':
     resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
@@ -3324,6 +3333,10 @@ packages:
   node-releases@2.0.57:
     resolution: {integrity: sha512-kQK9LGGFiHtrWiNhZtA7Qbw17AQz+dmsEKODRIVTXA9+e5MS/2gZEBhYJt13GrAz5/IOZKddH/0Z3TP/Zgo+yw==}
     engines: {node: '>=18'}
+
+  nodemailer@10.1.0:
+    resolution: {integrity: sha512-fXW8AulB25aOTuwfRYV6lqHyfz2VM4rr4SGXH03mE7x5znEUpzL5mu6anARUpZN7744Ziwkmr4AxSLPJsBQspg==}
+    engines: {node: '>=20.0.0'}
 
   nopt@5.0.0:
     resolution: {integrity: sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ==}
@@ -5954,6 +5967,10 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/nodemailer@8.0.2':
+    dependencies:
+      '@types/node': 22.20.5
+
   '@types/offscreencanvas@2019.7.3': {}
 
   '@types/passport-jwt@4.0.1':
@@ -8046,6 +8063,8 @@ snapshots:
   node-int64@0.4.0: {}
 
   node-releases@2.0.57: {}
+
+  nodemailer@10.1.0: {}
 
   nopt@5.0.0:
     dependencies:

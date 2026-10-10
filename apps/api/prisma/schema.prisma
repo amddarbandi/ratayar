@@ -18,6 +18,11 @@ model User {
   status          String    @default("active") @db.VarChar(20)
   twoFaEnabled    Boolean   @default(false) @map("two_fa_enabled")
   twoFaSecret     String?   @map("two_fa_secret")
+  email            String?   @db.VarChar(200)
+  emailVerified    Boolean   @default(false) @map("email_verified")
+  emailVerifiedAt  DateTime? @map("email_verified_at")
+  emailVerifyToken String?   @map("email_verify_token") @db.VarChar(100)
+  emailVerifyExpiresAt DateTime? @map("email_verify_expires_at")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
   lastLoginAt     DateTime? @map("last_login_at")
@@ -34,6 +39,8 @@ model User {
   ticketMessages  TicketMessage[]
 
   @@index([phone])
+  @@index([email])
+  @@index([emailVerifyToken])
   @@index([status])
   @@map("users")
 }
