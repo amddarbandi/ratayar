@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { fmtStorageMB } from '@/lib/format';
 import { toast } from 'sonner';
 
 interface Plan {
@@ -158,9 +159,7 @@ function UpgradeContent() {
                   <li>📄 {fmt(plan.maxDocuments)} سند</li>
                   <li>
                     💾{' '}
-                    {plan.maxStorageMB >= 1024
-                      ? `${(plan.maxStorageMB / 1024).toFixed(0)} GB`
-                      : `${plan.maxStorageMB} MB`}
+                    {fmtStorageMB(plan.maxStorageMB)}
                   </li>
                 </ul>
               </motion.button>

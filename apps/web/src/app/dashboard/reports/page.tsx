@@ -13,6 +13,7 @@ import {
 import { reportsApi } from '@/lib/api';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { fmtMoney } from '@/lib/format';
 
 const categoryLabels: any = {
   financial: 'مالی',
@@ -22,13 +23,7 @@ const categoryLabels: any = {
   business: 'کسب‌وکار',
 };
 
-const formatPrice = (price: number) => {
-  if (!price) return '۰';
-  if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} میلیارد`;
-  if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(1)} میلیون`;
-  if (price >= 1_000) return `${(price / 1_000).toFixed(0)} هزار`;
-  return `${price}`;
-};
+
 
 export default function ReportsPage() {
   const { data: overview, isLoading } = useQuery({
@@ -186,7 +181,7 @@ export default function ReportsPage() {
                 <div className="flex-1">
                   <div className="text-xs text-white/50">درآمد</div>
                   <div className="text-lg font-bold text-white">
-                    {formatPrice(ov.finance?.month?.income || 0)}
+                    {fmtMoney(ov.finance?.month?.income || 0)}
                   </div>
                 </div>
               </div>
@@ -198,7 +193,7 @@ export default function ReportsPage() {
                 <div className="flex-1">
                   <div className="text-xs text-white/50">هزینه</div>
                   <div className="text-lg font-bold text-white">
-                    {formatPrice(ov.finance?.month?.expense || 0)}
+                    {fmtMoney(ov.finance?.month?.expense || 0)}
                   </div>
                 </div>
               </div>
@@ -219,7 +214,7 @@ export default function ReportsPage() {
                     'text-lg font-bold',
                     (ov.finance?.month?.balance || 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
                   )}>
-                    {formatPrice(Math.abs(ov.finance?.month?.balance || 0))}
+                    {fmtMoney(Math.abs(ov.finance?.month?.balance || 0))}
                   </div>
                 </div>
               </div>
@@ -278,13 +273,13 @@ export default function ReportsPage() {
                 <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
                   <div className="text-xs text-emerald-300 mb-1">درآمد</div>
                   <div className="text-lg font-bold text-white">
-                    {formatPrice(yr.income || 0)}
+                    {fmtMoney(yr.income || 0)}
                   </div>
                 </div>
                 <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/20">
                   <div className="text-xs text-red-300 mb-1">هزینه</div>
                   <div className="text-lg font-bold text-white">
-                    {formatPrice(yr.expense || 0)}
+                    {fmtMoney(yr.expense || 0)}
                   </div>
                 </div>
               </div>
@@ -316,7 +311,7 @@ export default function ReportsPage() {
                 <div>
                   <div className="text-xs text-white/50 mb-1">ارزش دارایی‌ها</div>
                   <div className="text-xl font-bold text-white">
-                    {formatPrice(yr.assets?.totalValue || 0)}
+                    {fmtMoney(yr.assets?.totalValue || 0)}
                   </div>
                 </div>
               </div>

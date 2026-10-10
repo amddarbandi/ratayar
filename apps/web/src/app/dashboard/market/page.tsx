@@ -7,6 +7,7 @@ import { marketApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { PriceSparkline } from '@/components/market/price-sparkline';
 import { cn } from '@/lib/utils';
+import { fmtPercent } from '@/lib/format';
 import { toast } from 'sonner';
 
 interface Item {
@@ -232,7 +233,7 @@ function PriceCard({ item, delay }: { item: Item; delay: number }) {
               ) : (
                 <TrendingDown className="w-3 h-3" />
               )}
-              {Math.abs(item.change24h!).toFixed(2)}%
+              {fmtPercent(Math.abs(item.change24h!))}
             </div>
           )}
         </div>

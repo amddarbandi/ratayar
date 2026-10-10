@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { planApi, subscriptionApi } from '@/lib/api';
+import { fmtStorageMB } from '@/lib/format';
 
 interface Usage {
   plan: {
@@ -144,9 +145,7 @@ export default function StoragePage() {
               <div>حداکثر هر فایل: {data.plan.maxUploadMB} MB</div>
               <div>
                 فضای کل:{' '}
-                {data.plan.maxStorageMB >= 1024
-                  ? `${(data.plan.maxStorageMB / 1024).toFixed(0)} GB`
-                  : `${data.plan.maxStorageMB} MB`}
+                {fmtStorageMB(data.plan.maxStorageMB)}
               </div>
             </div>
           </div>
