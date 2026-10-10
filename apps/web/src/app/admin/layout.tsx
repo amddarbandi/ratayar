@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth-store';
 import {
   LayoutDashboard, Package, CreditCard, MessageSquare, ChevronLeft,
-  Shield, Users, Calendar, BarChart3, FileText, ListChecks, Bell, Settings, Activity, HardDrive,
+  Shield, Users, Calendar, BarChart3, FileText, ListChecks, Bell, Settings, Activity, HardDrive, Megaphone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LogoIcon } from '@/components/brand/logo';
@@ -22,6 +22,7 @@ const items = [
   { href: '/admin/documents', label: 'اسناد', icon: FileText },
   { href: '/admin/obligations', label: 'تعهدات', icon: ListChecks },
   { href: '/admin/notifications', label: 'اعلان‌ها', icon: Bell },
+  { href: '/admin/broadcast', label: 'ارسال گروهی', icon: Megaphone },
   { href: '/admin/audit-log', label: 'لاگ اقدامات', icon: Activity },
   { href: '/admin/settings', label: 'تنظیمات پلتفرم', icon: Settings },
 ];

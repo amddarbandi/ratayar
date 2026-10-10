@@ -425,6 +425,21 @@ export const adminApi = {
   },
   retryNotification: (id: string) =>
     api.post(`/admin/notifications/${id}/retry`),
+
+  // ─── Broadcasts ───
+  listBroadcasts: (params?: Record<string, string | number | undefined>) => {
+    const qs = buildQs(params);
+    return api.get(`/admin/broadcasts${qs}`);
+  },
+  createBroadcast: (data: {
+    channel: 'in_app' | 'sms' | 'email';
+    audience: string;
+    audienceMeta?: any;
+    title: string;
+    body: string;
+    priority?: string;
+    scheduledFor?: string;
+  }) => api.post('/admin/broadcasts', data),
 };
 
 function buildQs(params?: Record<string, string | number | undefined>) {
