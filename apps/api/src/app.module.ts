@@ -7,6 +7,8 @@ import { PrismaModule } from './common/prisma/prisma.module';
 import { PlanLimitsModule } from './common/plan-limits/plan-limits.module';
 import { AuditService } from './common/audit/audit.service';
 import { AuditInterceptor } from './common/audit/audit.interceptor';
+import { IpBlockGuard } from './common/guards/ip-block.guard';
+import { UserActivityInterceptor } from './common/interceptors/user-activity.interceptor';
 import { RedisModule } from './common/redis/redis.module';
 import { MinioModule } from './common/minio/minio.module';
 import { HealthModule } from './modules/health/health.module';
@@ -63,6 +65,8 @@ import { ReminderTask } from './common/tasks/reminder.task';
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: UserActivityInterceptor },
+    { provide: APP_GUARD, useClass: IpBlockGuard },
     AuditService,
     ReminderTask,
   ],

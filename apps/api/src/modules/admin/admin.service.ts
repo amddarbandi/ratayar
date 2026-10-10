@@ -1073,4 +1073,157 @@ export class AdminService {
     };
   }
 
+
+  // ═══════════════════════════════════════════
+  // Blocked IPs
+  // ═══════════════════════════════════════════
+  async listBlockedIps() {
+    const items = await this.prisma.blockedIp.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return { items };
+  }
+
+  async blockIp(ip: string, reason: string, until: string | null, actorId: string) {
+    if (!ip || ip.length < 4) throw new Error('IP معتبر نیست');
+    const blocked = await this.prisma.blockedIp.upsert({
+      where: { ip },
+      create: {
+        ip,
+        reason: reason || null,
+        blockedBy: actorId,
+        until: until ? new Date(until) : null,
+      },
+      update: {
+        reason: reason || null,
+        blockedBy: actorId,
+        until: until ? new Date(until) : null,
+      },
+    });
+    return blocked;
+  }
+
+  async unblockIp(ip: string) {
+    await this.prisma.blockedIp.delete({ where: { ip } }).catch(() => {});
+    return { ok: true };
+  }
+
+  // ═══════════════════════════════════════════
+  // API keys
+  // ═══════════════════════════════════════════
+  async listApiKeys() {
+    const items = await this.prisma.apiKey.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return {
+      items: items.map((k) => ({
+        id: k.id,
+        name: k.name,
+        keyPrefix: k.keyPrefix,
+        scopes: k.scopes,
+        lastUsedAt: k.lastUsedAt,
+        revokedAt: k.revokedAt,
+        expiresAt: k.expiresAt,
+        createdAt: k.createdAt,
+      })),
+    };
+  }
+
+  async createApiKey(
+    name: string,
+    scopes: string[],
+    expiresAt: string | null,
+    actorId: string,
+  ) {
+    if (!name || name.length < 2) throw new Error('نام الزامی است');
+
+    // generate 32-byte random key
+    const crypto = await import('crypto');
+    const raw = 'rt_' + crypto.randomBytes(24).toString('hex');
+    const hash = crypto.createHash('sha256').update(raw).digest('hex');
+    const prefix = raw.slice(0, 12);
+
+    const key = await this.prisma.apiKey.create({
+      data: {
+        name,
+        keyHash: hash,
+        keyPrefix: prefix,
+        scopes: scopes.length ? scopes : ['read'],
+        ownerId: actorId,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+      },
+    });
+
+    // WARNING: raw is returned ONCE — never stored
+    return {
+      id: key.id,
+      name: key.name,
+      keyPrefix: key.keyPrefix,
+      scopes: key.scopes,
+      createdAt: key.createdAt,
+      rawKey: raw,
+    };
+  }
+
+  async revokeApiKey(id: string) {
+    await this.prisma.apiKey.update({
+      where: { id },
+      data: { revokedAt: new Date() },
+    });
+    return { ok: true };
+  }
+
+  // ═══════════════════════════════════════════
+  // Analytics
+  // ═══════════════════════════════════════════
+  async getAnalytics(days = 30) {
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+    since.setHours(0, 0, 0, 0);
+
+    // DAU by day
+    const dauRows = await this.prisma.userActivity.groupBy({
+      by: ['day'],
+      where: { day: { gte: since } },
+      _count: { userId: true },
+      orderBy: { day: 'asc' },
+    });
+
+    // signups per day
+    const signups = await this.prisma.$queryRaw<Array<{ day: Date; count: bigint }>>`
+      SELECT DATE("created_at") as day, COUNT(*)::int as count
+      FROM "users"
+      WHERE "created_at" >= ${since} AND "deleted_at" IS NULL
+      GROUP BY DATE("created_at")
+      ORDER BY day ASC
+    `;
+
+    // new subscriptions per day (approved payments)
+    const revenueSeries = await this.prisma.$queryRaw<
+      Array<{ day: Date; total: bigint }>
+    >`
+      SELECT DATE("reviewed_at") as day, COALESCE(SUM(amount), 0)::bigint as total
+      FROM "payment_requests"
+      WHERE "reviewed_at" >= ${since} AND "status" = 'approved'
+      GROUP BY DATE("reviewed_at")
+      ORDER BY day ASC
+    `;
+
+    return {
+      rangeDays: days,
+      dau: dauRows.map((r) => ({
+        day: r.day,
+        activeUsers: r._count.userId,
+      })),
+      signups: signups.map((s) => ({
+        day: s.day,
+        count: Number(s.count),
+      })),
+      revenue: revenueSeries.map((r) => ({
+        day: r.day,
+        total: Number(r.total),
+      })),
+    };
+  }
+
 }

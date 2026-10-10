@@ -307,4 +307,63 @@ export class AdminController {
     res.end(JSON.stringify(data, null, 2));
   }
 
+
+  // ═══════════════════════════════════════════
+  // Blocked IPs
+  // ═══════════════════════════════════════════
+  @Get('blocked-ips')
+  listBlockedIps() {
+    return this.admin.listBlockedIps();
+  }
+
+  @Post('blocked-ips')
+  @Audited({ action: 'ip.admin.block', targetType: 'ip' })
+  blockIp(@Req() req: any, @Body() body: any) {
+    return this.admin.blockIp(
+      body.ip,
+      body.reason || '',
+      body.until || null,
+      req.user.userId,
+    );
+  }
+
+  @Delete('blocked-ips/:ip')
+  @Audited({ action: 'ip.admin.unblock', targetType: 'ip' })
+  unblockIp(@Param('ip') ip: string) {
+    return this.admin.unblockIp(ip);
+  }
+
+  // ═══════════════════════════════════════════
+  // API keys
+  // ═══════════════════════════════════════════
+  @Get('api-keys')
+  listApiKeys() {
+    return this.admin.listApiKeys();
+  }
+
+  @Post('api-keys')
+  @Audited({ action: 'apikey.admin.create', targetType: 'apikey' })
+  createApiKey(@Req() req: any, @Body() body: any) {
+    return this.admin.createApiKey(
+      body.name,
+      Array.isArray(body.scopes) ? body.scopes : [],
+      body.expiresAt || null,
+      req.user.userId,
+    );
+  }
+
+  @Delete('api-keys/:id')
+  @Audited({ action: 'apikey.admin.revoke', targetType: 'apikey' })
+  revokeApiKey(@Param('id') id: string) {
+    return this.admin.revokeApiKey(id);
+  }
+
+  // ═══════════════════════════════════════════
+  // Analytics
+  // ═══════════════════════════════════════════
+  @Get('analytics')
+  getAnalytics(@Query('days') days?: string) {
+    return this.admin.getAnalytics(days ? parseInt(days, 10) : 30);
+  }
+
 }
