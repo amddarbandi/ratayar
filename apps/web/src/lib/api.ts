@@ -454,6 +454,22 @@ export const adminApi = {
 
   // ─── Backup (binary download; used via direct link) ───
   backupUrl: () => '/api/admin/backup',
+
+  // ─── Blocked IPs ───
+  listBlockedIps: () => api.get('/admin/blocked-ips'),
+  blockIp: (body: { ip: string; reason?: string; until?: string }) =>
+    api.post('/admin/blocked-ips', body),
+  unblockIp: (ip: string) =>
+    api.delete(`/admin/blocked-ips/${encodeURIComponent(ip)}`),
+
+  // ─── API keys ───
+  listApiKeys: () => api.get('/admin/api-keys'),
+  createApiKey: (body: { name: string; scopes?: string[]; expiresAt?: string }) =>
+    api.post('/admin/api-keys', body),
+  revokeApiKey: (id: string) => api.delete(`/admin/api-keys/${id}`),
+
+  // ─── Analytics ───
+  analytics: (days = 30) => api.get(`/admin/analytics?days=${days}`),
 };
 
 function buildQs(params?: Record<string, string | number | undefined>) {

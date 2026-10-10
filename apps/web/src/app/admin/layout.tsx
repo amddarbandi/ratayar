@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth-store';
 import {
   LayoutDashboard, Package, CreditCard, MessageSquare, ChevronLeft,
-  Shield, Users, Calendar, BarChart3, FileText, ListChecks, Bell, Settings, Activity, HardDrive, Megaphone, Flag, Database,
+  Shield, Users, Calendar, BarChart3, FileText, ListChecks, Bell, Settings, Activity, HardDrive, Megaphone, Flag, Database, LineChart, ShieldAlert, KeyRound,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LogoIcon } from '@/components/brand/logo';
@@ -23,6 +23,9 @@ const items = [
   { href: '/admin/obligations', label: 'تعهدات', icon: ListChecks },
   { href: '/admin/notifications', label: 'اعلان‌ها', icon: Bell },
   { href: '/admin/broadcast', label: 'ارسال گروهی', icon: Megaphone },
+  { href: '/admin/analytics', label: 'آنالیتیکس', icon: LineChart },
+  { href: '/admin/abuse', label: 'کنترل دسترسی', icon: ShieldAlert },
+  { href: '/admin/api-keys', label: 'کلیدهای API', icon: KeyRound },
   { href: '/admin/audit-log', label: 'لاگ اقدامات', icon: Activity },
   { href: '/admin/settings', label: 'تنظیمات پلتفرم', icon: Settings },
   { href: '/admin/flags', label: 'فلگ‌های ویژگی', icon: Flag },
