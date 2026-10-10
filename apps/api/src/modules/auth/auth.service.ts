@@ -15,6 +15,14 @@ import { RedisService } from '../../common/redis/redis.service';
 import { MailService } from '../../common/mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { CompleteProfileDto } from './dto/complete-profile.dto';
+import {
+  isValidIranianNationalId,
+  isValidIranianPostalCode,
+  isValidPersianName,
+  isValidEmail,
+  toEnglishDigits,
+} from '../../common/validation/iran';
 
 @Injectable()
 export class AuthService {
@@ -425,6 +433,147 @@ export class AuthService {
 
     this.logger.log(`✅ Email verified for user ${user.id}`);
     return { ok: true, message: 'ایمیل با موفقیت تأیید شد', email: user.email };
+  }
+
+  // ═══════════════════════════════════════════
+  // Profile completion (L1)
+  // ═══════════════════════════════════════════
+  async getProfileStatus(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        profileCompleted: true,
+        firstName: true,
+        lastName: true,
+        fatherName: true,
+        nationalId: true,
+        idNumber: true,
+        birthDate: true,
+        address: true,
+        postalCode: true,
+        email: true,
+      },
+    });
+    if (!user) throw new NotFoundException('کاربر یافت نشد');
+
+    const missing: string[] = [];
+    if (!user.firstName) missing.push('firstName');
+    if (!user.lastName) missing.push('lastName');
+    if (!user.fatherName) missing.push('fatherName');
+    if (!user.nationalId) missing.push('nationalId');
+    if (!user.idNumber) missing.push('idNumber');
+    if (!user.birthDate) missing.push('birthDate');
+    if (!user.address) missing.push('address');
+    if (!user.postalCode) missing.push('postalCode');
+
+    return {
+      completed: user.profileCompleted,
+      missing,
+      prefilled: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        fatherName: user.fatherName,
+        nationalId: user.nationalId,
+        idNumber: user.idNumber,
+        birthDate: user.birthDate,
+        address: user.address,
+        postalCode: user.postalCode,
+        email: user.email,
+      },
+    };
+  }
+
+  async completeProfile(userId: string, dto: CompleteProfileDto) {
+    // ── server-side validation (never trust client) ──
+    if (!isValidPersianName(dto.firstName))
+      throw new BadRequestException('نام معتبر نیست');
+    if (!isValidPersianName(dto.lastName))
+      throw new BadRequestException('نام خانوادگی معتبر نیست');
+    if (!isValidPersianName(dto.fatherName))
+      throw new BadRequestException('نام پدر معتبر نیست');
+
+    const nationalId = toEnglishDigits(dto.nationalId);
+    if (!isValidIranianNationalId(nationalId))
+      throw new BadRequestException('کد ملی معتبر نیست');
+
+    const postalCode = toEnglishDigits(dto.postalCode);
+    if (!isValidIranianPostalCode(postalCode))
+      throw new BadRequestException('کد پستی معتبر نیست');
+
+    const idNumber = toEnglishDigits(dto.idNumber).trim();
+    if (!/^\d{1,10}$/.test(idNumber))
+      throw new BadRequestException('شماره شناسنامه معتبر نیست');
+
+    if (dto.address.trim().length < 10)
+      throw new BadRequestException('آدرس خیلی کوتاه است');
+
+    if (dto.email && !isValidEmail(dto.email))
+      throw new BadRequestException('ایمیل معتبر نیست');
+
+    // ── parse Jalali birth date ──
+    const birthDate = this.parseJalaliString(dto.birthDate);
+    if (!birthDate) throw new BadRequestException('تاریخ تولد معتبر نیست');
+
+    // ── uniqueness of nationalId ──
+    const conflict = await this.prisma.user.findFirst({
+      where: { nationalId, id: { not: userId } },
+    });
+    if (conflict) {
+      throw new ConflictException('این کد ملی قبلاً ثبت شده است');
+    }
+
+    // ── save ──
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: dto.firstName.trim(),
+        lastName: dto.lastName.trim(),
+        fatherName: dto.fatherName.trim(),
+        nationalId,
+        idNumber,
+        birthDate,
+        address: dto.address.trim(),
+        postalCode,
+        email: dto.email?.trim().toLowerCase() || undefined,
+        fullName: `${dto.firstName.trim()} ${dto.lastName.trim()}`,
+        profileCompleted: true,
+        profileCompletedAt: new Date(),
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        profileCompleted: true,
+      },
+    });
+
+    this.logger.log(`✅ Profile completed for user ${userId}`);
+    return { ok: true, profile: updated };
+  }
+
+  private parseJalaliString(input: string): Date | null {
+    const s = toEnglishDigits(input).trim();
+    const m = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+    if (!m) return null;
+    const jy = parseInt(m[1], 10);
+    const jm = parseInt(m[2], 10);
+    const jd = parseInt(m[3], 10);
+    if (jm < 1 || jm > 12 || jd < 1 || jd > 31) return null;
+    if (jy < 1300 || jy > 1410) return null;
+
+    // jalaali-js is available in workspace deps? If not, use Intl fallback.
+    // Simple approximation: use Intl.DateTimeFormat is not convertible to Gregorian.
+    // Use the jalaali-js library (already installed for web; also available at root)
+    // Fallback to JS Date via jalaali-js
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const jalaali = require('jalaali-js');
+      const g = jalaali.toGregorian(jy, jm, jd);
+      return new Date(g.gy, g.gm - 1, g.gd);
+    } catch {
+      // fallback approximation
+      return new Date(jy + 621, jm - 1, jd);
+    }
   }
 
 }

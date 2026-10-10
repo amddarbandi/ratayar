@@ -15,6 +15,7 @@ import { LoginDto } from './dto/login.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { CompleteProfileDto } from './dto/complete-profile.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('auth')
@@ -94,6 +95,26 @@ export class AuthController {
   @ApiOperation({ summary: 'تأیید ایمیل با توکن' })
   verifyEmail(@Body() body: { token: string }) {
     return this.authService.verifyEmail(body?.token || '');
+  }
+
+  // ═══════════════════════════════════════════
+  // Profile completion (L1)
+  // ═══════════════════════════════════════════
+  @Get('profile/status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'وضعیت تکمیل پروفایل' })
+  getProfileStatus(@Req() req: any) {
+    return this.authService.getProfileStatus(req.user.userId);
+  }
+
+  @Post('profile/complete')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'تکمیل پروفایل کاربری' })
+  completeProfile(@Req() req: any, @Body() dto: CompleteProfileDto) {
+    return this.authService.completeProfile(req.user.userId, dto);
   }
 
 }
