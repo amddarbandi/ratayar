@@ -105,3 +105,66 @@ export function todayISO(): string {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 }
+
+// ═══════════════════════════════════════════
+// Monthly calendar helpers
+// ═══════════════════════════════════════════
+
+export interface MonthDay {
+  jd: number;          // 1..31
+  weekday: number;     // 0=Saturday, 1=Sunday, ..., 6=Friday (Persian week)
+  isFriday: boolean;
+  isToday: boolean;
+}
+
+/**
+ * Returns all days of a Jalali month, plus the leading empty slots so
+ * that day 1 lands under the correct weekday column when the grid is
+ * rendered as 7 columns starting with شنبه.
+ *
+ * Column order (right-to-left in UI):
+ *   0 شنبه   1 یکشنبه   2 دوشنبه   3 سه‌شنبه
+ *   4 چهارشنبه   5 پنجشنبه   6 جمعه
+ */
+export function getJalaliMonthGrid(
+  jy: number,
+  jm: number,
+): (MonthDay | null)[] {
+  // length of the current jalali month
+  const monthLen = jalaaliMonthLength(jy, jm);
+
+  // weekday of day 1
+  const g1 = jalaali.toGregorian(jy, jm, 1);
+  const d1 = new Date(g1.gy, g1.gm - 1, g1.gd);
+  // JS: 0=Sun..6=Sat -> Persian column index (0=Sat..6=Fri)
+  const jsDow = d1.getDay(); // 0 Sun, 1 Mon ... 6 Sat
+  const persianCol = (jsDow + 1) % 7; // Sat=0 Sun=1 ... Fri=6
+
+  const today = toJalali(new Date());
+
+  const cells: (MonthDay | null)[] = [];
+  for (let i = 0; i < persianCol; i++) cells.push(null);
+
+  for (let day = 1; day <= monthLen; day++) {
+    const g = jalaali.toGregorian(jy, jm, day);
+    const dt = new Date(g.gy, g.gm - 1, g.gd);
+    const dow = (dt.getDay() + 1) % 7; // 0=Sat .. 6=Fri
+    cells.push({
+      jd: day,
+      weekday: dow,
+      isFriday: dow === 6,
+      isToday:
+        today.jy === jy && today.jm === jm && today.jd === day,
+    });
+  }
+
+  return cells;
+}
+
+/** Length of a Jalali month (29, 30, or 31). */
+export function jalaaliMonthLength(jy: number, jm: number): number {
+  if (jm <= 6) return 31;
+  if (jm <= 11) return 30;
+  // Esfand: leap check
+  return jalaali.isLeapJalaaliYear(jy) ? 30 : 29;
+}

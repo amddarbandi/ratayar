@@ -2,22 +2,25 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Clock, MapPin, Star, PartyPopper, Circle, Square } from 'lucide-react';
 import {
-  Clock, MapPin, Sun, Moon, Sunrise, Sunset, Star, PartyPopper,
-  Circle, Square,
-} from 'lucide-react';
-import {
-  CITIES, DEFAULT_CITY, getPrayerTimes, getNextPrayer, formatTime,
-  formatTimeSec, toHijri, toHijriString, getEventsForJalali, isHoliday,
+  CITIES, DEFAULT_CITY, toHijriString, getEventsForJalali, isHoliday,
 } from '@/lib/clock';
 import {
-  toJalali, toJalaliLong, FA_WEEKDAYS, FA_MONTHS,
+  toJalali, toJalaliLong, toJalaliString, FA_MONTHS, FA_WEEKDAYS,
+  getJalaliMonthGrid,
 } from '@/lib/jalali';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
+// convert digits to Persian — used everywhere in this page
+const fa2 = (n: number) =>
+  n.toLocaleString('fa-IR', { minimumIntegerDigits: 2, useGrouping: false });
+
+const faN = (n: number) => n.toLocaleString('fa-IR');
+
 // ═══════════════════════════════════════════
-// Analog clock — square or round
+// Analog clock — minimal, elegant
 // ═══════════════════════════════════════════
 
 function AnalogClock({
@@ -35,57 +38,35 @@ function AnalogClock({
   const minAngle = m * 6 + s * 0.1;
   const secAngle = s * 6;
 
-  // 12 hour markers
-  const markers = Array.from({ length: 12 }, (_, i) => i);
-
   return (
     <div
       className={cn(
-        'relative w-full max-w-[320px] aspect-square mx-auto',
+        'relative w-full max-w-[300px] aspect-square mx-auto',
         'bg-gradient-to-br from-white/[0.08] to-white/[0.02]',
-        'border-2 border-white/20 shadow-2xl shadow-purple-500/10',
+        'border border-white/15 shadow-2xl shadow-purple-500/10',
         shape === 'round' ? 'rounded-full' : 'rounded-[2.5rem]',
       )}
     >
-      {/* glow */}
-      <div className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-purple-500/10 to-cyan-500/10 blur-xl" />
+      {/* inner glow */}
+      <div className="absolute inset-0 rounded-[inherit] bg-gradient-to-br from-purple-500/8 to-cyan-500/8 blur-xl pointer-events-none" />
 
-      {/* hour numbers */}
-      {markers.map((i) => {
-        const angle = (i * 30 - 90) * (Math.PI / 180);
-        const radius = 42;
-        const x = 50 + radius * Math.cos(angle);
-        const y = 50 + radius * Math.sin(angle);
-        const num = i === 0 ? 12 : i;
-        return (
-          <div
-            key={i}
-            className="absolute text-white/70 font-bold text-sm"
-            style={{
-              left: `${x}%`,
-              top: `${y}%`,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            {num}
-          </div>
-        );
-      })}
-
-      {/* tick marks */}
+      {/* 60 tick marks */}
       {Array.from({ length: 60 }).map((_, i) => {
         const angle = i * 6;
         const isHour = i % 5 === 0;
         return (
           <div
             key={i}
-            className="absolute top-1/2 left-1/2 origin-bottom"
+            className="absolute top-1/2 left-1/2"
             style={{
               width: isHour ? '2px' : '1px',
-              height: isHour ? '14px' : '6px',
-              background: isHour ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)',
-              transform: `translate(-50%, -100%) rotate(${angle}deg) translateY(-46%)`,
-              transformOrigin: 'bottom center',
+              height: isHour ? '12px' : '5px',
+              background: isHour
+                ? 'rgba(255,255,255,0.55)'
+                : 'rgba(255,255,255,0.15)',
+              transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${shape === 'round' ? '44' : '42'}%)`,
+              transformOrigin: 'center center',
+              borderRadius: '2px',
             }}
           />
         );
@@ -93,12 +74,12 @@ function AnalogClock({
 
       {/* hour hand */}
       <div
-        className="absolute top-1/2 left-1/2 origin-bottom"
+        className="absolute top-1/2 left-1/2"
         style={{
-          width: '5px',
-          height: '24%',
-          background: 'linear-gradient(to top, #a855f7, #c4b5fd)',
-          borderRadius: '3px',
+          width: '6px',
+          height: '26%',
+          background: 'linear-gradient(to top, #7c3aed, #c4b5fd)',
+          borderRadius: '4px',
           transform: `translate(-50%, -100%) rotate(${hourAngle}deg)`,
           transformOrigin: 'bottom center',
         }}
@@ -106,12 +87,12 @@ function AnalogClock({
 
       {/* minute hand */}
       <div
-        className="absolute top-1/2 left-1/2 origin-bottom"
+        className="absolute top-1/2 left-1/2"
         style={{
           width: '3px',
-          height: '34%',
-          background: 'linear-gradient(to top, #06b6d4, #67e8f9)',
-          borderRadius: '2px',
+          height: '36%',
+          background: 'linear-gradient(to top, #0891b2, #67e8f9)',
+          borderRadius: '3px',
           transform: `translate(-50%, -100%) rotate(${minAngle}deg)`,
           transformOrigin: 'bottom center',
         }}
@@ -119,19 +100,96 @@ function AnalogClock({
 
       {/* second hand */}
       <div
-        className="absolute top-1/2 left-1/2 origin-bottom"
+        className="absolute top-1/2 left-1/2"
         style={{
           width: '1.5px',
-          height: '40%',
+          height: '42%',
           background: '#f43f5e',
           transform: `translate(-50%, -100%) rotate(${secAngle}deg)`,
           transformOrigin: 'bottom center',
         }}
       />
 
-      {/* center dot */}
-      <div className="absolute top-1/2 left-1/2 w-3 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-purple-400 to-cyan-400 shadow-lg shadow-purple-500/50 z-10" />
+      {/* center cap */}
+      <div className="absolute top-1/2 left-1/2 w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-purple-400 to-cyan-400 shadow-lg shadow-purple-500/50 ring-4 ring-background z-10" />
     </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// Month calendar grid
+// ═══════════════════════════════════════════
+
+function MonthCalendar({ now }: { now: Date }) {
+  const jalali = useMemo(() => toJalali(now), [now]);
+  const cells = useMemo(
+    () => getJalaliMonthGrid(jalali.jy, jalali.jm),
+    [jalali.jy, jalali.jm],
+  );
+  const monthLabel = `${FA_MONTHS[jalali.jm - 1]} ${jalali.jy}`;
+
+  const headers = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <div className="text-center mb-4">
+          <div className="text-white/50 text-xs mb-1">تقویم ماه</div>
+          <div className="text-white font-bold text-xl">{monthLabel}</div>
+        </div>
+
+        {/* header row */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {headers.map((h, i) => (
+            <div
+              key={i}
+              className={cn(
+                'text-center text-[11px] font-medium py-1',
+                i === 6 ? 'text-rose-400/70' : 'text-white/40',
+              )}
+            >
+              {h}
+            </div>
+          ))}
+        </div>
+
+        {/* day grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((cell, i) => {
+            if (!cell) return <div key={i} className="aspect-square" />;
+
+            const events = getEventsForJalali(jalali.jm, cell.jd);
+            const hasHolidayEvent = events.some((e) => e.holiday);
+            const hasAnyEvent = events.length > 0;
+
+            return (
+              <div
+                key={i}
+                className={cn(
+                  'aspect-square rounded-xl flex flex-col items-center justify-center relative transition',
+                  cell.isToday
+                    ? 'bg-gradient-to-br from-purple-500 to-cyan-500 text-white font-bold shadow-lg shadow-purple-500/30'
+                    : cell.isFriday || hasHolidayEvent
+                      ? 'text-rose-300'
+                      : 'text-white/80',
+                  !cell.isToday && 'hover:bg-white/[0.05]',
+                )}
+              >
+                <div className="text-sm">{faN(cell.jd)}</div>
+                {hasAnyEvent && !cell.isToday && (
+                  <div
+                    className={cn(
+                      'absolute bottom-1 w-1 h-1 rounded-full',
+                      hasHolidayEvent ? 'bg-rose-400' : 'bg-cyan-400/70',
+                    )}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -144,7 +202,6 @@ export default function CalendarPage() {
   const [shape, setShape] = useState<'round' | 'square'>('round');
   const [cityKey, setCityKey] = useState(DEFAULT_CITY.key);
 
-  // tick every second
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
@@ -157,6 +214,7 @@ export default function CalendarPage() {
 
   const jalali = useMemo(() => toJalali(now), [now]);
   const jalaliLong = useMemo(() => toJalaliLong(now), [now]);
+  const jalaliNum = useMemo(() => toJalaliString(now), [now]);
   const hijriStr = useMemo(() => toHijriString(now), [now]);
   const weekday = FA_WEEKDAYS[now.getDay()];
   const events = useMemo(
@@ -168,45 +226,47 @@ export default function CalendarPage() {
     [jalali.jm, jalali.jd, now],
   );
 
-  const prayerTimes = useMemo(
-    () => getPrayerTimes(now, city.lat, city.lng),
-    [now, city],
-  );
-  const nextPrayer = useMemo(
-    () => getNextPrayer(prayerTimes, now),
-    [prayerTimes, now],
-  );
+  // gregorian display with Persian digits — build manually
+  const gregMonths = [
+    'ژانویه', 'فوریه', 'مارس', 'آپریل', 'مه', 'ژوئن',
+    'ژوئیه', 'اوت', 'سپتامبر', 'اکتبر', 'نوامبر', 'دسامبر',
+  ];
+  const gregWeekdays = [
+    'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه',
+    'پنجشنبه', 'جمعه', 'شنبه',
+  ];
+  const gregorian = `${gregWeekdays[now.getDay()]}، ${faN(now.getDate())} ${gregMonths[now.getMonth()]} ${faN(now.getFullYear())}`;
 
-  const gregorian = now.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+
+  // hour label with Persian digits
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  const ampm = h < 12 ? 'قبل از ظهر' : 'بعد از ظهر';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
               <Clock className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white">
-              امروز چه خبره؟
+            <h1 className="text-2xl md:text-3xl font-bold text-white">
+              امروز
             </h1>
           </div>
-          <p className="text-white/50">
-            ساعت، تاریخ، مناسبت‌ها و اوقات شرعی
+          <p className="text-white/50 text-sm">
+            ساعت، تقویم و مناسبت‌های امروز
           </p>
         </div>
 
-        {/* City + shape toggles */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-white/5 border border-white/10">
-            <MapPin className="w-4 h-4 text-white/40 mr-1" />
-            {CITIES.map((c) => (
+            <MapPin className="w-3.5 h-3.5 text-white/40 mx-1" />
+            {CITIES.slice(0, 3).map((c) => (
               <button
                 key={c.key}
                 onClick={() => setCityKey(c.key)}
@@ -225,6 +285,7 @@ export default function CalendarPage() {
             onClick={() => setShape((s) => (s === 'round' ? 'square' : 'round'))}
             className="p-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white transition-colors"
             title="تغییر شکل ساعت"
+            aria-label="تغییر شکل ساعت"
           >
             {shape === 'round' ? (
               <Square className="w-4 h-4" />
@@ -235,131 +296,80 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {/* Top: clock + dates */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Clock */}
-        <Card>
-          <CardContent className="p-5 md:p-8">
-            <AnalogClock time={now} shape={shape} />
-            <motion.div
-              key={now.getSeconds()}
-              initial={{ opacity: 0.5 }}
-              animate={{ opacity: 1 }}
-              className="text-center mt-6"
-            >
-              <div
-                className="text-5xl font-black text-white tracking-wider tabular-nums"
-                dir="ltr"
-              >
-                {formatTimeSec(now)}
-              </div>
-              <div className="text-white/50 text-sm mt-2">{weekday}</div>
-            </motion.div>
-          </CardContent>
-        </Card>
+      {/* Clock + Calendar */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        {/* Clock column (2/5) */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardContent className="p-5 md:p-6">
+              <AnalogClock time={now} shape={shape} />
 
-        {/* Dates card */}
-        <Card>
-          <CardContent className="p-8 space-y-6">
-            {/* Jalali */}
-            <div>
-              <div className="text-xs text-white/40 mb-1">تاریخ شمسی</div>
-              <div className="text-3xl font-bold text-white">
-                {jalaliLong}
+              {/* Digital readout */}
+              <div className="text-center mt-6">
+                <div className="text-white/50 text-[11px] mb-1">{weekday}</div>
+                <div
+                  className="text-5xl font-black text-white tabular-nums tracking-wider"
+                  dir="ltr"
+                >
+                  {fa2(hour12)}
+                  <span className="text-cyan-400 mx-1">:</span>
+                  {fa2(m)}
+                </div>
+                <div className="text-white/40 text-xs mt-1">
+                  {ampm} — {fa2(s)} ثانیه
+                </div>
               </div>
-              <div className="text-white/60 text-sm mt-1 font-mono" dir="ltr">
-                {jalali.jy}/{String(jalali.jm).padStart(2, '0')}/{String(jalali.jd).padStart(2, '0')}
-              </div>
-            </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            {/* Gregorian */}
-            <div className="pt-4 border-t border-white/10">
-              <div className="text-xs text-white/40 mb-1">
-                تاریخ میلادی (Gregorian)
-              </div>
-              <div className="text-white/80">{gregorian}</div>
-            </div>
-
-            {/* Hijri */}
-            <div className="pt-4 border-t border-white/10">
-              <div className="text-xs text-white/40 mb-1">
-                تاریخ قمری (Hijri)
-              </div>
-              <div className="text-white/80">{hijriStr}</div>
-            </div>
-
-            {/* Holiday badge */}
-            {isTodayHoliday && (
-              <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-3 flex items-center gap-2">
-                <PartyPopper className="w-4 h-4 text-red-400" />
-                <span className="text-red-200 text-sm font-medium">
-                  امروز تعطیل است
-                </span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Month calendar column (3/5) */}
+        <div className="lg:col-span-3">
+          <MonthCalendar now={now} />
+        </div>
       </div>
 
-      {/* Next prayer */}
-      {nextPrayer && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
-                  <Moon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="text-xs text-white/50">اذان بعدی</div>
-                  <div className="text-white font-bold text-lg">
-                    {nextPrayer.label}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-end gap-6">
-                <div>
-                  <div className="text-3xl font-black text-white" dir="ltr">
-                    {formatTime(nextPrayer.at)}
-                  </div>
-                </div>
-                <div className="text-white/60 text-sm">
-                  {nextPrayer.hoursUntil > 0 && (
-                    <span>{nextPrayer.hoursUntil} ساعت </span>
-                  )}
-                  {nextPrayer.minsUntil} دقیقه دیگر
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Three dates */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <DateCard
+          label="تاریخ شمسی"
+          primary={jalaliLong}
+          secondary={jalaliNum}
+          accent="brand"
+        />
+        <DateCard
+          label="تاریخ میلادی"
+          primary={gregorian}
+          accent="cyan"
+        />
+        <DateCard
+          label="تاریخ قمری"
+          primary={hijriStr}
+          accent="amber"
+        />
+      </div>
 
-      {/* Prayer times grid */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Sun className="w-5 h-5 text-amber-400" />
-            <h2 className="text-lg font-bold text-white">اوقات شرعی</h2>
-            <span className="text-xs text-white/40 mr-2">— {city.name}</span>
+      {/* Holiday banner */}
+      {isTodayHoliday && (
+        <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 flex items-center gap-3">
+          <PartyPopper className="w-5 h-5 text-rose-400 flex-shrink-0" />
+          <div>
+            <div className="text-rose-200 font-medium text-sm">
+              امروز تعطیل است
+            </div>
+            <div className="text-rose-300/70 text-xs">
+              طبق مناسبت‌های رسمی یا جمعه
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <PrayerCell label="اذان صبح" time={formatTime(prayerTimes.fajr)} icon={Sunrise} />
-            <PrayerCell label="طلوع آفتاب" time={formatTime(prayerTimes.sunrise)} icon={Sun} />
-            <PrayerCell label="اذان ظهر" time={formatTime(prayerTimes.dhuhr)} icon={Sun} />
-            <PrayerCell label="اذان عصر" time={formatTime(prayerTimes.asr)} icon={Sun} />
-            <PrayerCell label="اذان مغرب" time={formatTime(prayerTimes.maghrib)} icon={Sunset} />
-            <PrayerCell label="اذان عشا" time={formatTime(prayerTimes.isha)} icon={Moon} />
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
       {/* Today's events */}
       {events.length > 0 ? (
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-5 md:p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Star className="w-5 h-5 text-yellow-400" />
+              <Star className="w-5 h-5 text-amber-400" />
               <h2 className="text-lg font-bold text-white">
                 مناسبت‌های امروز
               </h2>
@@ -372,22 +382,22 @@ export default function CalendarPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.06 }}
                   className={cn(
-                    'rounded-2xl border p-4 flex items-center justify-between',
+                    'rounded-2xl border p-4 flex items-center justify-between gap-3',
                     e.holiday
-                      ? 'border-red-500/30 bg-red-500/5'
+                      ? 'border-rose-500/30 bg-rose-500/5'
                       : 'border-white/10 bg-white/[0.03]',
                   )}
                 >
                   <span
                     className={cn(
-                      'font-medium',
-                      e.holiday ? 'text-red-200' : 'text-white/90',
+                      'font-medium text-sm',
+                      e.holiday ? 'text-rose-200' : 'text-white/90',
                     )}
                   >
                     {e.title}
                   </span>
                   {e.holiday && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-200">
+                    <span className="text-[11px] px-2 py-1 rounded-full bg-rose-500/20 text-rose-200 whitespace-nowrap">
                       تعطیل رسمی
                     </span>
                   )}
@@ -398,7 +408,7 @@ export default function CalendarPage() {
         </Card>
       ) : (
         <Card>
-          <CardContent className="p-8 text-center text-white/40">
+          <CardContent className="p-8 text-center text-white/40 text-sm">
             امروز مناسبت خاصی ثبت نشده است.
           </CardContent>
         </Card>
@@ -407,22 +417,41 @@ export default function CalendarPage() {
   );
 }
 
-function PrayerCell({
+// ═══════════════════════════════════════════
+// Sub-components
+// ═══════════════════════════════════════════
+
+const DATE_ACCENT = {
+  brand: 'from-purple-500/20 to-cyan-500/10 border-purple-500/30',
+  cyan: 'from-cyan-500/20 to-blue-500/10 border-cyan-500/30',
+  amber: 'from-amber-500/20 to-orange-500/10 border-amber-500/30',
+};
+
+function DateCard({
   label,
-  time,
-  icon: Icon,
+  primary,
+  secondary,
+  accent,
 }: {
   label: string;
-  time: string;
-  icon: any;
+  primary: string;
+  secondary?: string;
+  accent: keyof typeof DATE_ACCENT;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-center">
-      <Icon className="w-5 h-5 text-amber-400 mx-auto mb-2" />
-      <div className="text-xs text-white/50 mb-1">{label}</div>
-      <div className="text-white font-bold text-lg font-mono" dir="ltr">
-        {time}
-      </div>
+    <div
+      className={cn(
+        'rounded-2xl border bg-gradient-to-br backdrop-blur-xl p-4',
+        DATE_ACCENT[accent],
+      )}
+    >
+      <div className="text-[11px] text-white/50 mb-2">{label}</div>
+      <div className="text-white font-bold text-sm leading-6">{primary}</div>
+      {secondary && (
+        <div className="text-white/40 text-xs mt-1 font-mono" dir="ltr">
+          {secondary}
+        </div>
+      )}
     </div>
   );
 }
