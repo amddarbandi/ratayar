@@ -69,6 +69,19 @@ export const authApi = {
   login: (data: { phone: string; password: string; twoFaCode?: string }) =>
     api.post('/auth/login', data),
 
+  getProfileStatus: () => api.get('/auth/profile/status'),
+  completeProfile: (data: {
+    firstName: string;
+    lastName: string;
+    fatherName: string;
+    nationalId: string;
+    idNumber: string;
+    birthDate: string;
+    address: string;
+    postalCode: string;
+    email?: string;
+  }) => api.post('/auth/profile/complete', data),
+
   sendOtp: (phone: string) =>
     api.post('/auth/send-otp', { phone }),
 
