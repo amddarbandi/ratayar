@@ -110,10 +110,12 @@ function UpgradeContent() {
         </div>
       )}
 
-      {/* Plans grid */}
+      {/* Plans grid — exclude free plan */}
       {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {plans.map((plan, i) => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto">
+          {plans
+            .filter((p) => p.code !== 'free')
+            .map((plan, i) => {
             const isCurrent = plan.code === currentCode;
             const isSelected = selected?.id === plan.id;
             return (
@@ -126,7 +128,7 @@ function UpgradeContent() {
                 disabled={isCurrent}
                 onClick={() => setSelected(plan)}
                 className={cn(
-                  'text-right p-5 rounded-3xl border-2 transition-all backdrop-blur-xl',
+                  'text-right p-6 md:p-8 rounded-3xl border-2 transition-all backdrop-blur-xl',
                   isSelected
                     ? 'border-purple-500/60 bg-gradient-to-br from-purple-500/20 to-cyan-500/5 shadow-lg shadow-purple-500/20'
                     : isCurrent
@@ -135,7 +137,7 @@ function UpgradeContent() {
                 )}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div className="font-bold text-lg text-white">
+                  <div className="font-bold text-xl md:text-2xl text-white">
                     {plan.name}
                   </div>
                   {isSelected && (
@@ -147,10 +149,10 @@ function UpgradeContent() {
                     </span>
                   )}
                 </div>
-                <div className="text-sm text-white/60 mb-3">
+                <div className="text-base md:text-lg text-white/70 mb-4">
                   {fmtPrice(plan.priceMonthly)} تومان/ماه
                 </div>
-                <ul className="text-xs text-white/50 space-y-1">
+                <ul className="text-sm md:text-base text-white/60 space-y-2">
                   <li>👥 {fmt(plan.maxMembers)} کاربر</li>
                   <li>📋 {fmt(plan.maxObligations)} تعهد</li>
                   <li>📄 {fmt(plan.maxDocuments)} سند</li>
@@ -168,7 +170,7 @@ function UpgradeContent() {
       )}
 
       {/* Payment form */}
-      {selected && selected.code !== 'free' && (
+      {selected && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
