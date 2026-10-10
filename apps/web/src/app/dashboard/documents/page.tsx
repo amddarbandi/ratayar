@@ -15,6 +15,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { fmtSize } from '@/lib/format';
 import { toJalaliShort } from '@/lib/jalali';
 
 const typeConfig: any = {
@@ -28,12 +29,6 @@ const typeConfig: any = {
   other: { label: 'سایر', color: 'text-white/60', bg: 'bg-white/5', emoji: '📄' },
 };
 
-const formatSize = (bytes: number) => {
-  if (!bytes) return '۰';
-  if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-  if (bytes >= 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${bytes} B`;
-};
 
 const formatDate = (date: string) => {
   return toJalaliShort(date);
@@ -144,7 +139,7 @@ export default function DocumentsPage() {
                 <HardDrive className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-white">{formatSize(stats.totalSize)}</div>
+                <div className="text-2xl font-bold text-white">{fmtSize(stats.totalSize)}</div>
                 <div className="text-white/50 text-sm">حجم کل</div>
               </div>
             </div>
@@ -247,7 +242,7 @@ export default function DocumentsPage() {
                         <span className={cn('px-2 py-0.5 rounded-full', config.bg, config.color)}>
                           {config.emoji} {config.label}
                         </span>
-                        <span>{formatSize(doc.size)}</span>
+                        <span>{fmtSize(doc.size)}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -413,7 +408,7 @@ function PreviewModal({
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-white text-sm truncate">{doc.name}</h3>
             <p className="text-white/40 text-xs">
-              {formatSize(doc.size)} • {formatDate(doc.createdAt)}
+              {fmtSize(doc.size)} • {formatDate(doc.createdAt)}
             </p>
           </div>
         </div>
@@ -637,7 +632,7 @@ function UploadModal({ onClose, onSuccess }: any) {
                   <div className="text-sm font-medium text-white mb-1 truncate">
                     {file.name}
                   </div>
-                  <div className="text-xs text-white/40">{formatSize(file.size)}</div>
+                  <div className="text-xs text-white/40">{fmtSize(file.size)}</div>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

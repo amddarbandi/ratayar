@@ -17,6 +17,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { fmtMoney } from '@/lib/format';
 import { format } from 'date-fns-jalali';
 
 const COLORS = ['#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
@@ -34,13 +35,7 @@ const categoryLabels: any = {
   other: 'سایر',
 };
 
-const formatPrice = (price: number) => {
-  if (!price) return '۰';
-  if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} میلیارد`;
-  if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(1)} میلیون`;
-  if (price >= 1_000) return `${(price / 1_000).toFixed(0)} هزار`;
-  return `${price}`;
-};
+
 
 export default function FinancePage() {
   const queryClient = useQueryClient();
@@ -110,7 +105,7 @@ export default function FinancePage() {
                 <ArrowUpRight className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-white">{formatPrice(stats.income)}</div>
+                <div className="text-2xl font-bold text-white">{fmtMoney(stats.income)}</div>
                 <div className="text-white/50 text-sm">درآمد این ماه</div>
               </div>
             </div>
@@ -124,7 +119,7 @@ export default function FinancePage() {
                 <ArrowDownRight className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-white">{formatPrice(stats.expense)}</div>
+                <div className="text-2xl font-bold text-white">{fmtMoney(stats.expense)}</div>
                 <div className="text-white/50 text-sm">هزینه این ماه</div>
               </div>
             </div>
@@ -147,7 +142,7 @@ export default function FinancePage() {
                   'text-2xl font-bold',
                   stats.balance >= 0 ? 'text-emerald-400' : 'text-red-400',
                 )}>
-                  {formatPrice(Math.abs(stats.balance))}
+                  {fmtMoney(Math.abs(stats.balance))}
                 </div>
                 <div className="text-white/50 text-sm">مانده</div>
               </div>
@@ -188,7 +183,7 @@ export default function FinancePage() {
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                       <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" fontSize={12} />
-                      <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} tickFormatter={(v) => formatPrice(v)} />
+                      <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} tickFormatter={(v) => fmtMoney(v)} />
                       <Tooltip
                         contentStyle={{
                           background: 'rgba(10,10,15,0.95)',
@@ -197,7 +192,7 @@ export default function FinancePage() {
                           color: 'white',
                           direction: 'rtl',
                         }}
-                        formatter={(value) => [formatPrice(Number(value) || 0), '']}
+                        formatter={(value) => [fmtMoney(Number(value) || 0), '']}
                       />
                       <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} fill="url(#incomeGrad)" />
                       <Area type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={2} fill="url(#expenseGrad)" />
@@ -239,7 +234,7 @@ export default function FinancePage() {
                           color: 'white',
                           direction: 'rtl',
                         }}
-                        formatter={(value) => [formatPrice(Number(value) || 0), '']}
+                        formatter={(value) => [fmtMoney(Number(value) || 0), '']}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -250,7 +245,7 @@ export default function FinancePage() {
                           <div className="w-3 h-3 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
                           <span className="text-white/70">{item.name}</span>
                         </div>
-                        <span className="text-white font-medium">{formatPrice(Number(item.value) || 0)}</span>
+                        <span className="text-white font-medium">{fmtMoney(Number(item.value) || 0)}</span>
                       </div>
                     ))}
                   </div>
@@ -308,7 +303,7 @@ export default function FinancePage() {
                     'font-bold text-sm',
                     tx.type === 'income' ? 'text-emerald-400' : 'text-red-400',
                   )}>
-                    {tx.type === 'income' ? '+' : '-'}{formatPrice(tx.amount)}
+                    {tx.type === 'income' ? '+' : '-'}{fmtMoney(tx.amount)}
                   </div>
                   <button
                     onClick={() => {

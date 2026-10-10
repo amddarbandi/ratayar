@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { assetsApi } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { fmtMoney } from '@/lib/format';
 
 const typeConfig: any = {
   vehicle: {
@@ -73,12 +74,7 @@ const filters = [
   { key: 'financial', label: '💰 مالی' },
 ];
 
-const formatPrice = (price: number) => {
-  if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} میلیارد`;
-  if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(0)} میلیون`;
-  if (price >= 1_000) return `${(price / 1_000).toFixed(0)} هزار`;
-  return `${price}`;
-};
+
 
 export default function AssetsPage() {
   const queryClient = useQueryClient();
@@ -145,7 +141,7 @@ export default function AssetsPage() {
               </div>
               <div className="flex-1">
                 <div className="text-2xl font-bold text-white">
-                  {formatPrice(stats.totalValue)} تومان
+                  {fmtMoney(stats.totalValue)} تومان
                 </div>
                 <div className="text-white/50 text-sm">ارزش کل دارایی‌ها</div>
               </div>
@@ -250,7 +246,7 @@ export default function AssetsPage() {
                             <div className="flex items-baseline gap-2 mt-3">
                               <span className="text-white/40 text-xs">ارزش فعلی:</span>
                               <span className="text-white font-bold">
-                                {formatPrice(asset.currentValue)} تومان
+                                {fmtMoney(asset.currentValue)} تومان
                               </span>
                             </div>
                           )}

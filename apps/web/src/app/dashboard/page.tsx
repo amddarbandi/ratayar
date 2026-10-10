@@ -16,6 +16,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { dashboardApi, reportsApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { fmtMoney } from '@/lib/format';
 import { toJalaliShort, relativeJalali } from '@/lib/jalali';
 
 const priorityConfig: any = {
@@ -24,13 +25,7 @@ const priorityConfig: any = {
   normal: { badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30', icon: CheckCircle2, iconColor: 'text-cyan-400', iconBg: 'bg-cyan-500/10' },
 };
 
-const formatPrice = (price: number) => {
-  if (!price) return '۰';
-  if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} میلیارد`;
-  if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(1)} میلیون`;
-  if (price >= 1_000) return `${(price / 1_000).toFixed(0)} هزار`;
-  return `${price}`;
-};
+
 
 const formatDate = (date: string) => {
   return `${toJalaliShort(date)} · ${relativeJalali(date)}`;
@@ -153,7 +148,7 @@ export default function DashboardPage() {
               {stats.totalAssets || 0}
             </div>
             <div className="text-white/40 text-xs">
-              {formatPrice(stats.totalAssetsValue || 0)} ارزش
+              {fmtMoney(stats.totalAssetsValue || 0)} ارزش
             </div>
           </Card>
         </motion.div>
@@ -176,10 +171,10 @@ export default function DashboardPage() {
               'text-2xl font-black mb-1',
               (stats.monthBalance || 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
             )}>
-              {formatPrice(Math.abs(stats.monthBalance || 0))}
+              {fmtMoney(Math.abs(stats.monthBalance || 0))}
             </div>
             <div className="text-white/40 text-xs">
-              درآمد: {formatPrice(stats.monthIncome || 0)}
+              درآمد: {fmtMoney(stats.monthIncome || 0)}
             </div>
           </Card>
         </motion.div>
