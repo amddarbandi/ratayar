@@ -158,13 +158,24 @@ export class TicketsService {
     };
   }
 
-  async adminListAll(opts?: { status?: string; limit?: number }) {
+  async adminListAll(opts?: {
+    status?: string;
+    assignedTo?: string;
+    unassigned?: boolean;
+    limit?: number;
+  }) {
+    const where: any = {};
+    if (opts?.status) where.status = opts.status;
+    if (opts?.unassigned) where.assigneeId = null;
+    else if (opts?.assignedTo) where.assigneeId = opts.assignedTo;
+
     const tickets = await this.prisma.ticket.findMany({
-      where: opts?.status ? { status: opts.status } : undefined,
+      where,
       orderBy: [{ status: 'asc' }, { updatedAt: 'desc' }],
       take: opts?.limit ?? 100,
       include: {
         user: { select: { id: true, phone: true } },
+        assignee: { select: { id: true, phone: true, fullName: true } },
         _count: { select: { messages: true } },
       },
     });
@@ -176,6 +187,8 @@ export class TicketsService {
       status: t.status,
       referenceType: t.referenceType,
       referenceId: t.referenceId,
+      assigneeId: t.assigneeId,
+      assignee: (t as any).assignee,
       messageCount: t._count.messages,
       user: (t as any).user,
       createdAt: t.createdAt,

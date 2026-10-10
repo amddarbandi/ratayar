@@ -75,11 +75,18 @@ export class TicketsController {
   @UseGuards(RolesGuard)
   @Roles('admin')
   adminListAll(
+    @Req() req: any,
     @Query('status') status?: string,
+    @Query('assignedTo') assignedTo?: string,
+    @Query('unassigned') unassigned?: string,
     @Query('limit') limit?: string,
   ) {
+    const resolvedAssignedTo =
+      assignedTo === 'me' ? req.user.userId : assignedTo || undefined;
     return this.tickets.adminListAll({
       status,
+      assignedTo: resolvedAssignedTo,
+      unassigned: unassigned === 'true',
       limit: limit ? parseInt(limit, 10) : undefined,
     });
   }
