@@ -213,4 +213,29 @@ export class AdminController {
     return this.admin.retryNotification(id);
   }
 
+
+  // ═══════════════════════════════════════════
+  // Broadcasts
+  // ═══════════════════════════════════════════
+  @Get('broadcasts')
+  listBroadcasts(
+    @Query('status') status?: string,
+    @Query('channel') channel?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.admin.listBroadcasts({
+      status,
+      channel,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    });
+  }
+
+  @Post('broadcasts')
+  @Audited({ action: 'broadcast.admin.create', targetType: 'broadcast' })
+  createBroadcast(@Req() req: any, @Body() dto: any) {
+    return this.admin.createBroadcast(req.user.userId, dto);
+  }
+
 }

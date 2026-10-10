@@ -753,4 +753,159 @@ export class AdminService {
     return { ok: true };
   }
 
+
+  // ═══════════════════════════════════════════
+  // Broadcasts
+  // ═══════════════════════════════════════════
+  async createBroadcast(actorId: string, dto: {
+    channel: 'in_app' | 'sms' | 'email';
+    audience: string;          // all | plan:CODE | role:ROLE | users
+    audienceMeta?: any;        // { userIds?: string[] }
+    title: string;
+    body: string;
+    priority?: string;
+    scheduledFor?: string;
+  }) {
+    if (!dto.title || dto.title.trim().length < 3) {
+      throw new Error('عنوان الزامی است');
+    }
+    if (!dto.body || dto.body.trim().length < 3) {
+      throw new Error('متن الزامی است');
+    }
+
+    // resolve recipient ids
+    const recipients = await this.resolveAudience(
+      dto.audience,
+      dto.audienceMeta || {},
+    );
+
+    const bc = await this.prisma.broadcast.create({
+      data: {
+        actorId,
+        channel: dto.channel,
+        audience: dto.audience,
+        audienceMeta: dto.audienceMeta || {},
+        title: dto.title.trim(),
+        body: dto.body.trim(),
+        priority: dto.priority || 'normal',
+        recipientCount: recipients.length,
+        scheduledFor: dto.scheduledFor ? new Date(dto.scheduledFor) : null,
+        status: dto.scheduledFor ? 'queued' : 'sending',
+        startedAt: dto.scheduledFor ? null : new Date(),
+      },
+    });
+
+    // fire and forget send
+    if (!dto.scheduledFor) {
+      this.dispatchBroadcast(bc.id, recipients).catch((e) =>
+        this.logger.warn(`broadcast dispatch failed: ${e.message}`),
+      );
+    }
+
+    return {
+      id: bc.id,
+      status: bc.status,
+      recipientCount: recipients.length,
+    };
+  }
+
+  async listBroadcasts(opts: {
+    status?: string;
+    channel?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    const where: any = {};
+    if (opts.status) where.status = opts.status;
+    if (opts.channel) where.channel = opts.channel;
+
+    const [items, total] = await Promise.all([
+      this.prisma.broadcast.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(opts.limit ?? 30, 100),
+        skip: opts.offset ?? 0,
+      }),
+      this.prisma.broadcast.count({ where }),
+    ]);
+
+    return { items, total };
+  }
+
+  private async resolveAudience(audience: string, meta: any): Promise<string[]> {
+    if (audience === 'all') {
+      const users = await this.prisma.user.findMany({
+        where: { deletedAt: null, status: 'active' },
+        select: { id: true },
+      });
+      return users.map((u) => u.id);
+    }
+    if (audience.startsWith('plan:')) {
+      const code = audience.slice(5);
+      const subs = await this.prisma.subscription.findMany({
+        where: { status: 'active', plan: { code } },
+        select: { userId: true },
+      });
+      return [...new Set(subs.map((s) => s.userId))];
+    }
+    if (audience.startsWith('role:')) {
+      const role = audience.slice(5);
+      const users = await this.prisma.user.findMany({
+        where: { role, deletedAt: null },
+        select: { id: true },
+      });
+      return users.map((u) => u.id);
+    }
+    if (audience === 'users' && Array.isArray(meta?.userIds)) {
+      return meta.userIds;
+    }
+    return [];
+  }
+
+  private async dispatchBroadcast(bcId: string, userIds: string[]) {
+    try {
+      let sent = 0;
+      let failed = 0;
+      const bc = await this.prisma.broadcast.findUnique({ where: { id: bcId } });
+      if (!bc) return;
+
+      for (const userId of userIds) {
+        try {
+          await this.prisma.notification.create({
+            data: {
+              userId,
+              type: 'system',
+              title: bc.title,
+              body: bc.body,
+              priority: bc.priority,
+              status: 'pending',
+              referenceType: 'broadcast',
+              referenceId: bc.id,
+            },
+          });
+          sent++;
+        } catch {
+          failed++;
+        }
+      }
+
+      await this.prisma.broadcast.update({
+        where: { id: bcId },
+        data: {
+          status: failed === 0 ? 'sent' : sent === 0 ? 'failed' : 'sent',
+          sentCount: sent,
+          failedCount: failed,
+          finishedAt: new Date(),
+        },
+      });
+      this.logger.log(`Broadcast ${bcId}: sent=${sent} failed=${failed}`);
+    } catch (e: any) {
+      await this.prisma.broadcast.update({
+        where: { id: bcId },
+        data: { status: 'failed', finishedAt: new Date() },
+      });
+      throw e;
+    }
+  }
+
 }
