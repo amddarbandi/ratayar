@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { DashboardHeader } from '@/components/dashboard/header';
+import { EmailVerifyBanner } from '@/components/dashboard/email-verify-banner';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { SearchModal } from '@/components/search/search-modal';
 import { MobileNav } from '@/components/dashboard/mobile-nav';
@@ -54,7 +55,10 @@ export default function DashboardLayout({
         <DashboardSidebar onSearchClick={() => setSearchOpen(true)} />
         <div className="flex-1 min-h-screen">
           <DashboardHeader onSearchClick={() => setSearchOpen(true)} />
-          <main className="p-6 lg:p-8">{children}</main>
+          <main className="p-6 lg:p-8">
+            <EmailVerifyBanner />
+            {children}
+          </main>
         </div>
       </div>
 
