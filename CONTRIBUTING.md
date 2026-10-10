@@ -148,3 +148,21 @@ Homepage is the shop window — must show a live dashboard preview.
 Any UI drift must be fixed in the next commit.
 
 Full rules: docs/UI-GUIDELINES.md
+
+## Rule — Web build must use safe-build script
+
+Never run `turbo run build` or `pnpm run build` on the web app
+directly. Always use:
+
+    bash /var/www/zarvan/scripts/safe-build-web.sh
+
+Why: Next.js writes .next in place. A failed build leaves .next in a
+broken state and pm2 serves client-side errors to users. The safe
+script moves .next to .next.bak before the build; if the build fails
+it rolls back, so the site stays up. pm2 restart runs only after the
+build fully succeeds.
+
+Enforcement:
+- Every commit that touches apps/web must be verified by running
+  the safe script and confirming "✅ deployed".
+- If the script prints "❌ build FAILED" — do NOT commit, fix first.

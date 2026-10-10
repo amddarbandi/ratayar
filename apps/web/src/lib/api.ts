@@ -341,11 +341,17 @@ export const marketApi = {
 
 export const adminApi = {
   overview: () => api.get('/admin/overview'),
-  auditLog: (params?: Record<string, string | number>) => {
-    const qs = params
+  auditLog: (params?: Record<string, string | number | undefined>) => {
+    const clean: Record<string, string> = {};
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        if (v !== undefined && v !== '') clean[k] = String(v);
+      }
+    }
+    const qs = Object.keys(clean).length
       ? '?' +
-        Object.entries(params)
-          .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
+        Object.entries(clean)
+          .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
           .join('&')
       : '';
     return api.get(`/admin/audit-log${qs}`);
@@ -400,4 +406,34 @@ export const adminApi = {
   // ─── Refund ───
   refundPayment: (id: string, reason?: string) =>
     api.post(`/admin/payments/${id}/refund`, { reason }),
+
+  // ─── Content oversight ───
+  documents: (params?: Record<string, string | number | undefined>) => {
+    const qs = buildQs(params);
+    return api.get(`/admin/documents${qs}`);
+  },
+  deleteDocument: (id: string) => api.delete(`/admin/documents/${id}`),
+  obligations: (params?: Record<string, string | number | undefined>) => {
+    const qs = buildQs(params);
+    return api.get(`/admin/obligations${qs}`);
+  },
+  bulkDeleteObligations: (ids: string[]) =>
+    api.post('/admin/obligations/bulk-delete', { ids }),
+  notifications: (params?: Record<string, string | number | undefined>) => {
+    const qs = buildQs(params);
+    return api.get(`/admin/notifications${qs}`);
+  },
+  retryNotification: (id: string) =>
+    api.post(`/admin/notifications/${id}/retry`),
 };
+
+function buildQs(params?: Record<string, string | number | undefined>) {
+  if (!params) return '';
+  const clean: Record<string, string> = {};
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== '') clean[k] = String(v);
+  }
+  const keys = Object.keys(clean);
+  if (!keys.length) return '';
+  return '?' + keys.map((k) => `${k}=${encodeURIComponent(clean[k])}`).join('&');
+}

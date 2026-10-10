@@ -383,7 +383,7 @@ Full platform control. See docs/ADMIN-MASTER-PLAN.md.
 - [ ] ADM-016 /admin/invoices list + resend
 
 ### Phase 4 — Content oversight
-- [ ] ADM-017 /admin/documents all users + delete
+- [x] ADM-017 /admin/documents all users + delete
 - [ ] ADM-018 /admin/obligations all + bulk delete
 - [ ] ADM-019 /admin/notifications queue + retry
 - [ ] ADM-020 ticket assignment + macros
