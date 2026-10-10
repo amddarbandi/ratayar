@@ -260,4 +260,101 @@ export class TicketsService {
       })),
     };
   }
+
+  // ═══════════════════════════════════════════
+  // Assignment
+  // ═══════════════════════════════════════════
+  async adminAssign(ticketId: string, assigneeId: string | null) {
+    const ticket = await this.prisma.ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) throw new NotFoundException('تیکت یافت نشد');
+
+    if (assigneeId) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: assigneeId },
+        select: { id: true, role: true },
+      });
+      if (!user || !['admin', 'support'].includes(user.role)) {
+        throw new BadRequestException('ادمین/پشتیبان انتخاب‌شده معتبر نیست');
+      }
+    }
+
+    const updated = await this.prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        assigneeId,
+        assignedAt: assigneeId ? new Date() : null,
+      },
+      include: {
+        assignee: { select: { id: true, phone: true, fullName: true } },
+      },
+    });
+
+    this.logger.log(
+      `✅ Ticket ${ticketId} ${assigneeId ? 'assigned to ' + assigneeId : 'unassigned'}`,
+    );
+    return {
+      id: updated.id,
+      assigneeId: updated.assigneeId,
+      assignedAt: updated.assignedAt,
+      assignee: (updated as any).assignee,
+    };
+  }
+
+  async adminListAdmins() {
+    const admins = await this.prisma.user.findMany({
+      where: { role: { in: ['admin', 'support'] }, deletedAt: null },
+      select: { id: true, phone: true, fullName: true, role: true },
+      orderBy: { fullName: 'asc' },
+    });
+    return { items: admins };
+  }
+
+  // ═══════════════════════════════════════════
+  // Macros
+  // ═══════════════════════════════════════════
+  async listMacros() {
+    const items = await this.prisma.ticketMacro.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return { items };
+  }
+
+  async createMacro(
+    name: string,
+    body: string,
+    category: string,
+    actorId: string,
+  ) {
+    if (!name || name.trim().length < 2) throw new BadRequestException('نام الزامی است');
+    if (!body || body.trim().length < 2) throw new BadRequestException('متن الزامی است');
+    const macro = await this.prisma.ticketMacro.create({
+      data: {
+        name: name.trim(),
+        body: body.trim(),
+        category: category || 'other',
+        createdBy: actorId,
+      },
+    });
+    return macro;
+  }
+
+  async updateMacro(
+    id: string,
+    data: { name?: string; body?: string; category?: string },
+  ) {
+    return this.prisma.ticketMacro.update({
+      where: { id },
+      data: {
+        name: data.name ?? undefined,
+        body: data.body ?? undefined,
+        category: data.category ?? undefined,
+      },
+    });
+  }
+
+  async deleteMacro(id: string) {
+    await this.prisma.ticketMacro.delete({ where: { id } });
+    return { ok: true };
+  }
+
 }

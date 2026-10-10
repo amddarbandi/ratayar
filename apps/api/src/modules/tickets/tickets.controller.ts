@@ -10,6 +10,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
   BadRequestException,
+  Delete,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -107,4 +108,64 @@ export class TicketsController {
     if (!status) throw new BadRequestException('وضعیت الزامی است');
     return this.tickets.adminSetStatus(id, status, req.user.userId, note);
   }
+
+  // ═══════════════════════════════════════════
+  // Assignment
+  // ═══════════════════════════════════════════
+  @Get('admin/admins')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  adminListAdmins() {
+    return this.tickets.adminListAdmins();
+  }
+
+  @Patch('admin/:id/assign')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  adminAssign(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body('assigneeId') assigneeId: string | null,
+  ) {
+    return this.tickets.adminAssign(id, assigneeId || null);
+  }
+
+  // ═══════════════════════════════════════════
+  // Macros
+  // ═══════════════════════════════════════════
+  @Get('admin/macros')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  listMacros() {
+    return this.tickets.listMacros();
+  }
+
+  @Post('admin/macros')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  createMacro(
+    @Req() req: any,
+    @Body('name') name: string,
+    @Body('body') body: string,
+    @Body('category') category: string,
+  ) {
+    return this.tickets.createMacro(name, body, category, req.user.userId);
+  }
+
+  @Patch('admin/macros/:id')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  updateMacro(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() data: { name?: string; body?: string; category?: string },
+  ) {
+    return this.tickets.updateMacro(id, data);
+  }
+
+  @Delete('admin/macros/:id')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  deleteMacro(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.tickets.deleteMacro(id);
+  }
+
 }

@@ -29,7 +29,8 @@ model User {
   memberships     FamilyMember[]
   subscriptions   Subscription[]
   paymentRequests PaymentRequest[]
-  tickets         Ticket[]
+  tickets         Ticket[]         @relation("TicketUser")
+  assignedTickets Ticket[]         @relation("TicketAssignee")
   ticketMessages  TicketMessage[]
 
   @@index([phone])
@@ -283,20 +284,24 @@ model PaymentRequest {
 model Ticket {
   id            String    @id @default(uuid()) @db.Uuid
   userId        String    @map("user_id") @db.Uuid
+  assigneeId    String?   @map("assignee_id") @db.Uuid
   subject       String    @db.VarChar(200)
   category      String    @default("other") @db.VarChar(30)
   priority      String    @default("normal") @db.VarChar(20)
   status        String    @default("open") @db.VarChar(20)
   referenceId   String?   @map("reference_id") @db.Uuid
   referenceType String?   @map("reference_type") @db.VarChar(30)
+  assignedAt    DateTime? @map("assigned_at")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   closedAt      DateTime? @map("closed_at")
 
-  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User            @relation("TicketUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignee User?           @relation("TicketAssignee", fields: [assigneeId], references: [id])
   messages TicketMessage[]
 
   @@index([userId])
+  @@index([assigneeId])
   @@index([status])
   @@map("tickets")
 }
@@ -431,4 +436,16 @@ model UserActivity {
   @@unique([userId, day])
   @@index([day])
   @@map("user_activities")
+}
+
+model TicketMacro {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(120)
+  body      String
+  category  String   @default("other") @db.VarChar(30)
+  createdBy String?  @map("created_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("ticket_macros")
 }
