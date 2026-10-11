@@ -9,11 +9,13 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { PercentCalc } from '@/components/converters/percent-calc';
 import { DateCalc } from '@/components/converters/date-calc';
+import { TextTools } from '@/components/converters/tools/text-tools';
 
 export default function ConvertersPage() {
   const [activeCat, setActiveCat] = useState<Category | null>(null);
-  const [tab, setTab] = useState<'units' | 'calc'>('units');
+  const [tab, setTab] = useState<'units' | 'calc' | 'tools'>('units');
   const [calcTab, setCalcTab] = useState<'percent' | 'date'>('percent');
+  const [toolsTab, setToolsTab] = useState<'text'>('text');
 
   // ── restore last category from localStorage ──
   useEffect(() => {
@@ -40,14 +42,16 @@ export default function ConvertersPage() {
       <div>
         <div className="flex items-center gap-3 mb-1">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-2xl">
-            {tab === 'units' ? '🔄' : '🧮'}
+            {tab === 'units' ? '🔄' : tab === 'calc' ? '🧮' : '🛠️'}
           </div>
           <h1 className="text-3xl font-bold text-white">
             {tab === 'units'
               ? activeCat
                 ? activeCat.label
                 : 'تبدیل واحد'
-              : 'ماشین‌حساب'}
+              : tab === 'calc'
+                ? 'ماشین‌حساب'
+                : 'ابزارها'}
           </h1>
         </div>
         <p className="text-white/50">
@@ -55,7 +59,9 @@ export default function ConvertersPage() {
             ? activeCat
               ? 'مقدار را وارد کن — بلافاصله تبدیل می‌شود'
               : 'هر چیزی به هر چیزی — سریع، دقیق و رنگی'
-            : 'درصد، تخفیف و محاسبه تاریخ'}
+            : tab === 'calc'
+              ? 'درصد، تخفیف و محاسبه تاریخ'
+              : 'متن، هش، QR، رمز و زمان'}
         </p>
       </div>
 
@@ -65,6 +71,7 @@ export default function ConvertersPage() {
           [
             { key: 'units', label: 'تبدیل واحد' },
             { key: 'calc', label: 'ماشین‌حساب' },
+            { key: 'tools', label: 'ابزارها' },
           ] as const
         ).map((t) => (
           <button
@@ -109,10 +116,11 @@ export default function ConvertersPage() {
 
           {calcTab === 'percent' ? <PercentCalc /> : <DateCalc />}
         </>
+      ) : tab === 'tools' ? (
+        <TextTools />
       ) : (
       <>
       {/* UNITS — existing content */}
-      {false && null}
 
       <AnimatePresence mode="wait">
         {!activeCat ? (
