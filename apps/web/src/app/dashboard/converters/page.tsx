@@ -10,12 +10,13 @@ import { toast } from 'sonner';
 import { PercentCalc } from '@/components/converters/percent-calc';
 import { DateCalc } from '@/components/converters/date-calc';
 import { TextTools } from '@/components/converters/tools/text-tools';
+import { HashTools } from '@/components/converters/tools/hash-tools';
 
 export default function ConvertersPage() {
   const [activeCat, setActiveCat] = useState<Category | null>(null);
   const [tab, setTab] = useState<'units' | 'calc' | 'tools'>('units');
   const [calcTab, setCalcTab] = useState<'percent' | 'date'>('percent');
-  const [toolsTab, setToolsTab] = useState<'text'>('text');
+  const [toolsTab, setToolsTab] = useState<'text' | 'hash'>('text');
 
   // ── restore last category from localStorage ──
   useEffect(() => {
@@ -117,7 +118,32 @@ export default function ConvertersPage() {
           {calcTab === 'percent' ? <PercentCalc /> : <DateCalc />}
         </>
       ) : tab === 'tools' ? (
-        <TextTools />
+        <>
+          {/* Tools sub-tabs */}
+          <div className="inline-flex p-1 rounded-2xl bg-white/5 border border-white/10">
+            {(
+              [
+                { key: 'text', label: 'متن' },
+                { key: 'hash', label: 'هش و ID' },
+              ] as const
+            ).map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setToolsTab(t.key)}
+                className={cn(
+                  'px-4 py-2 rounded-xl text-xs font-medium transition-all',
+                  toolsTab === t.key
+                    ? 'bg-cyan-500/20 text-white'
+                    : 'text-white/60 hover:text-white',
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {toolsTab === 'text' ? <TextTools /> : <HashTools />}
+        </>
       ) : (
       <>
       {/* UNITS — existing content */}
