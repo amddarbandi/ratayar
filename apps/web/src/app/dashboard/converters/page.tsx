@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowLeftRight, Copy, Check } from 'lucide-react';
+import { ArrowLeft, ArrowLeftRight, Copy, Check, Share2 } from 'lucide-react';
 import { CATEGORIES, convert, type Category, type Unit } from '@/lib/unit-conversions';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,25 @@ import { toast } from 'sonner';
 
 export default function ConvertersPage() {
   const [activeCat, setActiveCat] = useState<Category | null>(null);
+
+  // ── restore last category from localStorage ──
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('converter.cat');
+      if (saved) {
+        const found = CATEGORIES.find((c) => c.key === saved);
+        if (found) setActiveCat(found);
+      }
+    } catch {}
+  }, []);
+
+  // ── persist category on change ──
+  useEffect(() => {
+    try {
+      if (activeCat) localStorage.setItem('converter.cat', activeCat.key);
+      else localStorage.removeItem('converter.cat');
+    } catch {}
+  }, [activeCat]);
 
   return (
     <div className="space-y-6">
@@ -94,6 +113,36 @@ function ConverterPanel({ category }: { category: Category }) {
   const [toUnit, setToUnit] = useState<Unit>(category.units[1] || category.units[0]);
   const [inputValue, setInputValue] = useState('1');
   const [copied, setCopied] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  // ── restore from/to/input for this category ──
+  useEffect(() => {
+    try {
+      const savedFrom = localStorage.getItem(`converter.${category.key}.from`);
+      const savedTo = localStorage.getItem(`converter.${category.key}.to`);
+      const savedInput = localStorage.getItem('converter.input');
+      if (savedFrom) {
+        const u = category.units.find((x) => x.key === savedFrom);
+        if (u) setFromUnit(u);
+      }
+      if (savedTo) {
+        const u = category.units.find((x) => x.key === savedTo);
+        if (u) setToUnit(u);
+      }
+      if (savedInput != null) setInputValue(savedInput);
+    } catch {}
+    setHydrated(true);
+  }, [category.key]);
+
+  // ── persist on change (after hydrate) ──
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(`converter.${category.key}.from`, fromUnit.key);
+      localStorage.setItem(`converter.${category.key}.to`, toUnit.key);
+      localStorage.setItem('converter.input', inputValue);
+    } catch {}
+  }, [hydrated, category.key, fromUnit.key, toUnit.key, inputValue]);
 
   const numValue = parseFloat(inputValue) || 0;
   const result = convert(numValue, fromUnit, toUnit);
@@ -111,6 +160,28 @@ function ConverterPanel({ category }: { category: Category }) {
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error('کپی نشد');
+    }
+  };
+
+  const share = async () => {
+    const text = `${inputValue} ${fromUnit.symbol} = ${fmt(result)} ${toUnit.symbol}`;
+    try {
+      if (
+        typeof navigator !== 'undefined' &&
+        (navigator as any).share
+      ) {
+        await (navigator as any).share({
+          title: 'تبدیل واحد — راتایار',
+          text,
+        });
+      } else {
+        await navigator.clipboard.writeText(text);
+        toast.success('نتیجه کپی شد');
+      }
+    } catch (e: any) {
+      if (e?.name !== 'AbortError') {
+        toast.error('اشتراک‌گذاری انجام نشد');
+      }
     }
   };
 
@@ -169,17 +240,26 @@ function ConverterPanel({ category }: { category: Category }) {
               <div className="text-xs text-white/50 font-medium">
                 به واحد
               </div>
-              <button
-                onClick={copy}
-                className="text-white/40 hover:text-white transition-colors"
-                title="کپی نتیجه"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-emerald-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={copy}
+                  className="text-white/40 hover:text-white transition-colors p-1.5"
+                  title="کپی نتیجه"
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-emerald-400" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+                <button
+                  onClick={share}
+                  className="text-white/40 hover:text-white transition-colors p-1.5"
+                  title="اشتراک‌گذاری نتیجه"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <UnitSelector
               units={category.units}
