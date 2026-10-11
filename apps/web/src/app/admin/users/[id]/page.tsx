@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { toJalaliString, toJalaliDateTime } from '@/lib/jalali';
+import { DirectMessageModal } from '@/components/admin/direct-message-modal';
 
 interface Detail {
   user: {
@@ -81,6 +82,7 @@ export default function AdminUserDetailPage({
   const [data, setData] = useState<Detail | null>(null);
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -194,6 +196,14 @@ export default function AdminUserDetailPage({
                   مسدود کردن
                 </>
               )}
+            </button>
+
+            <button
+              onClick={() => setShowMessage(true)}
+              className="min-h-[44px] px-4 rounded-xl flex items-center gap-2 text-sm font-medium bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/25"
+            >
+              <MessageSquare className="w-4 h-4" />
+              ارسال پیام
             </button>
           </div>
         </CardContent>
@@ -345,6 +355,13 @@ export default function AdminUserDetailPage({
           )}
         </CardContent>
       </Card>
+
+      <DirectMessageModal
+        open={showMessage}
+        onClose={() => setShowMessage(false)}
+        userId={u.id}
+        userLabel={u.fullName || u.phone}
+      />
     </div>
   );
 }
