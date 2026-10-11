@@ -7,9 +7,13 @@ import { CATEGORIES, convert, type Category, type Unit } from '@/lib/unit-conver
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { PercentCalc } from '@/components/converters/percent-calc';
+import { DateCalc } from '@/components/converters/date-calc';
 
 export default function ConvertersPage() {
   const [activeCat, setActiveCat] = useState<Category | null>(null);
+  const [tab, setTab] = useState<'units' | 'calc'>('units');
+  const [calcTab, setCalcTab] = useState<'percent' | 'date'>('percent');
 
   // ── restore last category from localStorage ──
   useEffect(() => {
@@ -36,18 +40,79 @@ export default function ConvertersPage() {
       <div>
         <div className="flex items-center gap-3 mb-1">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-2xl">
-            🔄
+            {tab === 'units' ? '🔄' : '🧮'}
           </div>
           <h1 className="text-3xl font-bold text-white">
-            {activeCat ? activeCat.label : 'کانورت‌ها'}
+            {tab === 'units'
+              ? activeCat
+                ? activeCat.label
+                : 'تبدیل واحد'
+              : 'ماشین‌حساب'}
           </h1>
         </div>
         <p className="text-white/50">
-          {activeCat
-            ? 'مقدار را وارد کن — بلافاصله تبدیل می‌شود'
-            : 'هر چیزی به هر چیزی — سریع، دقیق و رنگی'}
+          {tab === 'units'
+            ? activeCat
+              ? 'مقدار را وارد کن — بلافاصله تبدیل می‌شود'
+              : 'هر چیزی به هر چیزی — سریع، دقیق و رنگی'
+            : 'درصد، تخفیف و محاسبه تاریخ'}
         </p>
       </div>
+
+      {/* Top tabs */}
+      <div className="inline-flex p-1 rounded-2xl bg-white/5 border border-white/10">
+        {(
+          [
+            { key: 'units', label: 'تبدیل واحد' },
+            { key: 'calc', label: 'ماشین‌حساب' },
+          ] as const
+        ).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={cn(
+              'px-5 py-2.5 rounded-xl text-sm font-bold transition-all',
+              tab === t.key
+                ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/20'
+                : 'text-white/60 hover:text-white',
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'calc' ? (
+        <>
+          {/* Calc sub-tabs */}
+          <div className="inline-flex p-1 rounded-2xl bg-white/5 border border-white/10">
+            {(
+              [
+                { key: 'percent', label: 'درصد و تخفیف' },
+                { key: 'date', label: 'تاریخ' },
+              ] as const
+            ).map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setCalcTab(t.key)}
+                className={cn(
+                  'px-4 py-2 rounded-xl text-xs font-medium transition-all',
+                  calcTab === t.key
+                    ? 'bg-cyan-500/20 text-white'
+                    : 'text-white/60 hover:text-white',
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {calcTab === 'percent' ? <PercentCalc /> : <DateCalc />}
+        </>
+      ) : (
+      <>
+      {/* UNITS — existing content */}
+      {false && null}
 
       <AnimatePresence mode="wait">
         {!activeCat ? (
@@ -104,6 +169,8 @@ export default function ConvertersPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </>
+      )}
     </div>
   );
 }
