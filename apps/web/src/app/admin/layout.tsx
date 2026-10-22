@@ -10,27 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LogoIcon } from '@/components/brand/logo';
-
-const items = [
-  { href: '/admin', label: 'داشبورد', icon: LayoutDashboard },
-  { href: '/admin/users', label: 'کاربران', icon: Users },
-  { href: '/admin/subscriptions', label: 'اشتراک‌ها', icon: Calendar },
-  { href: '/admin/revenue', label: 'درآمد', icon: BarChart3 },
-  { href: '/admin/plans', label: 'پلن‌ها', icon: Package },
-  { href: '/admin/payments', label: 'پرداخت‌ها', icon: CreditCard },
-  { href: '/admin/tickets', label: 'تیکت‌ها', icon: MessageSquare },
-  { href: '/admin/documents', label: 'اسناد', icon: FileText },
-  { href: '/admin/obligations', label: 'تعهدات', icon: ListChecks },
-  { href: '/admin/notifications', label: 'اعلان‌ها', icon: Bell },
-  { href: '/admin/broadcast', label: 'ارسال گروهی', icon: Megaphone },
-  { href: '/admin/analytics', label: 'آنالیتیکس', icon: LineChart },
-  { href: '/admin/abuse', label: 'کنترل دسترسی', icon: ShieldAlert },
-  { href: '/admin/api-keys', label: 'کلیدهای API', icon: KeyRound },
-  { href: '/admin/audit-log', label: 'لاگ اقدامات', icon: Activity },
-  { href: '/admin/settings', label: 'تنظیمات پلتفرم', icon: Settings },
-  { href: '/admin/flags', label: 'فلگ‌های ویژگی', icon: Flag },
-  { href: '/admin/backup', label: 'بکاپ', icon: Database },
-];
+import { AdminMobileNav, ADMIN_NAV_ITEMS } from '@/components/admin/admin-mobile-nav';
 
 export default function AdminLayout({
   children,
@@ -61,9 +41,11 @@ export default function AdminLayout({
       <div className="fixed inset-0 -z-10 grid-pattern opacity-30" />
       <div className="fixed top-0 right-1/3 w-[600px] h-[600px] bg-red-500/5 rounded-full blur-[120px] -z-10" />
 
+      <AdminMobileNav />
+
       <div className="flex">
         {/* Admin Sidebar */}
-        <aside className="w-64 min-h-screen border-l border-white/10 bg-black/30 backdrop-blur sticky top-0 h-screen flex flex-col">
+        <aside className="hidden lg:flex w-64 min-h-screen border-l border-white/10 bg-black/30 backdrop-blur sticky top-0 h-screen flex-col">
           <div className="p-6 border-b border-white/10">
             <div className="flex items-center gap-2">
               <LogoIcon size={40} />
@@ -75,7 +57,7 @@ export default function AdminLayout({
           </div>
 
           <nav className="flex-1 p-4 space-y-1">
-            {items.map((item) => {
+            {ADMIN_NAV_ITEMS.map((item) => {
               const isActive =
                 pathname === item.href ||
                 (item.href !== '/admin' && pathname.startsWith(item.href));
@@ -113,7 +95,7 @@ export default function AdminLayout({
           </div>
         </aside>
 
-        <main className="flex-1 p-8" dir="rtl">
+        <main className="flex-1 p-4 md:p-6 lg:p-8" dir="rtl">
           {children}
         </main>
       </div>

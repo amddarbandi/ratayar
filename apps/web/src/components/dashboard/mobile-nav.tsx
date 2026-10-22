@@ -22,6 +22,7 @@ const PRIMARY = [
 const MORE_ITEMS = [
   { href: '/dashboard/assets', label: 'دارایی‌ها', icon: Package },
   { href: '/dashboard/family', label: 'خانواده', icon: Users },
+  { href: '/dashboard/family-tree', label: 'شجره‌نامه', icon: NetworkIcon },
   { href: '/dashboard/documents', label: 'اسناد', icon: FileText },
   { href: '/dashboard/storage', label: 'فضای ذخیره‌سازی', icon: HardDrive },
   { href: '/dashboard/converters', label: 'تبدیل', icon: Repeat },
