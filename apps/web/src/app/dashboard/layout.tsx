@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { DashboardHeader } from '@/components/dashboard/header';
 import { EmailVerifyBanner } from '@/components/dashboard/email-verify-banner';
+import { ProfileCompletionGate } from '@/components/profile/profile-completion-gate';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { SearchModal } from '@/components/search/search-modal';
 import { MobileNav } from '@/components/dashboard/mobile-nav';
@@ -55,8 +56,9 @@ export default function DashboardLayout({
         <DashboardSidebar onSearchClick={() => setSearchOpen(true)} />
         <div className="flex-1 min-h-screen">
           <DashboardHeader onSearchClick={() => setSearchOpen(true)} />
-          <main className="p-6 lg:p-8">
+          <main className="p-6 pb-24 lg:p-8 lg:pb-8">
             <EmailVerifyBanner />
+            <ProfileCompletionGate />
             {children}
           </main>
         </div>
