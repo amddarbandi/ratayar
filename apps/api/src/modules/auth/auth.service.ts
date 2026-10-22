@@ -188,14 +188,28 @@ export class AuthService {
     await this.redis.incr(rateLimitKey);
     await this.redis.expire(rateLimitKey, 3600);
 
-    // 🔒 فقط در environment development و اگر DEV_OTP_ENABLED=true باشد، کد برمی‌گردد
-    // در production، حتی اگر DEV_OTP_ENABLED=true باشد، کد نمایش داده نمی‌شود.
+    // 🔒 قواعد نمایش کد OTP در پاسخ:
+    //   - development + DEV_OTP_ENABLED=true -> نمایش می‌دهد
+    //   - کاربری با نقش admin (برای تست آسان) -> همیشه نمایش می‌دهد
+    //   - بقیه -> فقط در log (که در production خاموش است)
     const nodeEnv = this.config.get<string>('NODE_ENV', 'development');
     const devOtpEnabled = this.config.get('DEV_OTP_ENABLED') === 'true';
-    const showCode = nodeEnv === 'development' && devOtpEnabled;
+
+    let isAdmin = false;
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { phone },
+        select: { role: true },
+      });
+      isAdmin = user?.role === 'admin';
+    } catch {
+      // ignore DB error — fall back to non-admin behavior
+    }
+
+    const showCode = (nodeEnv === 'development' && devOtpEnabled) || isAdmin;
 
     if (showCode) {
-      this.logger.warn(`📱 [DEV ONLY] OTP for ${phone}: ${code}`);
+      this.logger.warn(`📱 [DEBUG] OTP for ${phone}: ${code} (admin=${isAdmin})`);
     } else {
       this.logger.log(`📱 OTP sent for ${phone.slice(0, 4)}***${phone.slice(-3)}`);
     }
