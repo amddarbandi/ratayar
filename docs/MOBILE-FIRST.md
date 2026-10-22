@@ -99,3 +99,20 @@ Priority:
 5. Forms
 
 Last updated: 2026-10-09
+
+## R11 — 100% Menu Parity (Desktop == Mobile)
+
+**Mandatory (2026-10-23):** Every menu item available on desktop MUST
+also be available on mobile and tablet. No exceptions.
+
+- If the desktop sidebar has N items, the mobile drawer / bottom nav
+  must contain the exact same N items with the same labels and routes.
+- New pages must be added to BOTH the desktop and mobile navigation
+  in the same commit.
+- Verification: compare `src/components/dashboard/sidebar.tsx` menu
+  items with `src/components/dashboard/mobile-nav.tsx` items; and
+  compare `src/app/admin/layout.tsx` desktop items with the admin
+  mobile drawer items.
+
+**Historical failures prevented:** admin panel had desktop-only items
+(no mobile drawer); plans/limits page could not be reached from mobile.

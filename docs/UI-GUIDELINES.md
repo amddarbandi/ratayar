@@ -103,3 +103,8 @@ audit. Desktop is the enhancement, not the baseline.
 
 See docs/TYPOGRAPHY.md. No text below 11px. Body text >= 14px.
 `text-[10px]` is forbidden everywhere outside the bottom-nav bar.
+
+## Rule 13 — Menu parity between desktop and mobile
+
+See docs/MOBILE-FIRST.md R11. If it exists on desktop, it exists on
+mobile. Missing mobile menu items are a bug, not a design choice.
