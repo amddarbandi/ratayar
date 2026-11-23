@@ -3,17 +3,14 @@
 // Version: 1.0.0
 // ============================================
 
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.1.0';
+const OFFLINE_HTML = `<!DOCTYPE html><html dir="rtl" lang="fa"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>آفلاین — راتایار</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:50px 20px;background:linear-gradient(135deg,#0a0a0f 0%,#1a0a2e 100%);color:#fff;min-height:100vh;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center}h1{font-size:2rem;margin:0 0 1rem}p{color:#a0a0b0;margin:0 0 2rem}button{padding:12px 32px;font-size:1rem;background:#10ffb3;color:#0a0a0f;border:none;border-radius:8px;cursor:pointer;font-weight:700}</style></head><body><h1>&#128225; اتصال قطع است</h1><p>لطفاً اتصال اینترنت خود را بررسی کنید.</p><button onclick="location.reload()">تلاش دوباره</button></body></html>`;
 const CACHE_STATIC = `ratayar-static-${VERSION}`;
 const CACHE_DYNAMIC = `ratayar-dynamic-${VERSION}`;
 const CACHE_IMAGES = `ratayar-images-${VERSION}`;
 const CACHE_API = `ratayar-api-${VERSION}`;
 
 const PRECACHE_URLS = [
-  '/',
-  '/login',
-  '/register',
-  '/offline',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
@@ -80,7 +77,7 @@ self.addEventListener('fetch', (event) => {
   ) {
     event.respondWith(
       caches.match(request).then((cached) => {
-        if (cached) return cached;
+        if (cached && request.destination !== 'document') return cached;
         return fetch(request).then((response) => {
           if (response.ok) {
             const clone = response.clone();
@@ -136,7 +133,7 @@ self.addEventListener('fetch', (event) => {
         .catch(() => {
           // اگر آفلاین بود، از cache بخوان
           return caches.match(request).then((cached) => {
-            if (cached) return cached;
+            if (cached && request.destination !== 'document') return cached;
             // اگر هیچی نبود، یک پاسخ خطا برگردان
             return new Response(
               JSON.stringify({
@@ -170,10 +167,10 @@ self.addEventListener('fetch', (event) => {
       })
       .catch(() => {
         return caches.match(request).then((cached) => {
-          if (cached) return cached;
+          if (cached && request.destination !== 'document') return cached;
           // صفحه offline
           if (request.destination === 'document') {
-            return caches.match('/offline');
+            return new Response(OFFLINE_HTML, { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
           }
           return new Response('Offline', { status: 503 });
         });
