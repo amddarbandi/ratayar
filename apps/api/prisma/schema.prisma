@@ -51,6 +51,7 @@ model User {
   @@index([email])
   @@index([emailVerifyToken])
   @@index([status])
+  documents       Document[]
   @@map("users")
 }
 
@@ -219,6 +220,7 @@ model Document {
   @@index([userId])
   @@index([type])
   @@index([deletedAt])
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@map("documents")
 }
 
