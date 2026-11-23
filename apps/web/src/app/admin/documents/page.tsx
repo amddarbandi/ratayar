@@ -19,6 +19,7 @@ interface Doc {
   storageKey: string;
   createdAt: string;
   expiresAt: string | null;
+  status: string;
   user: { id: string; phone: string; fullName: string | null } | null;
 }
 
@@ -165,7 +166,56 @@ export default function AdminDocumentsPage() {
                   </div>
                 </div>
               </div>
-              <button
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                {d.status === 'PENDING' && (
+                  <div className="flex gap-1">
+                    <button
+                      onClick={async () => {
+                        try {
+                          await adminApi.approveDocument(d.id);
+                          toast.success('سند تایید شد');
+                          load();
+                        } catch {
+                          toast.error('خطا در تایید');
+                        }
+                      }}
+                      className="px-2 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs hover:bg-emerald-500/20 transition-colors"
+                    >
+                      تایید
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await adminApi.rejectDocument(d.id);
+                          toast.error('سند رد شد');
+                          load();
+                        } catch {
+                          toast.error('خطا در رد');
+                        }
+                      }}
+                      className="px-2 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 text-xs hover:bg-rose-500/20 transition-colors"
+                    >
+                      رد
+                    </button>
+                  </div>
+                )}
+                {d.status === 'APPROVED' && (
+                  <span className="px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-[10px]">تایید شده</span>
+                )}
+                {d.status === 'REJECTED' && (
+                  <span className="px-2 py-1 rounded-lg bg-rose-500/10 text-rose-400 text-[10px]">رد شده</span>
+                )}
+                
+                {/* دکمه حذف (همان کد قبلی) */}
+                <button
+                  onClick={() => doDelete(d)}
+                  className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 flex-shrink-0"
+                  aria-label="حذف"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+                <button
                 onClick={() => doDelete(d)}
                 className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 flex-shrink-0"
                 aria-label="حذف"

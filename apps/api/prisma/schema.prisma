@@ -199,6 +199,7 @@ model Notification {
 model Document {
   id         String    @id @default(uuid()) @db.Uuid
   userId     String    @map("user_id") @db.Uuid
+  status     String    @default("PENDING") @db.VarChar(20) // PENDING | APPROVED | REJECTED
   name       String    @db.VarChar(200)
   type       String    @db.VarChar(50) // identity | property | vehicle | insurance | medical | business | family | other
   mimeType   String    @map("mime_type") @db.VarChar(100)

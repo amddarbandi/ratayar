@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Delete, Param, UseGuards, Req,
+  Controller, Get, Post, Delete, Patch, Param, UseGuards, Req,
   Query, UploadedFile, UseInterceptors, HttpCode, HttpStatus,
   Body, BadRequestException, Res, ParseUUIDPipe,
 } from '@nestjs/common';
@@ -17,16 +17,8 @@ export class DocumentsController {
 
   @Post('upload')
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', {
-    limits: { fileSize: 50 * 1024 * 1024 },
-  }))
-  upload(
-    @Req() req: any,
-    @UploadedFile() file: Express.Multer.File,
-    @Body('type') type: string,
-    @Body('name') name?: string,
-    @Body('expiresAt') expiresAt?: string,
-  ) {
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 50 * 1024 * 1024 } }))
+  upload(@Req() req: any, @UploadedFile() file: Express.Multer.File, @Body('type') type: string, @Body('name') name?: string, @Body('expiresAt') expiresAt?: string) {
     if (!type) throw new BadRequestException('نوع سند الزامی است');
     return this.documents.upload(req.user.userId, file, type, name, expiresAt);
   }
@@ -51,19 +43,12 @@ export class DocumentsController {
     const file = await this.documents.stream(req.user.userId, id);
     res.setHeader('Content-Type', file.mimeType);
     res.setHeader('Content-Length', file.size);
-    res.setHeader(
-      'Content-Disposition',
-      `inline; filename="${encodeURIComponent(file.name)}"`,
-    );
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.name)}"`);
     file.stream.pipe(res);
   }
 
   @Get(':id/download')
-  getDownloadUrl(
-    @Req() req: any,
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Query('inline') inline?: string,
-  ) {
+  getDownloadUrl(@Req() req: any, @Param('id', new ParseUUIDPipe()) id: string, @Query('inline') inline?: string) {
     return this.documents.getDownloadUrl(req.user.userId, id, inline === 'true');
   }
 
@@ -71,5 +56,16 @@ export class DocumentsController {
   @HttpCode(HttpStatus.OK)
   remove(@Req() req: any, @Param('id', new ParseUUIDPipe()) id: string) {
     return this.documents.remove(req.user.userId, id);
+  }
+
+  // --- مسیرهای ادمین (در محیط واقعی باید با AdminGuard محافظت شوند) ---
+  @Patch(':id/approve')
+  approve(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.documents.approve(id);
+  }
+
+  @Patch(':id/reject')
+  reject(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.documents.reject(id);
   }
 }

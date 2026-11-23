@@ -191,6 +191,8 @@ export const documentsApi = {
   download: (id: string) => api.get(`/documents/${id}/download`),
   remove: (id: string) => api.delete(`/documents/${id}`),
 
+  approve: (id: string) => api.patch(`/documents/${id}/approve`),
+  reject: (id: string) => api.patch(`/documents/${id}/reject`),
   upload: (file: File, type: string, name?: string, expiresAt?: string) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -451,6 +453,8 @@ export const adminApi = {
     return api.get(`/admin/documents${qs}`);
   },
   deleteDocument: (id: string) => api.delete(`/admin/documents/${id}`),
+  approveDocument: (id: string) => api.patch(`/documents/${id}/approve`),
+  rejectDocument: (id: string) => api.patch(`/documents/${id}/reject`),
   obligations: (params?: Record<string, string | number | undefined>) => {
     const qs = buildQs(params);
     return api.get(`/admin/obligations${qs}`);

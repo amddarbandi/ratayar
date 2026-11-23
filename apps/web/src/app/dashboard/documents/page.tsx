@@ -570,7 +570,7 @@ function UploadModal({ onClose, onSuccess }: any) {
 
       clearInterval(interval);
       setProgress(100);
-      toast.success('سند آپلود شد ✅');
+      toast.success('سند آپلود شد. در انتظار تایید ادمین/هوش مصنوعی است ⏳');
       onSuccess();
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'خطا در آپلود');
