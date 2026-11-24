@@ -42,13 +42,112 @@ const CAT_COLOR: Record<string, string> = {
   crypto: 'from-purple-500 to-fuchsia-500',
 };
 
-const SYMBOL_BG: Record<string, string> = {
-  USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', AED: '🇦🇪', TRY: '🇹🇷',
-  BTC: '₿', ETH: 'Ξ', USDT: '₮', BNB: 'B', SOL: 'S',
-  XRP: 'X', TRX: 'T', DOGE: 'Ð', ADA: 'A', XAUT: 'Au',
-  GOLD18: 'Au', GOLD24: 'Au', MESGHAL: 'M', XAU: 'Au',
-  SEKKE_EMAMI: '🪙', SEKKE_BAHAR: '🪙', NIM: '🪙', ROB: '🪙',
+// CDN برای آیکون‌های واقعی
+const CRYPTO_CDN = 'https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color';
+const FLAG_CDN = 'https://flagcdn.com/w160';
+
+const IMAGE_ICONS: Record<string, string> = {
+  // ارز دیجیتال
+  BTC: `${CRYPTO_CDN}/btc.png`,
+  ETH: `${CRYPTO_CDN}/eth.png`,
+  USDT: `${CRYPTO_CDN}/usdt.png`,
+  BNB: `${CRYPTO_CDN}/bnb.png`,
+  SOL: `${CRYPTO_CDN}/sol.png`,
+  XRP: `${CRYPTO_CDN}/xrp.png`,
+  TRX: `${CRYPTO_CDN}/trx.png`,
+  DOGE: `${CRYPTO_CDN}/doge.png`,
+  ADA: `${CRYPTO_CDN}/ada.png`,
+  // فیات (پرچم)
+  USD: `${FLAG_CDN}/us.png`,
+  EUR: `${FLAG_CDN}/eu.png`,
+  GBP: `${FLAG_CDN}/gb.png`,
+  AED: `${FLAG_CDN}/ae.png`,
+  TRY: `${FLAG_CDN}/tr.png`,
 };
+
+const EMOJI_FALLBACK: Record<string, string> = {
+  XAUT: '🪙',
+  GOLD18: '🥇',
+  GOLD24: '🏆',
+  MESGHAL: '⚖️',
+  XAU: '🪙',
+  SEKKE_EMAMI: '👑',
+  SEKKE_BAHAR: '🌸',
+  NIM: '🪙',
+  ROB: '🪙',
+};
+
+// ═══════════════════════════════════════════
+// SymbolIcon — آیکون هوشمند
+// ═══════════════════════════════════════════
+function SymbolIcon({ symbol, category }: { symbol: string; category: string }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const imageUrl = IMAGE_ICONS[symbol];
+
+  // لایه ۱: تصویر واقعی
+  if (imageUrl && !imgFailed) {
+    return (
+      <div className="w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden p-1 shrink-0">
+        <img
+          src={imageUrl}
+          alt={symbol}
+          className="w-full h-full object-contain"
+          onError={() => setImgFailed(true)}
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
+  // لایه ۲: نقره (اگر روزی به دیتا اضافه شد)
+  if (symbol === 'XAG' || symbol === 'SILVER') {
+    return (
+      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-slate-200 via-slate-300 to-slate-500 flex items-center justify-center shadow-lg shadow-slate-400/30 shrink-0">
+        <svg viewBox="0 0 24 24" className="w-7 h-7">
+          <path d="M3.5 14.5L6 7h12l2.5 7.5L18 17H6l-2.5-2.5z" fill="#334155" fillOpacity="0.3" />
+          <text x="12" y="14.8" textAnchor="middle" fontSize="6" fontWeight="bold" fill="#334155">Ag</text>
+        </svg>
+      </div>
+    );
+  }
+
+  // لایه ۳: دسته طلا → شمش طلا
+  if (category === 'gold') {
+    return (
+      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
+        <svg viewBox="0 0 24 24" className="w-7 h-7">
+          <path d="M3.5 14.5L6 7h12l2.5 7.5L18 17H6l-2.5-2.5z" fill="#78350f" fillOpacity="0.3" />
+          <text x="12" y="14.8" textAnchor="middle" fontSize="6" fontWeight="bold" fill="#78350f">Au</text>
+        </svg>
+      </div>
+    );
+  }
+
+  // لایه ۴: دسته سکه → سکه طلا
+  if (category === 'coin') {
+    return (
+      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30 shrink-0">
+        <svg viewBox="0 0 24 24" className="w-7 h-7">
+          <circle cx="12" cy="12" r="9" fill="#fbbf24" stroke="#78350f" strokeWidth="1" />
+          <circle cx="12" cy="12" r="6.5" fill="#fde047" stroke="#b45309" strokeWidth="0.5" />
+          <text x="12" y="15" textAnchor="middle" fontSize="5" fontWeight="bold" fill="#78350f">IR</text>
+        </svg>
+      </div>
+    );
+  }
+
+  // لایه نهایی: ایموجی/متن
+  return (
+    <div
+      className={cn(
+        'w-11 h-11 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-bold text-lg shrink-0',
+        CAT_COLOR[category] || 'from-purple-500 to-pink-500',
+      )}
+    >
+      {EMOJI_FALLBACK[symbol] || symbol.slice(0, 2)}
+    </div>
+  );
+}
 
 export default function MarketPage() {
   const [data, setData] = useState<Payload | null>(null);
@@ -84,12 +183,10 @@ export default function MarketPage() {
 
   return (
     <div className="relative min-h-screen pt-28 pb-16 md:pt-32 md:pb-24 overflow-hidden">
-      {/* Background Glows */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-amber-500/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
       <div className="fixed bottom-0 right-0 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
-      
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl space-y-6 relative z-10">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
@@ -112,7 +209,6 @@ export default function MarketPage() {
           </button>
         </div>
 
-        {/* USD hero */}
         {data && (
           <Card>
             <CardContent className="p-6">
@@ -125,15 +221,13 @@ export default function MarketPage() {
                   </div>
                 </div>
                 <div className="text-xs text-white/40">
-                  آخرین به‌روزرسانی:{' '}
-                  {new Date(data.fetchedAt).toLocaleTimeString('fa-IR')}
+                  آخرین به‌روزرسانی: {new Date(data.fetchedAt).toLocaleTimeString('fa-IR')}
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* Filter tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {CATEGORIES.map((c) => (
             <button
@@ -152,7 +246,6 @@ export default function MarketPage() {
           ))}
         </div>
 
-        {/* Cards grid */}
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -197,18 +290,9 @@ function PriceCard({ item, delay }: { item: Item; delay: number }) {
       <div className="relative">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div
-              className={cn(
-                'w-11 h-11 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-bold text-lg',
-                CAT_COLOR[item.category],
-              )}
-            >
-              {SYMBOL_BG[item.symbol] || item.symbol.slice(0, 2)}
-            </div>
+            <SymbolIcon symbol={item.symbol} category={item.category} />
             <div>
-              <div className="text-white font-bold text-sm leading-tight">
-                {item.label}
-              </div>
+              <div className="text-white font-bold text-sm leading-tight">{item.label}</div>
               <div className="text-white/40 text-xs font-mono" dir="ltr">
                 {item.symbol}
               </div>
