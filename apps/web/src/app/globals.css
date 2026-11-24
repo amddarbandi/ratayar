@@ -153,3 +153,9 @@ a,
 [role='button'] {
   touch-action: manipulation;
 }
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

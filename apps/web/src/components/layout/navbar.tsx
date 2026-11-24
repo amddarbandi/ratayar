@@ -13,9 +13,8 @@ const navLinks = [
   { href: '#pricing', label: 'قیمت‌ها' },
   { href: '#about', label: 'درباره ما' },
   { href: '/dashboard/converters', label: 'تبدیل' },
-  { href: '/dashboard/market', label: 'بازار' },
+  { href: '/market', label: 'بازار (طلا/دلار/ارزدیجیتال)' },
   { href: '/dashboard/calendar', label: 'تقویم' },
-  { href: '/dashboard/network', label: 'IP' },
 ];
 
 export function Navbar() {
@@ -54,16 +53,42 @@ export function Navbar() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="relative px-4 py-2 text-sm text-white/70 hover:text-white transition-colors group"
-              >
-                {link.label}
-                <span className="absolute bottom-0 right-1/2 translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-cyan-400 group-hover:w-1/2 transition-all duration-300 rounded-full" />
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isMarket = link.href === '/market';
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "relative px-4 py-2 text-sm transition-colors group overflow-hidden rounded-lg",
+                    isMarket ? "font-bold text-amber-300 hover:text-amber-200" : "text-white/70 hover:text-white"
+                  )}
+                >
+                  {isMarket ? (
+                    <motion.span
+                      animate={{
+                        scale: [1, 1.05, 1],
+                        textShadow: [
+                          "0 0 0px rgba(251,191,36,0)",
+                          "0 0 10px rgba(251,191,36,0.8)",
+                          "0 0 0px rgba(251,191,36,0)"
+                        ]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="relative z-10 inline-block"
+                    >
+                      {link.label}
+                    </motion.span>
+                  ) : (
+                    link.label
+                  )}
+                  {isMarket && (
+                    <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-amber-400/30 to-transparent animate-[shimmer_2s_infinite]" />
+                  )}
+                  <span className="absolute bottom-0 right-1/2 translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-cyan-400 group-hover:w-1/2 transition-all duration-300 rounded-full" />
+                </Link>
+              );
+            })}
           </nav>
 
           {/* CTAs */}
